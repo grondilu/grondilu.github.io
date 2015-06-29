@@ -128,22 +128,22 @@
         gl.bindTexture(gl.TEXTURE_2D, null);
 
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, neheTexture);
+        gl.bindTexture(gl.TEXTURE_2D, cobraTexture);
         gl.uniform1i(shaderProgram.samplerUniform, 0);
 
     }
 
 
-    var neheTexture;
+    var cobraTexture;
 
     function initTexture() {
-        neheTexture = gl.createTexture();
-        neheTexture.image = new Image();
-        neheTexture.image.onload = function () {
-            handleLoadedTexture(neheTexture)
+        cobraTexture = gl.createTexture();
+        cobraTexture.image = new Image();
+        cobraTexture.image.onload = function () {
+            handleLoadedTexture(cobraTexture)
         }
 
-        neheTexture.image.src = "../images/textures/cobra3_redux.png";
+        cobraTexture.image.src = "../images/textures/cobra3_redux.png";
     }
 
 
@@ -173,13 +173,13 @@
 
     function degToRad(degrees) { return degrees * Math.PI / 180; }
 
-    var cubeVertexPositionBuffer;
-    var cubeVertexTextureCoordBuffer;
-    var cubeVertexIndexBuffer;
+    var cobraVertexPositionBuffer;
+    var cobraVertexTextureCoordBuffer;
+    var cobraVertexIndexBuffer;
 
     function initBuffers() {
-        cubeVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+        cobraVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cobraVertexPositionBuffer);
         vertices = [
 	    0.00000, 15.00000, 0.00000,
 	    16.00000, -0.50000, 32.50000,
@@ -195,11 +195,11 @@
 	    0.00000, 15.00000, -32.50000
         ];
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        cubeVertexPositionBuffer.itemSize = 3;
-        cubeVertexPositionBuffer.numItems = 12;
+        cobraVertexPositionBuffer.itemSize = 3;
+        cobraVertexPositionBuffer.numItems = 12;
 
-        cubeVertexTextureCoordBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
+        cobraVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cobraVertexTextureCoordBuffer);
         var textureCoords = [
 	    0.597272, 0.403270, 0.807101, 0.501509, 0.989045, 0.235094,
 	    0.597150, 0.599785, 0.807101, 0.501509, 0.597272, 0.403270,
@@ -223,12 +223,12 @@
 	    0.997979, 0.501436, 0.807101, 0.501509, 0.989458, 0.768069
         ];
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-        cubeVertexTextureCoordBuffer.itemSize = 2;
-        cubeVertexTextureCoordBuffer.numItems = 60;
+        cobraVertexTextureCoordBuffer.itemSize = 2;
+        cobraVertexTextureCoordBuffer.numItems = 60;
 
-        cubeVertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-        var cubeVertexIndices = [
+        cobraVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cobraVertexIndexBuffer);
+        var cobraVertexIndices = [
 	    1,0,8,
 	    2,0,1,
 	    3,1,9,
@@ -250,9 +250,9 @@
 	    9,10,3,
 	    11,0,5
         ];
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
-        cubeVertexIndexBuffer.itemSize = 1;
-        cubeVertexIndexBuffer.numItems = 60;
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cobraVertexIndices), gl.STATIC_DRAW);
+        cobraVertexIndexBuffer.itemSize = 1;
+        cobraVertexIndexBuffer.numItems = 60;
     }
 
 
@@ -274,15 +274,15 @@
         mat4.rotate(mvMatrix, degToRad(yRot), [0, 1, 0]);
         mat4.rotate(mvMatrix, degToRad(zRot), [0, 0, 1]);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, cobraVertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cobraVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, cobraVertexTextureCoordBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cobraVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cobraVertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, cobraVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
     }
 
 
