@@ -127,23 +127,34 @@
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.bindTexture(gl.TEXTURE_2D, null);
 
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, shipTexture);
-        gl.uniform1i(shaderProgram.samplerUniform, 0);
-
     }
 
 
-    var shipTexture;
+    var cobra3Texture;
+    var anacondaTexture;
 
     function initTexture() {
-        shipTexture = gl.createTexture();
-        shipTexture.image = new Image();
-        shipTexture.image.onload = function () {
-        handleLoadedTexture(shipTexture)
+        cobra3Texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, cobra3Texture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+		              new Uint8Array([255, 0, 0, 255]));
+        cobra3Texture.image = new Image();
+        cobra3Texture.image.onload = function () {
+        handleLoadedTexture(cobra3Texture)
         }
 
-        shipTexture.image.src = mesh.texture.image;
+        cobra3Texture.image.src = ships.cobra3._texture.image;
+
+        anacondaTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, anacondaTexture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+		              new Uint8Array([0, 255, 0, 255]));
+        anacondaTexture.image = new Image();
+        anacondaTexture.image.onload = function () {
+        handleLoadedTexture(anacondaTexture)
+        }
+
+        anacondaTexture.image.src = ships.anaconda._texture.image;
     }
 
 
@@ -173,22 +184,20 @@
 
     function degToRad(degrees) { return degrees * Math.PI / 180; }
 
-    var shipVertexPositionBuffer;
-    var shipVertexTextureCoordBuffer;
-    var shipVertexIndexBuffer;
-
     var ships = {
 	asp : {
+		  yPos : -500,
 	        vertices : [ 21.5,-8,7,0,-10,-7,-21.5,-8,7,-13,-2.5,35,13,-2.5,35,32.5,0,-7,21.5,0,-35,0,-5,-35,-21.5,0,-35,-32.5,0,-7,21.5,10,7,13,-2.5,35,-13,-2.5,35,-21.5,10,7,21.5,0,-35,32.5,0,-7,0,5,-35,-32.5,0,-7,-21.5,0,-35,0,5,-35,-21.5,0,-35,0,-5,-35,21.5,0,-35 ],
-	        texture : {
+	        _texture : {
 	    image : "../images/textures/asp_redux.png",
 		    coord : [ 0.378185,0.312275,0.250456,0.226598,0.122831,0.312431,0.16598,0.491073,0.335254,0.490969,0.466446,0.230464,0.393557,0.049784,0.250349,0.050841,0.107139,0.049959,0.034471,0.230727,0.367882,0.718161,0.332607,0.537745,0.167974,0.537739,0.132686,0.718153,0.391203,0.966681,0.462924,0.788937,0.250276,0.967303,0.03764,0.788922,0.109348,0.966672,0.782443,0.900531,0.620595,0.93817,0.782443,0.975809,0.944292,0.93817 ]
 			   },
 	        faces    : [ 0,1,2,2,3,4,2,4,0,0,5,6,0,6,7,7,1,0,2,1,7,7,8,2,8,9,2,10,11,12,10,12,13,14,15,10,16,14,10,13,17,18,13,18,16,19,20,21,19,21,22,0,4,5,9,3,2,15,11,10,13,12,17,13,16,10 ]
 	},
     anaconda : {
+		  yPos : 500,
 	   vertices : [ -13,-30,-57.5,13,-30,-57.5,0,0,-85,-13,-30,-57.5,-22,-11,-75,-37.5,3.5,-64,22,-11,-75,37.5,3.5,-64,-22,-11,-75,0,27.5,-80,-21.5,30,-67.5,-37.5,3.5,-64,37.5,3.5,-64,13,-30,-57.5,22,-26,-36,22,-11,-75,21.5,30,-67.5,21.5,30,-67.5,37.5,3.5,-64,37.5,-4,-40,13,-30,-57.5,-13,-30,-57.5,-22,-26,-36,37.5,-4,-40,0,-4,85,0,-4,85,-37.5,-4,-40,-37.5,-4,-40,-37.5,3.5,-64,-21.5,30,-67.5,0,27.5,-80 ],
-	   texture : {
+	   _texture : {
 	    image : "../images/textures/anaconda_redux.png",
 	    coord : [ 0.195154,0.986773,0.302596,0.986773,0.248875,0.829083,0.673388,0.053827,0.575818,0.001525,0.503822,0.066156,0.339568,0.879751,0.418284,0.819471,0.158181,0.879751,0.248875,0.719775,0.144697,0.707556,0.079466,0.819471,0.993275,0.06605,0.823703,0.053795,0.837602,0.148488,0.921251,0.00145,0.353053,0.707556,0.336188,0.6334,0.454245,0.589148,0.455331,0.487391,0.801159,0.05999,0.695935,0.060013,0.65953,0.148526,0.947393,0.156882,0.748673,0.646233,0.249386,0.001037,0.549743,0.156968,0.043118,0.487254,0.044136,0.589011,0.162163,0.633342,0.249158,0.684961 ]
 	   },
@@ -196,8 +205,9 @@
 	   flip_y   : false
     },
     cobra3 : {
+		  yPos : 0,
 	   vertices : [ 16,-0.5,32.5,0,15,0,44,10,-32.5,-16,-0.5,32.5,16,-15,-32.5,60,-3,-13,-16,-15,-32.5,-65,-3,-32.5,-60,-3,-13,-44,10,-32.5,-60,-3,-13,-65,-3,-32.5,0,15,-32.5,44,10,-32.5,0,15,-32.5,-44,10,-32.5,-65,-3,-32.5,65,-3,-32.5,60,-3,-13,65,-3,-32.5,65,-3,-32.5 ],
-	   texture : {
+	   _texture : {
 	    image : "../images/textures/cobra3_redux_flipped.png",
 	    coord : [ 0.597272,0.40327,0.807101,0.501509,0.989045,0.235094,0.59715,0.599785,0.187142,0.402521,0.320941,0.127925,0.187173,0.59978,0.201678,0.91,0.320416,0.874519,0.989458,0.768069,0.85732,0.874027,0.970709,0.914429,0.997979,0.501436,0.03188,0.22963,0.001961,0.501656,0.033533,0.772816,0.114031,0.902052,0.111804,0.099227,0.85704,0.129422,0.970035,0.089156,0.202224,0.092212 ]
 	   },
@@ -207,8 +217,9 @@
 	     },
 
 constrictor : {
+		  yPos : 1000,
       vertices : [ -10,5,-7.5,-10,-5,30,-27,-5,10,10,5,-7.5,10,-5,30,27,-5,10,-27,-5,-30,-10,5,-30,27,-5,-30,10,5,-30,27,-5,-30,-27,-5,-30,-27,-5,10,27,-5,10,27,-5,-30,-27,-5,-30 ],
-     texture : {
+     _texture : {
 	 image :  "../images/textures/constrictor_redux.png",
 	  coord : [ 0.251369,0.423332,0.540432,0.423332,0.393136,0.287552,0.251369,0.573917,0.540432,0.573917,0.393136,0.709482,0.086999,0.287552,0.086999,0.423332,0.086999,0.709482,0.086999,0.573917,0.995316,0.709482,0.995316,0.287552,0.692008,0.287552,0.692008,0.709482,0.006135,0.709482,0.006135,0.287552 ]
 	    },
@@ -216,34 +227,60 @@ constrictor : {
 	      }
     };
 
-    var mesh;
+    var cobra3VertexPositionBuffer;
+    var cobra3VertexTextureCoordBuffer;
+    var cobra3VertexIndexBuffer;
 
-    mesh = ships.anaconda;
+    var anacondaVertexPositionBuffer;
+    var anacondaVertexTextureCoordBuffer;
+    var anacondaVertexIndexBuffer;
 
     function initBuffers() {
-        shipVertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, shipVertexPositionBuffer);
-        vertices = mesh.vertices;
+        cobra3VertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cobra3VertexPositionBuffer);
+        vertices = ships.cobra3.vertices;
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-        shipVertexPositionBuffer.itemSize = 3;
-        shipVertexPositionBuffer.numItems = Math.floor(mesh.vertices.length / 3);
+        cobra3VertexPositionBuffer.itemSize = 3;
+        cobra3VertexPositionBuffer.numItems = Math.floor(ships.cobra3.vertices.length / 3);
 
-        shipVertexTextureCoordBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, shipVertexTextureCoordBuffer);
-        var textureCoords = mesh.texture.coord;
+        cobra3VertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, cobra3VertexTextureCoordBuffer);
+        var textureCoords = ships.cobra3._texture.coord;
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
-        shipVertexTextureCoordBuffer.itemSize = 2;
-        shipVertexTextureCoordBuffer.numItems = Math.floor(mesh.texture.coord.length / 2);
+        cobra3VertexTextureCoordBuffer.itemSize = 2;
+        cobra3VertexTextureCoordBuffer.numItems = Math.floor(ships.cobra3._texture.coord.length / 2);
 
-        shipVertexIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shipVertexIndexBuffer);
-        var shipVertexIndices = mesh.faces;
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(shipVertexIndices), gl.STATIC_DRAW);
-        shipVertexIndexBuffer.itemSize = 1;
-        shipVertexIndexBuffer.numItems = mesh.faces.length;
+        cobra3VertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cobra3VertexIndexBuffer);
+        var cobra3VertexIndices = ships.cobra3.faces;
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cobra3VertexIndices), gl.STATIC_DRAW);
+        cobra3VertexIndexBuffer.itemSize = 1;
+        cobra3VertexIndexBuffer.numItems = ships.cobra3.faces.length;
+
+        anacondaVertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, anacondaVertexPositionBuffer);
+        vertices = ships.anaconda.vertices;
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        anacondaVertexPositionBuffer.itemSize = 3;
+        anacondaVertexPositionBuffer.numItems = Math.floor(ships.anaconda.vertices.length / 3);
+
+        anacondaVertexTextureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, anacondaVertexTextureCoordBuffer);
+        var textureCoords = ships.anaconda._texture.coord;
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+        anacondaVertexTextureCoordBuffer.itemSize = 2;
+        anacondaVertexTextureCoordBuffer.numItems = Math.floor(ships.anaconda._texture.coord.length / 2);
+
+        anacondaVertexIndexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, anacondaVertexIndexBuffer);
+        var anacondaVertexIndices = ships.anaconda.faces;
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(anacondaVertexIndices), gl.STATIC_DRAW);
+        anacondaVertexIndexBuffer.itemSize = 1;
+        anacondaVertexIndexBuffer.numItems = ships.anaconda.faces.length;
     }
 
 
+    var yPos = 0;
     var xRot = 0;
     var yRot = 0;
     var zRot = 0;
@@ -252,25 +289,51 @@ constrictor : {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 200.0, pMatrix);
+        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 1000.0, pMatrix);
 
         mat4.identity(mvMatrix);
 
-        mat4.translate(mvMatrix, [0.0, 0.0, -150.0]);
+        mat4.translate(mvMatrix, [-150.0, 0.0, -600.0]);
 
         mat4.rotate(mvMatrix, degToRad(xRot), [1, 0, 0]);
         mat4.rotate(mvMatrix, degToRad(yRot), [0, 1, 0]);
         mat4.rotate(mvMatrix, degToRad(zRot), [0, 0, 1]);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, shipVertexPositionBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, shipVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, cobra3VertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, cobra3VertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, shipVertexTextureCoordBuffer);
-        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, shipVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, cobra3VertexTextureCoordBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, cobra3VertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shipVertexIndexBuffer);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, cobra3Texture);
+        gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cobra3VertexIndexBuffer);
         setMatrixUniforms();
-        gl.drawElements(gl.TRIANGLES, shipVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, cobra3VertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+        mat4.identity(mvMatrix);
+
+        mat4.translate(mvMatrix, [150.0, 0.0, -600.0]);
+
+        mat4.rotate(mvMatrix, degToRad(xRot), [1, 0, 0]);
+        mat4.rotate(mvMatrix, degToRad(yRot), [0, 1, 0]);
+        mat4.rotate(mvMatrix, degToRad(zRot), [0, 0, 1]);
+        gl.bindBuffer(gl.ARRAY_BUFFER, anacondaVertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, anacondaVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, anacondaVertexTextureCoordBuffer);
+        gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, anacondaVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, anacondaTexture);
+        gl.uniform1i(shaderProgram.samplerUniform, 0);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, anacondaVertexIndexBuffer);
+        setMatrixUniforms();
+        gl.drawElements(gl.TRIANGLES, anacondaVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
     }
 
 
@@ -311,10 +374,7 @@ constrictor : {
 
 function changeship() {
     var selector = document.getElementById("shipSelector");
-    var ship = selector.options[selector.selectedIndex].value;
-    mesh = ships[ship];
-    initBuffers();
-    initTexture();
+    yPos = ships[selector.options[selector.selectedIndex].value].yPos;
 }
 
 </script>
