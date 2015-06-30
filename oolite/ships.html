@@ -312,9 +312,9 @@ var ships = {
         if (lastTime != 0) {
             var elapsed = timeNow - lastTime;
 
-            xRot += (7 * elapsed) / 1000.0;
-            yRot += (15 * elapsed) / 1000.0;
-            zRot += (3 * elapsed) / 1000.0;
+            xRot += (xRotRate.value * elapsed) / 1000.0;
+            yRot += (yRotRate.value * elapsed) / 1000.0;
+            zRot += (zRotRate.value * elapsed) / 1000.0;
         }
         lastTime = timeNow;
     }
@@ -329,6 +329,9 @@ var ships = {
 
     function webGLStart() {
         var canvas = document.getElementById("lesson05-canvas");
+	xRotRate = document.getElementById("xRotRate");
+	yRotRate = document.getElementById("yRotRate");
+	zRotRate = document.getElementById("zRotRate");
         initGL(canvas);
         initShaders();
         initBuffers();
@@ -411,6 +414,9 @@ var ships = {
 	    <option value=krait>Krait</option>
 	    <option value=python>Python</option>
 	</select>
+	<input type=range id=xRotRate min=0 max=50 value=0 />
+	<input type=range id=yRotRate min=0 max=50 value=0 />
+	<input type=range id=zRotRate min=0 max=50 value=0 />
     </form>
 </body>
 
