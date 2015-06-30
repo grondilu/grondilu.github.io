@@ -55,6 +55,7 @@
 <script type="text/javascript">
 
     var gl;
+    var HUD;
     var images = {};
     var shipSelector;
 
@@ -285,6 +286,8 @@ var ships = {
     }
 
 
+    var Roll;
+    var Pitch;
     var xRot = 0;
     var yRot = 0;
     var zRot = 0;
@@ -327,9 +330,9 @@ var ships = {
         if (lastTime != 0) {
             var elapsed = timeNow - lastTime;
 
-            xRot += (xRotRate.value * elapsed) / 1000.0;
-            yRot += (yRotRate.value * elapsed) / 1000.0;
-            zRot += (zRotRate.value * elapsed) / 1000.0;
+            xRot += (Pitch.value * elapsed) / 1000.0;
+            //yRot += (Yaw.value * elapsed) / 1000.0;
+            zRot += (Roll.value * elapsed) / 1000.0;
         }
         lastTime = timeNow;
     }
@@ -344,9 +347,6 @@ var ships = {
 
     function webGLStart() {
         var canvas = document.getElementById("webGL-canvas");
-	xRotRate = document.getElementById("xRotRate");
-	yRotRate = document.getElementById("yRotRate");
-	zRotRate = document.getElementById("zRotRate");
         initGL(canvas);
         initShaders();
         initBuffers();
@@ -360,6 +360,9 @@ var ships = {
 
     function start() {
 	shipSelector = document.getElementById("shipSelector");
+	Roll = document.getElementById("Roll");
+	Pitch = document.getElementById("Pitch");
+	HUD = document.getElementById("HUD").getContext("2d");
 	var image_urls = [];
 	for (var i in ships) {
 	    image_urls.push(url = ships[i]._texture.image);
@@ -433,9 +436,8 @@ var ships = {
 	    <option value=krait>Krait</option>
 	    <option value=python>Python</option>
 	</select><br>
-	<label for=xRotRate>x</label><input type=range id=xRotRate min=-180 max=180 value=0 />
-	<label for=yRotRate>y</label><input type=range id=yRotRate min=-180 may=180 value=0 />
-	<label for=zRotRate>z</label><input type=range id=zRotRate min=-180 maz=180 value=0 />
+	<label for=Pitch>Pitch</label><input type=range id=Pitch min=-180 max=180 value=0 />
+	<label for=Roll>Roll</label><input type=range id=Roll min=-180 may=180 value=0 />
     </form>
 </body>
 
