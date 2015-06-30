@@ -286,8 +286,8 @@ var ships = {
     }
 
 
-    var Roll;
-    var Pitch;
+    var Roll = 0;
+    var Pitch = 0;
     var xRot = 0;
     var yRot = 0;
     var zRot = 0;
@@ -330,9 +330,9 @@ var ships = {
         if (lastTime != 0) {
             var elapsed = timeNow - lastTime;
 
-            xRot += (Pitch.value * elapsed) / 1000.0;
-            //yRot += (Yaw.value * elapsed) / 1000.0;
-            zRot += (Roll.value * elapsed) / 1000.0;
+            xRot += (Pitch * elapsed) / 1000.0;
+            //yRot += (Yaw * elapsed) / 1000.0;
+            zRot += (Roll * elapsed) / 1000.0;
         }
         lastTime = timeNow;
     }
@@ -340,10 +340,46 @@ var ships = {
 
     function tick() {
         requestAnimFrame(tick);
+	handleKeys();
         drawScene();
         animate();
     }
 
+    var currentlyPressedKeys = {};
+
+    function handleKeyDown(event) {
+	currentlyPressedKeys[event.keyCode] = true;
+
+	if (String.fromCharCode(event.keyCode) == "F") {
+	    filter += 1;
+	    if (filter == 3) {
+		filter = 0;
+	    }
+	}
+    }
+
+    function handleKeyUp(event) {
+	currentlyPressedKeys[event.keyCode] = false;
+    }
+
+    function handleKeys() {
+	if (currentlyPressedKeys[37]) {
+	    // Left cursor key
+	    Roll -= 1;
+	}
+	if (currentlyPressedKeys[39]) {
+	    // Right cursor key
+	    Roll += 1;
+	}
+	if (currentlyPressedKeys[38]) {
+	    // Up cursor key
+	    Pitch += 1;
+	}
+	if (currentlyPressedKeys[40]) {
+	    // Down cursor key
+	    Pitch -= 1;
+	}
+    }
 
     function webGLStart() {
         var canvas = document.getElementById("webGL-canvas");
@@ -360,13 +396,14 @@ var ships = {
 
     function start() {
 	shipSelector = document.getElementById("shipSelector");
-	Roll = document.getElementById("Roll");
-	Pitch = document.getElementById("Pitch");
+	document.onkeydown = handleKeyDown;
+	document.onkeyup = handleKeyUp;
 	HUD = document.getElementById("HUD").getContext("2d");
 	var image_urls = [];
 	for (var i in ships) {
 	    image_urls.push(url = ships[i]._texture.image);
 	}
+
 	loadImages(image_urls, webGLStart);
     }
 
@@ -416,7 +453,9 @@ var ships = {
     <a href="https://github.com/OoliteProject/oolite-binary-resources/blob/master/Models/">gihub</a>.
     In order to turn these models into webGL I used this <a href="https://gist.github.com/grondilu/aa164666244e3fdeee8e">Perl6 script</a>.</p>
 
-    <p>Use the sliders to make the model turn.</p>
+    <p>Use the arrow keys for pitch and roll.</p>
+
+    <p>You may have to wait a few seconds until the textures are loaded.</p>
 
     <div class=container id=viewscreen>
 	<canvas id="webGL-canvas" style="border: none;" width=500 height=500></canvas>
@@ -435,9 +474,7 @@ var ships = {
 	    <option value=constrictor>Constrictor</option>
 	    <option value=krait>Krait</option>
 	    <option value=python>Python</option>
-	</select><br>
-	<label for=Pitch>Pitch</label><input type=range id=Pitch min=-180 max=180 value=0 />
-	<label for=Roll>Roll</label><input type=range id=Roll min=-180 may=180 value=0 />
+	</select>
     </form>
 </body>
 
