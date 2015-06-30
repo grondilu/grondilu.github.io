@@ -3,6 +3,21 @@
 
 <head>
 <title>grondilu is learning WebGL</title>
+<style>
+    .container {
+	position: relative;
+    }
+
+    #HUD {
+	position: absolute;
+	border:   none;
+	left:     0px;
+	top:    350px;
+	z-index:   10;
+    }
+</style>
+
+
 <meta charset="utf-8">
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
@@ -328,7 +343,7 @@ var ships = {
 
 
     function webGLStart() {
-        var canvas = document.getElementById("lesson05-canvas");
+        var canvas = document.getElementById("webGL-canvas");
 	xRotRate = document.getElementById("xRotRate");
 	yRotRate = document.getElementById("yRotRate");
 	zRotRate = document.getElementById("zRotRate");
@@ -400,8 +415,10 @@ var ships = {
 
     <p>Use the sliders to make the model turn.</p>
 
-    <canvas id="lesson05-canvas" style="border: none;" width="500"
-    height="500"></canvas>
+    <div class=container id=viewscreen>
+	<canvas id="webGL-canvas" style="border: none;" width=500 height=500></canvas>
+	<canvas id="HUD" width=500 height=150></canvas>
+    </div>
 
     <form>
 	<select id=shipSelector>
@@ -415,10 +432,10 @@ var ships = {
 	    <option value=constrictor>Constrictor</option>
 	    <option value=krait>Krait</option>
 	    <option value=python>Python</option>
-	</select>
-	<input type=range id=xRotRate min=0 max=50 value=0 />
-	<input type=range id=yRotRate min=0 max=50 value=0 />
-	<input type=range id=zRotRate min=0 max=50 value=0 />
+	</select><br>
+	<label for=xRotRate>x</label><input type=range id=xRotRate min=-180 max=180 value=0 />
+	<label for=yRotRate>y</label><input type=range id=yRotRate min=-180 may=180 value=0 />
+	<label for=zRotRate>z</label><input type=range id=zRotRate min=-180 maz=180 value=0 />
     </form>
 </body>
 
