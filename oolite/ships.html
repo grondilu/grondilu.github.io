@@ -57,7 +57,7 @@
     var gl;
     var HUD;
     var images = {};
-    var shipSelector;
+    var shipSelector,attitudeControlMethodSelector;
 
 var ships = {
     adder : {
@@ -288,6 +288,7 @@ var ships = {
 
     var Roll = 0;
     var Pitch = 0;
+    var Yaw = 0;
     var xRot = 0;
     var yRot = 0;
     var zRot = 0;
@@ -302,9 +303,22 @@ var ships = {
 	mat4.identity(mvMatrix);
 	mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -200.0]);
 
-	mat4.rotate(mvMatrix, mvMatrix, degToRad(xRot), [1, 0, 0]);
-	mat4.rotate(mvMatrix, mvMatrix, degToRad(yRot), [0, 1, 0]);
-	mat4.rotate(mvMatrix, mvMatrix, degToRad(zRot), [0, 0, 1]);
+	if (attitudeControlMethodSelector.options[attitudeControlMethodSelector.selectedIndex].value == 'euler') {
+	    mat4.rotate(mvMatrix, mvMatrix, xRot, [1, 0, 0]);
+	    mat4.rotate(mvMatrix, mvMatrix, yRot, [0, 1, 0]);
+	    mat4.rotate(mvMatrix, mvMatrix, zRot, [0, 0, 1]);
+	} else {
+	    var Q = [Math.sin(xRot/2), 0, 0, Math.cos(xRot/2)];
+	    quat.multiply(Q, Q, [0, Math.sin(yRot/2), 0, Math.cos(yRot/2)]);
+	    quat.multiply(Q, Q, [0, 0, Math.sin(zRot/2), Math.cos(zRot/2)]);
+
+	    var M = mat4.create();
+	    mat4.fromQuat(M, Q);
+	    mat4.multiply(mvMatrix, mvMatrix, M);
+	    quat.invert(Q, Q);
+	    mat4.fromQuat(M, Q);
+	    mat4.multiply(mvMatrix, M, mvMatrix);
+	}
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, ship.vertexPositionBuffer);
 	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, ship.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -325,13 +339,14 @@ var ships = {
     var lastTime = 0;
 
     function animate() {
+	var timescale = 50000;
         var timeNow = new Date().getTime();
         if (lastTime != 0) {
             var elapsed = timeNow - lastTime;
 
-            xRot += (Pitch * elapsed) / 1000.0;
-            //yRot += (Yaw * elapsed) / 1000.0;
-            zRot += (Roll * elapsed) / 1000.0;
+            xRot += (Pitch * elapsed) / timescale;
+            yRot += (Yaw * elapsed) / timescale;
+            zRot += (Roll * elapsed) / timescale;
         }
         lastTime = timeNow;
     }
@@ -395,6 +410,7 @@ var ships = {
 
     function start() {
 	shipSelector = document.getElementById("shipSelector");
+	attitudeControlMethodSelector = document.getElementById("attitudeControlMethodSelector");
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;
 	HUD = document.getElementById("HUD").getContext("2d");
@@ -473,6 +489,10 @@ var ships = {
 	    <option value=constrictor>Constrictor</option>
 	    <option value=krait>Krait</option>
 	    <option value=python>Python</option>
+	</select>
+	<select id=attitudeControlMethodSelector>
+	    <option value=euler>Euler</option>
+	    <option value=quaternion>Quaternions</option>
 	</select>
     </form>
 </body>
