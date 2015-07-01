@@ -314,8 +314,7 @@ var ships = {
 	    quat.multiply(Q, Q, [               0, Math.sin(Yaw/scale),                0, Math.cos(Yaw/scale)]);
 	    quat.multiply(Q, Q, [               0,                0, Math.sin(Roll/scale), Math.cos(Roll/scale)]);
 
-	    mat4.fromQuat(mvMatrix, Q);
-	    mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -200.0]);
+	    mat4.fromRotationTranslation(mvMatrix, Q, [0.0, 0.0, -200.0]);
 	}
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, ship.vertexPositionBuffer);
