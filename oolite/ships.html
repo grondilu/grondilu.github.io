@@ -286,6 +286,7 @@ var ships = {
     }
 
 
+    var Q = [0, 0, 0, 1];
     var Roll = 0;
     var Pitch = 0;
     var Yaw = 0;
@@ -301,23 +302,20 @@ var ships = {
 
 	var ship = ships[shipSelector.options[shipSelector.selectedIndex].value];
 	mat4.identity(mvMatrix);
-	mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -200.0]);
 
 	if (attitudeControlMethodSelector.options[attitudeControlMethodSelector.selectedIndex].value == 'euler') {
+	    mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -200.0]);
 	    mat4.rotate(mvMatrix, mvMatrix, xRot, [1, 0, 0]);
 	    mat4.rotate(mvMatrix, mvMatrix, yRot, [0, 1, 0]);
 	    mat4.rotate(mvMatrix, mvMatrix, zRot, [0, 0, 1]);
 	} else {
-	    var Q = [Math.sin(xRot/2), 0, 0, Math.cos(xRot/2)];
-	    quat.multiply(Q, Q, [0, Math.sin(yRot/2), 0, Math.cos(yRot/2)]);
-	    quat.multiply(Q, Q, [0, 0, Math.sin(zRot/2), Math.cos(zRot/2)]);
+	    var scale = 2000;
+	    quat.multiply(Q, Q, [Math.sin(Pitch/scale),              0,                0, Math.cos(Pitch/scale)]);
+	    quat.multiply(Q, Q, [               0, Math.sin(Yaw/scale),                0, Math.cos(Yaw/scale)]);
+	    quat.multiply(Q, Q, [               0,                0, Math.sin(Roll/scale), Math.cos(Roll/scale)]);
 
-	    var M = mat4.create();
-	    mat4.fromQuat(M, Q);
-	    mat4.multiply(mvMatrix, mvMatrix, M);
-	    quat.invert(Q, Q);
-	    mat4.fromQuat(M, Q);
-	    mat4.multiply(mvMatrix, M, mvMatrix);
+	    mat4.fromQuat(mvMatrix, Q);
+	    mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -200.0]);
 	}
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, ship.vertexPositionBuffer);
@@ -494,6 +492,7 @@ var ships = {
 	    <option value=euler>Euler</option>
 	    <option value=quaternion>Quaternions</option>
 	</select>
+	<output id=value></value>
     </form>
 </body>
 
