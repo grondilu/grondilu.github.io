@@ -432,8 +432,8 @@ escpod :
 	HUD.strokeStyle = "yellow";
 	HUD.clearRect(1, 1, 78, 6);
 	HUD.clearRect(1, 11, 78, 6);
-	HUD.strokeRect(Math.max(Math.min(40 + Pitch, 77), 1), 2, 3, 4);
-	HUD.strokeRect(Math.max(Math.min(40 + Roll, 77), 1), 12, 3, 4);
+	HUD.strokeRect(Math.max(Math.min(40 + Pitch, 75), 1), 2, 3, 4);
+	HUD.strokeRect(Math.max(Math.min(40 + Roll, 75), 1), 12, 3, 4);
 	HUD.restore();
     }
 
@@ -475,9 +475,11 @@ escpod :
 	};
 
 	for (var ii = 0; ii < imagesToLoad; ++ii) {
+	    document.getElementById('debugline').innerHTML = "loading " + urls[ii] + "...";
 	    var image = loadImage(urls[ii], onImageLoad);
 	    images.push(image);
 	}
+	document.getElementById('debugline').innerHTML = "All images are now loaded.  You should see a ship now.  Use the arrow keys for pitch and roll.";
     }
 
 </script>
@@ -498,9 +500,7 @@ escpod :
     <a href="https://github.com/OoliteProject/oolite-binary-resources/blob/master/Models/">gihub</a>.
     In order to turn these models into webGL I used this <a href="https://gist.github.com/grondilu/aa164666244e3fdeee8e">Perl script</a>.</p>
 
-    <p>Use the arrow keys for pitch and roll.</p>
-
-    <p>You may have to wait a few seconds until the textures are loaded.</p>
+    <p id=debugline>You may have to wait a few seconds until the textures are loaded.</p>
 
     <div class=container id=viewscreen>
 	<canvas id="webGL-canvas" style="border: none;" width=500 height=500></canvas>
