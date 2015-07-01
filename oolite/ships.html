@@ -461,6 +461,7 @@ escpod :
     }
 
     function loadImages(urls, callback) {
+	var count = 0;
 	var images = [];
 	var imagesToLoad = urls.length;
 
@@ -468,18 +469,18 @@ escpod :
 	// loading.
 	var onImageLoad = function() {
 	    --imagesToLoad;
+	    document.getElementById('debugline').innerHTML = "loading " + urls[count++] + "...";
 	    // If all the images are loaded call the callback.
 	    if (imagesToLoad == 0) {
 		callback(images);
+		document.getElementById('debugline').innerHTML = "All images are now loaded.  You should see a ship now.  Use the arrow keys for pitch and roll.";
 	    }
 	};
 
 	for (var ii = 0; ii < imagesToLoad; ++ii) {
-	    document.getElementById('debugline').innerHTML = "loading " + urls[ii] + "...";
 	    var image = loadImage(urls[ii], onImageLoad);
 	    images.push(image);
 	}
-	document.getElementById('debugline').innerHTML = "All images are now loaded.  You should see a ship now.  Use the arrow keys for pitch and roll.";
     }
 
 </script>
