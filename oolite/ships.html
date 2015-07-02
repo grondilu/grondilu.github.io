@@ -478,11 +478,11 @@ coriolis_faceplate : {
 
     function refreshHUD() {
 	HUD.save();
-	HUD.strokeStyle = "yellow";
+	HUD.fillStyle = "yellow";
 	HUD.clearRect(1, 1, 78, 6);
 	HUD.clearRect(1, 11, 78, 6);
-	HUD.strokeRect(Math.max(Math.min(40 + Pitch, 75), 1), 2, 3, 4);
-	HUD.strokeRect(Math.max(Math.min(40 + Roll, 75), 1), 12, 3, 4);
+	HUD.fillRect(Math.max(Math.min(40 + Pitch, 75), 1), 2, 3, 4);
+	HUD.fillRect(Math.max(Math.min(40 + Roll, 75), 1), 12, 3, 4);
 	HUD.restore();
     }
 
