@@ -368,11 +368,6 @@ coriolis_faceplate : {
 	    mat4.rotate(mvMatrix, mvMatrix, yRot, [0, 1, 0]);
 	    mat4.rotate(mvMatrix, mvMatrix, zRot, [0, 0, 1]);
 	} else {
-	    var scale = 2000;
-	    quat.multiply(qOrientation, qOrientation, [Math.sin(Pitch/scale),              0,                0, Math.cos(Pitch/scale)]);
-	    quat.multiply(qOrientation, qOrientation, [               0, Math.sin(Yaw/scale),                0, Math.cos(Yaw/scale)]);
-	    quat.multiply(qOrientation, qOrientation, [               0,                0, Math.sin(Roll/scale), Math.cos(Roll/scale)]);
-
 	    mat4.fromRotationTranslation(mvMatrix, qOrientation, [0.0, 0.0, -deltaZ]);
 	}
 
@@ -400,11 +395,17 @@ coriolis_faceplate : {
 	var timescale = 50000;
         var timeNow = new Date().getTime();
         if (lastTime != 0) {
-            var elapsed = timeNow - lastTime;
+            var elapsed = timeNow - lastTime,
+            dXRot = (Pitch * elapsed) / timescale,
+            dYRot = (Yaw * elapsed) / timescale,
+            dZRot = (Roll * elapsed) / timescale;
 
-            xRot += (Pitch * elapsed) / timescale;
-            yRot += (Yaw * elapsed) / timescale;
-            zRot += (Roll * elapsed) / timescale;
+	    xRot += dXRot; yRot += dYRot; zRot += dZRot;
+
+	    quat.multiply(qOrientation, qOrientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)]);
+	    quat.multiply(qOrientation, qOrientation, [ 0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
+	    quat.multiply(qOrientation, qOrientation, [ 0, 0, Math.sin(dZRot), Math.cos(dZRot)]);
+
         }
         lastTime = timeNow;
     }
