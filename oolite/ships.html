@@ -371,7 +371,7 @@ escpod : {
 
 	switch(methodSelector.options[methodSelector.selectedIndex].value) {
 	    case 'euler':
-		mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ]);
+		mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ.value]);
 		mat4.rotate(mvMatrix, mvMatrix, xRot, [1, 0, 0]);
 		mat4.rotate(mvMatrix, mvMatrix, yRot, [0, 1, 0]);
 		mat4.rotate(mvMatrix, mvMatrix, zRot, [0, 0, 1]);
