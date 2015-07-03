@@ -357,6 +357,8 @@ escpod : {
     var yRot = 0;
     var zRot = 0;
 
+    var deltaZ = { value: 200 };
+
     var oPitch, oRoll, oSpeed;
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -366,7 +368,6 @@ escpod : {
 
 	mat4.identity(mvMatrix);
 	var ship = ships[shipSelector.options[shipSelector.selectedIndex].value];
-	var deltaZ = ship.name == 'coriolis' ? 2000 : 200;
 
 	switch(methodSelector.options[methodSelector.selectedIndex].value) {
 	    case 'euler':
@@ -376,7 +377,7 @@ escpod : {
 		mat4.rotate(mvMatrix, mvMatrix, zRot, [0, 0, 1]);
 		break;
 	    case 'quaternions':
-		mat4.fromRotationTranslation(mvMatrix, qOrientation, [0.0, 0.0, -deltaZ]);
+		mat4.fromRotationTranslation(mvMatrix, qOrientation, [0.0, 0.0, -deltaZ.value]);
 		break;
 	}
 
@@ -493,6 +494,7 @@ escpod : {
     function start() {
 	shipSelector = document.getElementById("shipSelector");
 	methodSelector = document.getElementById("methodSelector");
+	deltaZ = document.getElementById("deltaZ");
 	pitch = document.getElementById("pitch");
 	roll = document.getElementById("roll");
 	yaw = { value : 0 };  // we don't allow yaw control for now;
@@ -587,6 +589,7 @@ escpod : {
 	    <option value=quaternions>Quaternions</option>
 	    <option value=euler>Euler</option>
 	</select>
+	<label for=deltaZ>Z</label><input type=range id=deltaZ min=0 max=2000 value=200></input>
 	<fieldset>
 	    <legend>Flight Control</legend>
 	    <label for=pitch>Pitch</label><input id=pitch type=range min=-30 max=30 value=0><output id=oPitch>0</output>
