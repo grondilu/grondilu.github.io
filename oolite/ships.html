@@ -22,8 +22,8 @@
 
 <script type="text/javascript" src="gl-matrix-min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
-<script type="text/javascript" src="versor.js/versor.js"></script>
-<script type="text/javascript" src="versor.js/C3.js"></script>
+<script type="text/javascript" src="versor.js"></script>
+<script type="text/javascript" src="C3.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -413,8 +413,8 @@ escpod : {
 	    xRot += dXRot; yRot += dYRot; zRot += dZRot;
 
 	    quat.multiply(qOrientation, qOrientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)]);
-	    quat.multiply(qOrientation, qOrientation, [ 0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
-	    quat.multiply(qOrientation, qOrientation, [ 0, 0, Math.sin(dZRot), Math.cos(dZRot)]);
+	    quat.multiply(qOrientation, qOrientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
+	    quat.multiply(qOrientation, qOrientation, [0, 0, Math.sin(dZRot), Math.cos(dZRot)]);
 
         }
         lastTime = timeNow;
