@@ -393,8 +393,10 @@
 		qOrientation = ship.custom_views[ship.viewSelector.selectedIndex].view_orientation.split(" ");
 	    }
 	}
-	viewSelector = ships[shipSelector.selectedIndex].viewSelector;
+	var ship = ships[shipSelector.selectedIndex];
+	viewSelector = ship.viewSelector;
 	document.getElementById("shipFieldSet").appendChild(viewSelector);
+	qOrientation = ship.custom_views[ship.viewSelector.selectedIndex].view_orientation.split(" ");
     }
     function collectTextureImages() {
 	var image_urls = [], cache = {};
