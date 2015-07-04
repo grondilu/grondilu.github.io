@@ -22,8 +22,6 @@
 
 <script type="text/javascript" src="gl-matrix-min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
-<script type="text/javascript" src="versor.js"></script>
-<script type="text/javascript" src="C3.js"></script>
 <script type="text/javascript" src="ships.js"></script>
 <script type="text/javascript" src="shaders.js"></script>
 
@@ -190,6 +188,7 @@
 
     var qOrientation = [0, 0, 0, 1];
 
+    var custom_view;
     var roll, pitch, yaw, speed;
 
     var xRot = 0;
@@ -208,6 +207,7 @@
 	mat4.identity(mvMatrix);
 
 
+	var ship = ships[shipSelector.selectedIndex];
 	switch(methodSelector.options[methodSelector.selectedIndex].value) {
 	    case 'euler':
 		mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ.value]);
@@ -216,13 +216,20 @@
 		mat4.rotate(mvMatrix, mvMatrix, zRot, [0, 0, 1]);
 		break;
 	    case 'quaternions':
-		mat4.fromRotationTranslation(mvMatrix, qOrientation, [0.0, 0.0, -deltaZ.value]);
+		custom_view = ship.custom_views[viewSelector.selectedIndex];
+		var orientation = custom_view.view_orientation.split(" ").map(parseFloat);
+		orientation = [orientation[1], orientation[2], orientation[3], orientation[0]];
+		//quat.mul(orientation, qOrientation, orientation);
+		mat4.fromQuat(mvMatrix, orientation);
+		mat4.translate(mvMatrix, mvMatrix,
+			custom_view.view_position.split(" ").map(parseFloat).map(function (x) { return x })
+			);
 		break;
 	}
 
 	setMatrixUniforms();
 	for (
-		var ship = ships[shipSelector.selectedIndex];
+		;
 		ship;
 		ship = ships[ship.subEntity]
 	    ) {
@@ -300,7 +307,7 @@
 	}
 	oPitch.value = pitch.value;
 	oRoll.value = roll.value;
-	refreshHUD();
+	//refreshHUD();
     }
 
     function webGLStart() {
@@ -355,7 +362,7 @@
 	loadImages(collectTextureImages(), webGLStart);
 	createShipSelector();
 	createViewSelectors();
-	drawHUD();
+	//drawHUD();
     }
 
     function createShipSelector() {
@@ -390,13 +397,11 @@
 	    ships[i].viewSelector.onchange = function () {
 		var ship = ships[shipSelector.selectedIndex];
 		console.log("changing view to " + ship.viewSelector.options[ship.viewSelector.selectedIndex].value);
-		qOrientation = ship.custom_views[ship.viewSelector.selectedIndex].view_orientation.split(" ");
 	    }
 	}
 	var ship = ships[shipSelector.selectedIndex];
 	viewSelector = ship.viewSelector;
 	document.getElementById("shipFieldSet").appendChild(viewSelector);
-	qOrientation = ship.custom_views[ship.viewSelector.selectedIndex].view_orientation.split(" ");
     }
     function collectTextureImages() {
 	var image_urls = [], cache = {};
