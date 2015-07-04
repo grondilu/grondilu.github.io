@@ -390,6 +390,7 @@
 	    ships[i].viewSelector.onchange = function () {
 		var ship = ships[shipSelector.selectedIndex];
 		console.log("changing view to " + ship.viewSelector.options[ship.viewSelector.selectedIndex].value);
+		qOrientation = ship.custom_views[ship.viewSelector.selectedIndex].view_orientation.split(" ");
 	    }
 	}
 	viewSelector = ships[shipSelector.selectedIndex].viewSelector;
