@@ -1,6 +1,18 @@
 var shaders =
 [
 {
+    use : function () {
+	gl.useProgram(this.program);
+        this.program.vertexPositionAttribute = gl.getAttribLocation(this.program, "aVertexPosition");
+        gl.enableVertexAttribArray(this.program.vertexPositionAttribute);
+
+        this.program.textureCoordAttribute = gl.getAttribLocation(this.program, "aTextureCoord");
+        gl.enableVertexAttribArray(this.program.textureCoordAttribute);
+
+        this.program.pMatrixUniform = gl.getUniformLocation(this.program, "uPMatrix");
+        this.program.mvMatrixUniform = gl.getUniformLocation(this.program, "uMVMatrix");
+        this.program.samplerUniform = gl.getUniformLocation(this.program, "uSampler");
+    },
     vertex :
     {
 	src :
