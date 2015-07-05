@@ -143,7 +143,7 @@
 
     function mvPushMatrix() {
         var copy = mat4.create();
-        mat4.set(mvMatrix, copy);
+        mat4.copy(copy, mvMatrix);
         mvMatrixStack.push(copy);
     }
 
@@ -185,28 +185,39 @@
 
 
     var ships = [];
-    [
-	Adder, Asp,
-	Anaconda,
-	Boa, Boa2,
-	CobraI, CobraIII,
-	Shuttle,
-	Sidewinder,
-	Thargoid, Thargon,
-	Viper
-    ].forEach(function(x) { ships.push(new x()) } );
-    var qOrientation = [0, 0, 0, 1];
+//    [
+//	Adder, Asp,
+//	Anaconda,
+//	Boa, Boa2,
+//	CobraI, CobraIII,
+//	Shuttle,
+//	Sidewinder,
+//	Thargoid, Thargon,
+//	Viper
+//    ].forEach(function(x) { ships.push(new x()) } );
 
-    var custom_view;
-    var roll, pitch, yaw, speed;
+    var ships = [ new Anaconda(), new CobraIII ];
+
+    ships[0].position = [ -150, 0, 0 ];
+    ships[1].position = [  150, 0, 0 ];
+
+    ships[0].orientation = [ 0, 0, 0, 1 ];
+    ships[0].pitch = 0;
+    ships[0].roll = 0;
+    ships[0].yaw = 0;
+
+    ships[1].orientation = [ 0, 0, 0, 1 ];
+    ships[1].pitch = 0;
+    ships[1].roll = 0;
+    ships[1].yaw = 0;
+    var qOrientation = [0, 0, 0, 1];
 
     var xRot = 0;
     var yRot = 0;
     var zRot = 0;
 
-    var deltaZ = { value: 200 };
+    var deltaZ = { value: 600 };
 
-    var oPitch, oRoll, oSpeed;
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -215,27 +226,17 @@
 
 	mat4.identity(mvMatrix);
 
+	mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ.value]);
 
-	var ship = ships[shipSelector.selectedIndex];
-	switch(methodSelector.options[methodSelector.selectedIndex].value) {
-	    case 'euler':
-		mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ.value]);
-		mat4.rotate(mvMatrix, mvMatrix, xRot, [1, 0, 0]);
-		mat4.rotate(mvMatrix, mvMatrix, yRot, [0, 1, 0]);
-		mat4.rotate(mvMatrix, mvMatrix, zRot, [0, 0, 1]);
-		break;
-	    case 'quaternions':
-		mat4.fromRotationTranslation(mvMatrix, qOrientation, [0.0, 0.0, -deltaZ.value]);
+	for (var i = 0, ship; ship = ships[i]; i++) {
+	    mvPushMatrix();
+	    var rotPos = mat4.create();
+	    //mat4.translate(mvMatrix, mvMatrix, ship.position);
+	    mat4.fromRotationTranslation(rotPos, ship.orientation, ship.position);
+	    mat4.mul(mvMatrix, mvMatrix, rotPos);
 
-		break;
-	}
+	    setMatrixUniforms();
 
-	setMatrixUniforms();
-	for (
-		;
-		ship;
-		ship = ships[ship.subEntity]
-	    ) {
 	    gl.bindBuffer(gl.ARRAY_BUFFER, ship.vertexPositionBuffer);
 	    gl.vertexAttribPointer(shaders[currentShader].program.vertexPositionAttribute, ship.vertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
@@ -248,6 +249,8 @@
 
 	    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ship.vertexIndexBuffer);
 	    gl.drawElements(gl.TRIANGLES, ship.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+	    mvPopMatrix();
 	}
     }
 
@@ -258,21 +261,22 @@
 	var timescale = 50000;
         var timeNow = new Date().getTime();
         if (lastTime != 0) {
-            var elapsed = timeNow - lastTime,
-            dXRot = (pitch.value * elapsed) / timescale,
-            dYRot = (yaw.value * elapsed) / timescale,
-            dZRot = (roll.value * elapsed) / timescale;
+	    var elapsed = timeNow - lastTime;
+	    for (var i = 0, ship; ship = ships[i]; i++) {
+		var 
+		dXRot = (ship.pitch * elapsed) / timescale,
+		dYRot = (ship.yaw * elapsed) / timescale,
+		dZRot = (ship.roll * elapsed) / timescale;
 
-	    xRot += dXRot; yRot += dYRot; zRot += dZRot;
+		xRot += dXRot; yRot += dYRot; zRot += dZRot;
 
-	    quat.multiply(qOrientation, qOrientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)]);
-	    quat.multiply(qOrientation, qOrientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
-	    quat.multiply(qOrientation, qOrientation, [0, 0, Math.sin(dZRot), Math.cos(dZRot)]);
-
+		quat.multiply(ship.orientation, ship.orientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)]);
+		quat.multiply(ship.orientation, ship.orientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
+		quat.multiply(ship.orientation, ship.orientation, [0, 0, Math.sin(dZRot), Math.cos(dZRot)]);
+	    }
         }
         lastTime = timeNow;
     }
-
 
     function tick() {
         requestAnimFrame(tick);
@@ -292,24 +296,23 @@
     }
 
     function handleKeys() {
+	var ship = ships[shipSelector.selectedIndex];
 	if (currentlyPressedKeys[37]) {
 	    // Left cursor key
-	    roll.value--;
+	    ship.roll--;
 	}
 	if (currentlyPressedKeys[39]) {
 	    // Right cursor key
-	    roll.value++;
+	    ship.roll++;
 	}
 	if (currentlyPressedKeys[38]) {
 	    // Up cursor key
-	    pitch.value++;
+	    ship.pitch++;
 	}
 	if (currentlyPressedKeys[40]) {
 	    // Down cursor key
-	    pitch.value--;
+	    ship.pitch--;
 	}
-	oPitch.value = pitch.value;
-	oRoll.value = roll.value;
 	//refreshHUD();
     }
 
@@ -343,8 +346,8 @@
 	HUD.fillStyle = "yellow";
 	HUD.clearRect(1, 1, 78, 6);
 	HUD.clearRect(1, 11, 78, 6);
-	HUD.fillRect(Math.max(Math.min(40 + parseInt(pitch.value), 75), 1), 2, 3, 4);
-	HUD.fillRect(Math.max(Math.min(40 + parseInt(roll.value), 75), 1), 12, 3, 4);
+	HUD.fillRect(Math.max(Math.min(40 + Math.Floor(ships[shipSelector.selectedIndex].pitch), 75), 1), 2, 3, 4);
+	HUD.fillRect(Math.max(Math.min(40 + Math.Floor(ships[shipSelector.selectedIndex].roll), 75), 1), 12, 3, 4);
 	HUD.restore();
     }
 
@@ -352,13 +355,6 @@
 	theForm = document.getElementById("theForm");
 	methodSelector = document.getElementById("methodSelector");
 	HUD = document.getElementById("HUD").getContext("2d");
-	pitch = document.getElementById("pitch");
-	roll = document.getElementById("roll");
-	yaw = { value : 0 };  // we don't allow yaw control for now;
-	<!-- speed = document.getElementById("speed"); -->
-	oPitch = document.getElementById("oPitch");
-	oRoll = document.getElementById("oRoll");
-	<!-- oSpeed = document.getElementById("oSpeed"); -->
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;
 
@@ -437,16 +433,6 @@
 
     <form id=theForm>
 	<fieldset id=shipFieldSet><legend>Ship</legend>
-	</fieldset>
-	<fieldset id=flightControl>
-	    <legend>Flight Control</legend>
-	    <select id=methodSelector>
-		<option value=quaternions>Quaternions</option>
-		<option value=euler>Euler</option>
-	    </select>
-	    <label for=pitch>Pitch</label><input id=pitch type=range min=-30 max=30 value=0><output id=oPitch>0</output>
-	    <label for=roll>Roll</label><input id=roll type=range min=-30 max=30 value=0><output id=oRoll>0</output>
-	    <!-- <label for=speed>Speed</label><input id=speed type=range min=0 max=100 value=0><output id=oSpeed>0</output> -->
 	</fieldset>
     </form>
 </body>
