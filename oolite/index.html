@@ -201,20 +201,12 @@
     ships[0].position = [ -150, 0, 0 ];
     ships[1].position = [  150, 0, 0 ];
 
-    ships[0].orientation = [ 0, 0, 0, 1 ];
-    ships[0].pitch = 0;
-    ships[0].roll = 0;
-    ships[0].yaw = 0;
-
-    ships[1].orientation = [ 0, 0, 0, 1 ];
-    ships[1].pitch = 0;
-    ships[1].roll = 0;
-    ships[1].yaw = 0;
-    var qOrientation = [0, 0, 0, 1];
-
-    var xRot = 0;
-    var yRot = 0;
-    var zRot = 0;
+    for (var i = 0, ship; ship = ships[i]; i++) {
+	ship.orientation = [ 0, 0, 0, 1 ];
+	ship.pitch = 0;
+	ship.roll = 0;
+	ship.yaw = 0;
+    }
 
     var deltaZ = { value: 600 };
 
@@ -267,8 +259,6 @@
 		dXRot = (ship.pitch * elapsed) / timescale,
 		dYRot = (ship.yaw * elapsed) / timescale,
 		dZRot = (ship.roll * elapsed) / timescale;
-
-		xRot += dXRot; yRot += dYRot; zRot += dZRot;
 
 		quat.multiply(ship.orientation, ship.orientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)]);
 		quat.multiply(ship.orientation, ship.orientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
@@ -406,7 +396,7 @@
 	    // If all the images are loaded call the callback.
 	    if (imagesToLoad == 0) {
 		callback(images);
-		document.getElementById('debugline').innerHTML = "All images are loaded.  You should see a ship now.  Use the arrow keys for pitch and roll.";
+		document.getElementById('debugline').innerHTML = "";
 	    }
 	};
 
