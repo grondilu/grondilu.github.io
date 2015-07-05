@@ -183,23 +183,37 @@
 	}
     }
 
+    var POV = {
+	orientation : quat.create(),
+        pitch : 0,
+	roll : 0,
+	yaw : 0
+    };
+    var ship_models = [
+      Adder, Asp,
+      Anaconda,
+      Boa, Boa2,
+      CobraI, CobraIII,
+      Shuttle,
+      Sidewinder,
+      Thargon,
+      Viper
+    ];
 
     var ships = [];
-//    [
-//	Adder, Asp,
-//	Anaconda,
-//	Boa, Boa2,
-//	CobraI, CobraIII,
-//	Shuttle,
-//	Sidewinder,
-//	Thargoid, Thargon,
-//	Viper
-//    ].forEach(function(x) { ships.push(new x()) } );
-
-    var ships = [ new Anaconda(), new CobraIII ];
-
-    ships[0].position = [ -150, 0, 0 ];
-    ships[1].position = [  150, 0, 0 ];
+    (function () {
+    var distance = 200, N = 2;
+    for (var x = -N*distance; x <= N*distance; x+=distance) {
+	for (var y= -N*distance; y <= N*distance; y+=distance) {
+	    for (var z = -N*distance; z <= N*distance; z+=distance) {
+		var model = Math.floor(Math.random() * ship_models.length);
+		var ship = new ship_models[model]();
+		ships.push(ship);
+		ship.position = [ x, y, z ];
+	    }
+	}
+    }
+    })()
 
     for (var i = 0, ship; ship = ships[i]; i++) {
 	ship.orientation = [ 0, 0, 0, 1 ];
@@ -208,7 +222,7 @@
 	ship.yaw = 0;
     }
 
-    var deltaZ = { value: 600 };
+    var deltaZ = { value: 200 };
 
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -216,10 +230,11 @@
 
         mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 5000.0);
 
-	mat4.identity(mvMatrix);
+	//mat4.identity(mvMatrix);
+	//mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ.value]);
+	mat4.fromRotationTranslation(mvMatrix, POV.orientation, [0.0, 0.0, -deltaZ.value]);
 
-	mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ.value]);
-
+	// Placing each ship in the scene
 	for (var i = 0, ship; ship = ships[i]; i++) {
 	    mvPushMatrix();
 	    var rotPos = mat4.create();
@@ -254,6 +269,7 @@
         var timeNow = new Date().getTime();
         if (lastTime != 0) {
 	    var elapsed = timeNow - lastTime;
+	    //document.getElementById("debugline").innerHTML = Math.floor(1000 /elapsed) + ' fps';
 	    for (var i = 0, ship; ship = ships[i]; i++) {
 		var 
 		dXRot = (ship.pitch * elapsed) / timescale,
@@ -264,6 +280,14 @@
 		quat.multiply(ship.orientation, ship.orientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
 		quat.multiply(ship.orientation, ship.orientation, [0, 0, Math.sin(dZRot), Math.cos(dZRot)]);
 	    }
+	    var 
+	    dXRot = (POV.pitch * elapsed) / timescale,
+	    dYRot = (POV.yaw * elapsed) / timescale,
+	    dZRot = (POV.roll * elapsed) / timescale;
+
+	    quat.multiply(POV.orientation, POV.orientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)]);
+	    quat.multiply(POV.orientation, POV.orientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
+	    quat.multiply(POV.orientation, POV.orientation, [0, 0, Math.sin(dZRot), Math.cos(dZRot)]);
         }
         lastTime = timeNow;
     }
@@ -286,7 +310,7 @@
     }
 
     function handleKeys() {
-	var ship = ships[shipSelector.selectedIndex];
+	var ship = POV;
 	if (currentlyPressedKeys[37]) {
 	    // Left cursor key
 	    ship.roll--;
@@ -336,8 +360,6 @@
 	HUD.fillStyle = "yellow";
 	HUD.clearRect(1, 1, 78, 6);
 	HUD.clearRect(1, 11, 78, 6);
-	HUD.fillRect(Math.max(Math.min(40 + Math.Floor(ships[shipSelector.selectedIndex].pitch), 75), 1), 2, 3, 4);
-	HUD.fillRect(Math.max(Math.min(40 + Math.Floor(ships[shipSelector.selectedIndex].roll), 75), 1), 12, 3, 4);
 	HUD.restore();
     }
 
@@ -349,7 +371,7 @@
 	document.onkeyup = handleKeyUp;
 
 	loadImages(collectTextureImages(), webGLStart);
-	createShipSelector();
+	//createShipSelector();
 	//drawHUD();
     }
 
@@ -367,9 +389,10 @@
 	var image_urls = [], cache = {};
 	for (var i = 0; ships[i]; i++) {
 	    for (var j = 0, url; url = ships[i].model.texture.images[j]; j++) {
-		if (!cache['url']++) {
+		if (!cache[url]) {
+		    cache[url] = true;
 		    image_urls.push(textureImagesDirectory + url);
-		    console.log("loading " + url + "...");
+		    console.log("loading " + url + " (" + cache[url] + ")...");
 		}
 	    }
 	}
