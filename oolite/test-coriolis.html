@@ -194,7 +194,7 @@
 
     var deltaZ = { value: 4000 };
     var POV = {
-	orientation : quat.create(),
+	orientation : [0, 1, 0, 0],
         position : [0, 0, deltaZ.value],
         pitch : 0,
 	roll : 0,
@@ -292,11 +292,11 @@
 	    var q = quat.create();
 	    var orientation_conjugate = quat.create();
 	    quat.conjugate(orientation_conjugate, POV.orientation);
-	    quat.multiply(q, orientation_conjugate, [0, 0, 1, 0]);
-	    quat.multiply(q, q, POV.orientation);
-	    POV.position[0] -= POV.speed * q[0] * elapsed / timescale;
-	    POV.position[1] -= POV.speed * q[1] * elapsed / timescale;
-	    POV.position[2] -= POV.speed * q[2] * elapsed / timescale;
+	    quat.multiply(q, [0, 0, -1, 0], orientation_conjugate );
+	    quat.multiply(q, POV.orientation, q);
+	    POV.position[0] += POV.speed * q[0] * elapsed / timescale;
+	    POV.position[1] += POV.speed * q[1] * elapsed / timescale;
+	    POV.position[2] += POV.speed * q[2] * elapsed / timescale;
         }
         lastTime = timeNow;
     }
