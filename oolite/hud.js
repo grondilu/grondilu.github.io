@@ -17,7 +17,7 @@ function Hud(canvas) {
 	    position : vec2.create(),
 	    size : 8,
 	    half_size : 4,
-	    fillOrStroke : "fill",
+	    fillOrStroke : "stroke",
 	    setFrom3D : function (x, y, z) {
 		vec2.set(this.position, x, y);
 		var n = Math.sqrt(x*x + y*y);
@@ -29,8 +29,8 @@ function Hud(canvas) {
 			    Math.abs(angle) / ( n * Math.PI / 2 )
 			    * 16
 			    );
-		    this.fillOrStroke = z < 0 ? "fill" : "stroke";
 		}
+		this.fillOrStroke = z < 0 ? "fill" : "stroke";
 	    }
 	}
     };
