@@ -64,9 +64,10 @@ sub gather_data {
 		my $image = shift @fields;
 		$image{$image}++;
 		keys(%image) == 1
-		    or die "can't deal with multi-level textures yet (@{[keys %image]}), sorry" if
-		$fields[0] == 1 && $fields[1] == 1
-		    or die "unexpected range in the texture (line is $line)";
+		    or die "can't deal with multi-level textures yet (@{[keys %image]}), sorry";
+		#$fields[0] == 1 && $fields[1] == 1 or die "unexpected range in the texture (line is $line)";
+		$fields[$_]/=$fields[0] for 2, 4, 6;
+		$fields[$_]/=$fields[1] for 3, 5, 7;
 		push @texture, {
 		    image => $image,
 		    coord => [
@@ -128,28 +129,24 @@ sub not_completely_dumb_mesher {
     @new_vertices;
 
     print <<EOF
-function () {
-    this.name = "UNSPECIFIED";
-    this.model =
-    {
-	dat_file : "UNSPECIFIED",
-	vertices : [ @{[
-	    join ',',
-	    map { @{$vertices[$_]} }
-	    map { (split ':')[0] }
-	    @new_vertices
-	]} ],
-	faces : [ @{[
-	    join ',',
-	    map { $new_vertices{$_} }
-	    map { @{$_->{'vertex_indices'}} }
-	    @faces
-	]} ],
-	texture : {
-	    images : [ "$texture_image" ],
-	    coordinates : [ @{[ join ',', map { (split ':')[1] } @new_vertices ]} ]
-	}
-    };
+model : {
+    dat_file : "UNSPECIFIED",
+    vertices : [ @{[
+	join ',',
+	map { @{$vertices[$_]} }
+	map { (split ':')[0] }
+	@new_vertices
+    ]} ],
+    faces : [ @{[
+	join ',',
+	map { $new_vertices{$_} }
+	map { @{$_->{'vertex_indices'}} }
+	@faces
+    ]} ],
+    texture : {
+	images : [ "$texture_image" ],
+	coordinates : [ @{[ join ',', map { (split ':')[1] } @new_vertices ]} ]
+    }
 }
 EOF
     ;
