@@ -12,7 +12,7 @@
 	position: absolute;
 	border:   none;
 	left:     0px;
-	top:    400px;
+	top:      0px;
 	z-index:   10;
     }
 </style>
@@ -195,7 +195,8 @@
 	orientation : quat.create(),
         pitch : 0,
 	roll : 0,
-	yaw : 0
+	yaw : 0,
+	rotationrate_increment :  0.01 // radians per sec
     };
     var ship_models = [
       Adder, Asp,
@@ -211,7 +212,7 @@
 
     var ships = [ new Coriolis() ];
 
-    var deltaZ = { value: 2000 };
+    var deltaZ = { value: 4000 };
 
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -265,24 +266,24 @@
     var lastTime = 0;
 
     function animate() {
-	var timescale = 100000;
-        var timeNow = new Date().getTime();
+	var timescale = 1000;  // ms
+        var timeNow = new Date().getTime();   // ms
         if (lastTime != 0) {
 	    var elapsed = timeNow - lastTime;
 	    for (var i = 0, ship; ship = ships[i]; i++) {
 		var 
-		dXRot = (ship.pitch * elapsed) / timescale,
-		dYRot = (ship.yaw * elapsed) / timescale,
-		dZRot = (ship.roll * elapsed) / timescale;
+		dXRot = (ship.pitch * elapsed) / timescale / 2,
+		dYRot = (ship.yaw * elapsed) / timescale / 2,
+		dZRot = (ship.roll * elapsed) / timescale / 2;
 
 		quat.multiply(ship.orientation, ship.orientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)]);
 		//quat.multiply(ship.orientation, ship.orientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)]);
 		quat.multiply(ship.orientation, ship.orientation, [0, 0, Math.sin(dZRot), Math.cos(dZRot)]);
 	    }
 	    var 
-	    dXRot = (POV.pitch * elapsed) / timescale,
-	    dYRot = (POV.yaw * elapsed) / timescale,
-	    dZRot = (POV.roll * elapsed) / timescale;
+	    dXRot = (POV.pitch * elapsed) / timescale / 2,
+	    dYRot = (POV.yaw * elapsed) / timescale / 2,
+	    dZRot = (POV.roll * elapsed) / timescale / 2;
 
 	    quat.multiply(POV.orientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)], POV.orientation);
 	    //quat.multiply(POV.orientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)], POV.orientation);
@@ -312,19 +313,19 @@
     function handleKeys() {
 	if (currentlyPressedKeys[37]) {
 	    // Left cursor key
-	    POV.roll--;
+	    POV.roll -= POV.rotationrate_increment;
 	}
 	if (currentlyPressedKeys[39]) {
 	    // Right cursor key
-	    POV.roll++;
+	    POV.roll += POV.rotationrate_increment;
 	}
 	if (currentlyPressedKeys[38]) {
 	    // Up cursor key
-	    POV.pitch++;
+	    POV.pitch += POV.rotationrate_increment;
 	}
 	if (currentlyPressedKeys[40]) {
 	    // Down cursor key
-	    POV.pitch--;
+	    POV.pitch -= POV.rotationrate_increment;
 	}
     }
 
@@ -351,10 +352,54 @@
 	hud.context.clearRect(0, 0, hud.context.canvas.width, hud.context.canvas.height);
 	drawScanner();
 	drawCompass();
+	drawAttitudeBars();
     }
 
     function drawAttitudeBars() {
 	hud.context.save();
+	var top = {
+	    x : hud.context.canvas.width - hud.attitudeBars.width - 2,
+	    y : hud.context.canvas.height - 100
+	};
+	hud.context.strokeRect(
+		top.x, top.y,
+		hud.attitudeBars.width, hud.attitudeBars.height
+		);
+	hud.context.strokeRect(
+		top.x, top.y + hud.attitudeBars.height + 2,
+		hud.attitudeBars.width, hud.attitudeBars.height
+		);
+	hud.context.fillStyle = "yellow";
+	var roll = POV.roll / Math.PI * hud.attitudeBars.width;
+	roll = Math.min(roll,  hud.attitudeBars.width/2 - 1);
+	roll = Math.max(roll, -hud.attitudeBars.width/2 + 1);
+	hud.context.fillRect(
+		top.x + hud.attitudeBars.width / 2 - 1 + roll,
+		top.y + 1,
+		3,
+		hud.attitudeBars.height - 2
+		);
+	hud.context.strokeRect(
+		top.x + hud.attitudeBars.width / 2 - 1,
+		top.y + 1,
+		3,
+		hud.attitudeBars.height - 2
+		);
+	var pitch = POV.pitch / Math.PI * hud.attitudeBars.width;
+	pitch = Math.min(pitch,  hud.attitudeBars.width/2 - 1);
+	pitch = Math.max(pitch, -hud.attitudeBars.width/2 + 1);
+	hud.context.fillRect(
+		top.x + hud.attitudeBars.width / 2 - 1 + pitch,
+		top.y + 1 + hud.attitudeBars.height + 2,
+		3,
+		hud.attitudeBars.height - 2
+		);
+	hud.context.strokeRect(
+		top.x + hud.attitudeBars.width / 2 - 1,
+		top.y + 1 + hud.attitudeBars.height + 2,
+		3,
+		hud.attitudeBars.height - 2
+		);
 	hud.context.restore();
     }
 
@@ -363,7 +408,7 @@
 	hud.context.beginPath();
 	hud.context.ellipse(
 		hud.context.canvas.width / 2,
-		hud.context.canvas.height / 2,
+		hud.context.canvas.height - hud.scanner.height / 2 - 10,
 		hud.scanner.width / 2,
 		hud.scanner.height / 2,
 		0, 0, 2*Math.PI
@@ -377,7 +422,7 @@
 	hud.context.fillStyle = "green";
 	var center = [
 		hud.context.canvas.width / 2 + hud.scanner.width / 2 + 10,
-		hud.context.canvas.height / 2 + 2*hud.scanner.height / 6
+		hud.context.canvas.height - hud.compass.half_size - 1
 	       ];	
 	hud.context.beginPath();
 	hud.context.arc(
@@ -476,7 +521,7 @@
 
     <div class=container id=viewscreen>
 	<canvas id="webGL-canvas" style="border: none;" width=500 height=500></canvas>
-	<canvas id="hud" width=500 height=100></canvas>
+	<canvas id="hud" width=500 height=500></canvas>
     </div>
 
     <output id=debug></debug>
