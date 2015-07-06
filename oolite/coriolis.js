@@ -42,6 +42,6 @@ function Coriolis() {
     this.orientation = [0,0,0,1];
     this.position = [0, 0, 0];
     this.pitch = 0;
-    this.roll = 5;
+    this.roll = 0.1;
     this.yaw = 0;
 }
