@@ -191,12 +191,17 @@
 	}
     }
 
+
+    var deltaZ = { value: 4000 };
     var POV = {
 	orientation : quat.create(),
+        position : [0, 0, deltaZ.value],
         pitch : 0,
 	roll : 0,
 	yaw : 0,
-	rotationrate_increment :  0.01 // radians per sec
+	rotationrate_increment :  0.01, // radians per sec
+	speed : 0,
+	speed_increment : 1 // meters per sec
     };
     var ship_models = [
       Adder, Asp,
@@ -212,19 +217,14 @@
 
     var ships = [ new Coriolis() ];
 
-    var deltaZ = { value: 4000 };
-
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 5000.0);
 
-	//mat4.identity(mvMatrix);
-	//mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ.value]);
-	//mat4.fromQuat(mvMatrix, POV.orientation);
 	mat4.fromQuat(mvMatrix, POV.orientation);
-	mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -deltaZ.value]);
+	mat4.translate(mvMatrix, mvMatrix, [-POV.position[0], -POV.position[1], -POV.position[2]]);
 
 	hud.compass.dot.setFrom3D(mvMatrix[12], mvMatrix[13], mvMatrix[14]);
 
@@ -288,6 +288,15 @@
 	    quat.multiply(POV.orientation, [Math.sin(dXRot), 0, 0, Math.cos(dXRot)], POV.orientation);
 	    //quat.multiply(POV.orientation, [0, Math.sin(dYRot), 0, Math.cos(dYRot)], POV.orientation);
 	    quat.multiply(POV.orientation, [0, 0, Math.sin(dZRot), Math.cos(dZRot)], POV.orientation);
+
+	    var q = quat.create();
+	    var orientation_conjugate = quat.create();
+	    quat.conjugate(orientation_conjugate, POV.orientation);
+	    quat.multiply(q, orientation_conjugate, [0, 0, 1, 0]);
+	    quat.multiply(q, q, POV.orientation);
+	    POV.position[0] -= POV.speed * q[0] * elapsed / timescale;
+	    POV.position[1] -= POV.speed * q[1] * elapsed / timescale;
+	    POV.position[2] -= POV.speed * q[2] * elapsed / timescale;
         }
         lastTime = timeNow;
     }
@@ -327,6 +336,16 @@
 	    // Down cursor key
 	    POV.pitch -= POV.rotationrate_increment;
 	}
+	if (currentlyPressedKeys[87]) {
+	    // W
+	    POV.speed += POV.speed_increment;
+	}
+	if (currentlyPressedKeys[83]) {
+	    // S
+	    if (POV.speed > 0) {
+		POV.speed -= POV.speed_increment;
+	    }
+	}
     }
 
     function webGLStart() {
@@ -348,13 +367,33 @@
 
     function drawHud() {
 	hud.context.strokeStyle = "green";
-	hud.context.fillStyle = "blue";
+	hud.context.fillStyle = "DarkGreen";
 	hud.context.clearRect(0, 0, hud.context.canvas.width, hud.context.canvas.height);
-	drawScanner();
+	//drawScanner();
 	drawCompass();
 	drawAttitudeBars();
+	drawSpeedIndicator();
     }
 
+    function drawSpeedIndicator() {
+	hud.context.save();
+	var top = {
+	    x : hud.context.canvas.width - hud.attitudeBars.width - 2,
+            y : hud.context.canvas.height - 100 + 2*hud.attitudeBars.height + 2
+	}
+	hud.context.strokeRect(
+		top.x, top.y,
+		hud.attitudeBars.width, hud.attitudeBars.height
+		);
+	var speed = POV.speed / 200 * hud.attitudeBars.width;
+	speed = Math.min(speed, hud.attitudeBars.width - 1);
+	hud.context.fillRect(
+		top.x + 1, top.y + 1,
+		speed,
+		hud.attitudeBars.height - 2
+		);
+	hud.context.restore();
+    }
     function drawAttitudeBars() {
 	hud.context.save();
 	var top = {
@@ -499,7 +538,7 @@
 	    // If all the images are loaded call the callback.
 	    if (imagesToLoad == 0) {
 		callback(images);
-		document.getElementById('debugline').innerHTML = "Press the arrow keys";
+		document.getElementById('debugline').innerHTML = "Arrow keys for pitch/roll.  W/S for speed.  No touchscreen support yet.";
 	    }
 	};
 
