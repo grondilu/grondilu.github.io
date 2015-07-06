@@ -33,7 +33,11 @@ function Hud(canvas) {
 		}
 	    }
 	}
-    }
+    };
+    this.attitudeBars = {
+	width : 100,
+	height : 10
+    };
 };
 
 
