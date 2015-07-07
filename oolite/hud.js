@@ -56,6 +56,8 @@ function Compass(context, target) {
 	    if (z == 0) {
 		context.fillStyle = "grey";
 		context.fill();
+		context.restore();
+		return;
 	    } 
        	} else {
 	    var angle = Math.atan2(n, Math.abs(z));
@@ -66,8 +68,8 @@ function Compass(context, target) {
 	    context.arc(50 +50*x, 50-50*y, dotsize, 0, 2*Math.PI);
 	    // I don't understand why writing z > 0 here
 	    // gives me the opposite result of what I want
-	    z < 0 ? context.fill() : context.stroke();
 	}
+	z < 0 ? context.fill() : context.stroke();
 	context.restore();
     }
 }
