@@ -190,16 +190,16 @@
     }
 
 
-    var deltaZ = { value: 4000 };
     var POV = {
 	orientation : [0, 0, 0, 1],
-        position : [0, 0, deltaZ.value],
+        position : [0, 0, 4000],
         pitch : 0,
 	roll : 0,
 	yaw : 0,
 	rotationrate_increment :  0.01, // radians per sec
 	speed : 0,
-	speed_increment : 1 // meters per sec
+	speed_increment : 1, // meters per sec
+	target : [0, 0, 0]
     };
     var ship_models = [
       Adder, Asp,
@@ -212,7 +212,6 @@
       Viper
     ];
 
-
     var ships = [ new Coriolis() ];
 
     function drawScene() {
@@ -224,7 +223,9 @@
 	mat4.fromQuat(mvMatrix, POV.orientation);
 	mat4.translate(mvMatrix, mvMatrix, [-POV.position[0], -POV.position[1], -POV.position[2]]);
 
-	hud.compass.dot.setFrom3D(mvMatrix[12], mvMatrix[13], mvMatrix[14]);
+	// this is for a constant target to the origin
+	// TODO:  Make it so it adapts to any target.
+	POV.target = [mvMatrix[12], mvMatrix[13], mvMatrix[14]];
 
 	// Placing each ship in the scene
 	for (var i = 0, ship; ship = ships[i]; i++) {
@@ -303,7 +304,7 @@
         requestAnimFrame(tick);
 	handleKeys();
         drawScene();
-	drawHud();
+	hud.draw();
         animate();
     }
 
@@ -363,131 +364,14 @@
         tick();
     }
 
-    function drawHud() {
-	hud.context.strokeStyle = "green";
-	hud.context.fillStyle = "DarkGreen";
-	hud.context.clearRect(0, 0, hud.context.canvas.width, hud.context.canvas.height);
-	//drawScanner();
-	drawCompass();
-	drawAttitudeBars();
-	drawSpeedIndicator();
-    }
-
-    function drawSpeedIndicator() {
-	hud.context.save();
-	var top = {
-	    x : hud.context.canvas.width - hud.attitudeBars.width - 2,
-            y : hud.context.canvas.height - 100 + 2*hud.attitudeBars.height + 2
-	}
-	hud.context.strokeRect(
-		top.x, top.y,
-		hud.attitudeBars.width, hud.attitudeBars.height
-		);
-	var speed = POV.speed / 200 * hud.attitudeBars.width;
-	speed = Math.min(speed, hud.attitudeBars.width - 1);
-	hud.context.fillRect(
-		top.x + 1, top.y + 1,
-		speed,
-		hud.attitudeBars.height - 2
-		);
-	hud.context.restore();
-    }
-    function drawAttitudeBars() {
-	hud.context.save();
-	var top = {
-	    x : hud.context.canvas.width - hud.attitudeBars.width - 2,
-	    y : hud.context.canvas.height - 100
-	};
-	hud.context.strokeRect(
-		top.x, top.y,
-		hud.attitudeBars.width, hud.attitudeBars.height
-		);
-	hud.context.strokeRect(
-		top.x, top.y + hud.attitudeBars.height + 2,
-		hud.attitudeBars.width, hud.attitudeBars.height
-		);
-	hud.context.fillStyle = "yellow";
-	var roll = POV.roll / Math.PI * hud.attitudeBars.width;
-	roll = Math.min(roll,  hud.attitudeBars.width/2 - 1);
-	roll = Math.max(roll, -hud.attitudeBars.width/2 + 1);
-	hud.context.fillRect(
-		top.x + hud.attitudeBars.width / 2 - 1 + roll,
-		top.y + 1,
-		3,
-		hud.attitudeBars.height - 2
-		);
-	hud.context.strokeRect(
-		top.x + hud.attitudeBars.width / 2 - 1,
-		top.y + 1,
-		3,
-		hud.attitudeBars.height - 2
-		);
-	var pitch = POV.pitch / Math.PI * hud.attitudeBars.width;
-	pitch = Math.min(pitch,  hud.attitudeBars.width/2 - 1);
-	pitch = Math.max(pitch, -hud.attitudeBars.width/2 + 1);
-	hud.context.fillRect(
-		top.x + hud.attitudeBars.width / 2 - 1 + pitch,
-		top.y + 1 + hud.attitudeBars.height + 2,
-		3,
-		hud.attitudeBars.height - 2
-		);
-	hud.context.strokeRect(
-		top.x + hud.attitudeBars.width / 2 - 1,
-		top.y + 1 + hud.attitudeBars.height + 2,
-		3,
-		hud.attitudeBars.height - 2
-		);
-	hud.context.restore();
-    }
-
-    function drawScanner() {
-	hud.context.save();
-	hud.context.beginPath();
-	hud.context.ellipse(
-		hud.context.canvas.width / 2,
-		hud.context.canvas.height - hud.scanner.height / 2 - 10,
-		hud.scanner.width / 2,
-		hud.scanner.height / 2,
-		0, 0, 2*Math.PI
-	);
-	hud.context.stroke();
-	hud.context.restore();
-    }
-
-    function drawCompass() {
-	hud.context.save();
-	hud.context.fillStyle = "green";
-	var center = [
-		hud.context.canvas.width / 2 + hud.scanner.width / 2 + 10,
-		hud.context.canvas.height - hud.compass.half_size - 1
-	       ];	
-	hud.context.beginPath();
-	hud.context.arc(
-		center[0], center[1],
-		hud.compass.half_size,
-		0, 2*Math.PI
-	);
-	hud.context.stroke();
-	hud.context.beginPath();
-	hud.context.arc(
-		center[0] + hud.compass.dot.position[0], center[1] - hud.compass.dot.position[1],
-		hud.compass.dot.half_size,
-		0, 2*Math.PI
-	);
-	hud.context[hud.compass.dot.fillOrStroke]();
-	hud.context.restore();
-    }
-
     function start() {
 	theForm = document.getElementById("theForm");
 	methodSelector = document.getElementById("methodSelector");
-	hud = new Hud(document.getElementById("hud"));
+	hud = new Hud(document.getElementById("hud"), POV);
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;
 
 	loadImages(collectTextureImages(), webGLStart);
-	//createShipSelector();
-	drawHud();
     }
 
     function createShipSelector() {
