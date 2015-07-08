@@ -3,12 +3,12 @@ function Hud(canvas, ship, scene) {
     context.scale(canvas.width / 100, canvas.height / 100);
     this.context = context;
     this.ship = ship;
-    this.scene = scene;
     this.compass = new Compass(context, function() { return ship.target });
     this.pitchIndicator = new AngularRateIndicator(context, function () { return ship.pitch });
     this.rollIndicator  = new AngularRateIndicator(context, function () { return ship.roll });
     this.speedIndicator = new Gauge(context, function() {return ship.speed;}, 200);
     this.sight = new Sight(context);
+    this.scanner = new Scanner(context, ship, scene);
     this.draw = function (tx, ty, sx, sy) {
 	context.save();
 	context.clearRect(0, 0, 100, 100);
@@ -20,12 +20,54 @@ function Hud(canvas, ship, scene) {
 	this.pitchIndicator.draw(75, 75 + 3, 0.25, 0.25);
 	this.speedIndicator.draw(75, 75 + 6, 0.25, 0.25);
 	this.sight.draw(50, 50, 1, 1);
-	//this.compass.draw((100 + 75)/2, (100 + 75 + 9)/2, 0.25, 0.25);
 	this.compass.draw(75, 75 + 12, 0.1, 0.1);
+	this.scanner.draw(35, 85, 0.5, 0.2);
 	context.restore();
     }
 }
 
+function Scanner(context, ship, scene) {
+    this.draw = function (tx, ty, sx, sy) {
+	range = 5000;
+	context.save();
+	if ( tx || ty ) { context.translate(tx, ty); }
+	if ( sx || sy ) { context.scale(sx, sy); }
+	context.beginPath();
+	context.arc(0, 0, 50, 0, 2*Math.PI);
+	context.stroke();
+	if (scene) {
+	    var orientation = quat.create();
+	    quat.copy(orientation, ship.orientation);
+	    var orientation_conjug = quat.create();
+	    quat.conjugate(orientation_conjug, orientation);
+	    for (var i = 0, element; element = scene[i]; i++) {
+		if (element.transponder) {
+		    var data = element.transponder();
+		    var dist = vec3.distance(data.position, ship.position);
+		    if (dist < range) {
+			var p = vec3.create();
+			vec3.subtract(p, data.position, ship.position);
+			var q = quat.create();
+			quat.set(q, p[0], p[1], p[2], 0);
+			document.querySelector("#debugline").innerHTML = [q[0], q[1], q[2], q[3]].join(",");
+			quat.mul(q, orientation, q);
+			quat.mul(q, q, orientation_conjug);
+			vec3.set(p, q[0], q[1], q[2]);
+			vec3.scale(p, p, 50 / range);
+			if (sy) { p[1] /= sy }
+			context.beginPath();
+			context.moveTo(0, 0);
+			context.lineTo(p[0], p[2]);
+			context.lineTo(p[0], p[2] -p[1]);
+			context.stroke();
+			context.strokeRect(p[0], p[2] -p[1], 3, 3);
+		    }
+		}
+	    }
+	}
+	context.restore();
+    }
+}
 function Sight(context) {
     this.draw = function (tx, ty, sx, sy) {
 	context.save();

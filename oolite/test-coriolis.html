@@ -108,10 +108,6 @@
 
         shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
         gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
-
-        shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-        shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-        shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
     }
 
 
@@ -158,8 +154,8 @@
     }
 
     function setMatrixUniforms() {
-        gl.uniformMatrix4fv(shaders[currentShader].program.pMatrixUniform, false, pMatrix);
-        gl.uniformMatrix4fv(shaders[currentShader].program.mvMatrixUniform, false, mvMatrix);
+        gl.uniformMatrix4fv(gl.getUniformLocation(shaders[currentShader].program, "uPMatrix"), false, pMatrix);
+        gl.uniformMatrix4fv(gl.getUniformLocation(shaders[currentShader].program, "uMVMatrix"), false, mvMatrix);
     }
 
     function degToRad(degrees) { return degrees * Math.PI / 180; }
@@ -251,7 +247,7 @@
 
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, model.GL.texture);
-		gl.uniform1i(shaders[currentShader].program.samplerUniform, 0);
+		gl.uniform1i(gl.getUniformLocation(shaders[currentShader].program, "uSampler"), 0);
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, model.vertexIndexBuffer);
 		gl.drawElements(gl.TRIANGLES, model.vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
@@ -367,27 +363,18 @@
     function start() {
 	theForm = document.getElementById("theForm");
 	methodSelector = document.getElementById("methodSelector");
-	hud = new Hud(document.getElementById("hud"), POV);
+	hud = new Hud(document.getElementById("hud"), POV, ships);
 	document.onkeydown = handleKeyDown;
 	document.onkeyup = handleKeyUp;
 
 	loadImages(collectTextureImages(), webGLStart);
     }
 
-    function createShipSelector() {
-	shipSelector = document.createElement("SELECT");
-	for (var i = 0; ships[i]; i++) {
-	    console.log("adding " + ships[i].name);
-	    var option = document.createElement("OPTION");
-	    option.appendChild(document.createTextNode(ships[i].name));
-	    shipSelector.appendChild(option);
-	}
-	document.getElementById("shipFieldSet").appendChild(shipSelector);
-    }
     function collectTextureImages() {
 	var image_urls = [], cache = {};
 	for (var i = 0, ship; ship = ships[i]; i++) {
-	    for (var j = 0, model; model = ship.models[j]; j++) {
+	    var models = ship.models || [ ship.model ];
+	    for (var j = 0, model; model = models[j]; j++) {
 		for (var k = 0, url; url = model.texture.images[k]; k++) {
 		    if (!cache[url]) {
 			cache[url] = true;
