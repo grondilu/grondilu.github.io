@@ -19,7 +19,7 @@ function Hud(canvas, ship, scene) {
 	this.rollIndicator.draw( 75, 75,     0.25, 0.25);
 	this.pitchIndicator.draw(75, 75 + 3, 0.25, 0.25);
 	this.speedIndicator.draw(75, 75 + 6, 0.25, 0.25);
-	this.sight.draw(50, 50, 0.1, 0.1);
+	this.sight.draw(50, 50, 1, 1);
 	//this.compass.draw((100 + 75)/2, (100 + 75 + 9)/2, 0.25, 0.25);
 	this.compass.draw(75, 75 + 12, 0.1, 0.1);
 	context.restore();
@@ -32,8 +32,8 @@ function Sight(context) {
 	if ( tx || ty ) { context.translate(tx, ty); }
 	if ( sx || sy ) { context.scale(sx, sy); }
 	context.beginPath();
-	context.arc(0, 0, 50, 0, 2*Math.PI);
-	context.moveTo(0, 50);
+	context.arc(0, 0, 10, 0, 2*Math.PI);
+	context.moveTo(0, 10);
 	context.lineTo(0, 0);
 	context.stroke();
 	context.restore();
