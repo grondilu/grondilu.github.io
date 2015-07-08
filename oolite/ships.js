@@ -1,5 +1,15 @@
+var ship_prototype = 
+{
+    orientation : [0, 0, 0, 1],
+    position : [0, 0, 0],
+    pitch : 0,
+    roll : 0,
+    yaw : 0
+};
+
 function CobraIII() {
-    this.name = "Cobra Mark III",
+    Object.setPrototypeOf(this, ship_prototype);
+    this.name = "Cobra Mark III";
     this.model =
     {
 	dat_file : "cobra3_redux.dat",
@@ -13,6 +23,7 @@ function CobraIII() {
 }
 
 function Anaconda() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Anaconda";
     this.model =
     {
@@ -27,6 +38,7 @@ function Anaconda() {
 }
 
 function FerDeLance() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Fer de Lance";
     this.model =
     {
@@ -41,6 +53,7 @@ function FerDeLance() {
 }
 
 function Adder() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Adder";
     this.model =
     {
@@ -55,6 +68,7 @@ function Adder() {
 }
 
 function Asp() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Asp";
     this.model =
     {
@@ -69,6 +83,7 @@ function Asp() {
 }
 
 function Boa2() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Boa 2";
     this.model =
     {
@@ -83,6 +98,7 @@ function Boa2() {
 }
 
 function Boa() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Boa";
     this.model =
     {
@@ -97,6 +113,7 @@ function Boa() {
 }
 
 function CobraI() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Cobra Mark I";
     this.model =
     {
@@ -111,6 +128,7 @@ function CobraI() {
 }
 
 function Constrictor() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Constrictor";
     this.model =
     {
@@ -125,6 +143,7 @@ function Constrictor() {
 }
 
 function EscapePod() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Escape pod";
     this.model =
     {
@@ -139,6 +158,7 @@ function EscapePod() {
 }
 
 function Gecko() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Gecko";
     this.model =
     {
@@ -153,6 +173,7 @@ function Gecko() {
 }
 
 function Krait() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Krait";
     this.model =
     {
@@ -167,6 +188,7 @@ function Krait() {
 }
 
 function Mamba() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Mamba";
     this.model =
     {
@@ -181,6 +203,7 @@ function Mamba() {
 }
 
 function Moray() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Moray";
     this.model =
     {
@@ -195,6 +218,7 @@ function Moray() {
 }
 
 function Shuttle() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Shuttle";
     this.model =
     {
@@ -209,6 +233,7 @@ function Shuttle() {
 }
 
 function Sidewinder() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Sidewinder";
     this.model =
     {
@@ -223,6 +248,7 @@ function Sidewinder() {
 }
 
 function Thargoid() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Thargoid";
     this.model =
     {
@@ -237,6 +263,7 @@ function Thargoid() {
 }
 
 function Thargon() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Thargon";
     this.model =
     {
@@ -251,6 +278,7 @@ function Thargon() {
 }
 
 function Viper() {
+    Object.setPrototypeOf(this, ship_prototype);
     this.name = "Viper";
     this.model =
     {
@@ -263,4 +291,3 @@ function Viper() {
 	}
     };
 }
-
