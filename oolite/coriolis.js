@@ -42,6 +42,7 @@ function Coriolis() {
     this.orientation = [0,0,0,1];
     this.position = [0, 0, 0];
     this.pitch = 0;
-    this.roll = 0.1;
+    this.roll = 0;
     this.yaw = 0;
+    this.transponder = (function (position) { return function () { return { position : position } } })(this.position);
 }
