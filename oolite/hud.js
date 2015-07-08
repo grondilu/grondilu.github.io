@@ -49,7 +49,6 @@ function Scanner(context, ship, scene) {
 			vec3.subtract(p, data.position, ship.position);
 			var q = quat.create();
 			quat.set(q, p[0], p[1], p[2], 0);
-			document.querySelector("#debugline").innerHTML = [q[0], q[1], q[2], q[3]].join(",");
 			quat.mul(q, orientation, q);
 			quat.mul(q, q, orientation_conjug);
 			vec3.set(p, q[0], q[1], q[2]);
