@@ -42,15 +42,16 @@ function StarCatalog(webGLContext, catalog) {
 	return;
     } else {
 	//
+	var radius = 1e6;
 	for (var i = 0, ra, de, ma; catalog[i]; i+=3) {
 	    // expected format is Right Ascention, Declination, Magnitude
 	    ra = catalog[i];
 	    de = catalog[i+1];
 	    ma = catalog[i+2];
 	    tmparray.push(
-		    Math.cos(de)*Math.cos(ra),
-		    Math.cos(de)*Math.sin(ra),
-		    Math.sin(de),
+		    radius * Math.cos(de)*Math.cos(ra),
+		    radius * Math.cos(de)*Math.sin(ra),
+		    radius * Math.sin(de),
 		    Math.pow(2.52, -1.4 + ma)
 	    );
 	}
