@@ -189,17 +189,6 @@
     }
 
 
-    var POV = {
-	orientation : [0, 0, 0, 1],
-        position : [0, 0, 4000],
-        pitch : 0,
-	roll : 0,
-	yaw : 0,
-	rotationrate_increment :  0.01, // radians per sec
-	speed : 0,
-	speed_increment : 1, // meters per sec
-	target : [0, 0, 0]
-    };
     var ship_models = [
       Adder, Asp,
       Anaconda,
@@ -211,7 +200,19 @@
       Viper
     ];
 
-    var ships = [ new Coriolis() ];
+    var coriolis_station = new Coriolis();
+    var ships = [ coriolis_station ];
+    var POV = {
+	orientation : [0, 0, 0, 1],
+        position : [0, 0, 4000],
+        pitch : 0,
+	roll : 0,
+	yaw : 0,
+	rotationrate_increment :  0.01, // radians per sec
+	speed : 0,
+	speed_increment : 1, // meters per sec
+	target : coriolis_station
+    };
 
     function drawScene() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -223,10 +224,6 @@
 	hipparcos.draw(pMatrix, mvMatrix);
 
 	mat4.translate(mvMatrix, mvMatrix, [-POV.position[0], -POV.position[1], -POV.position[2]]);
-
-	// this is for a constant target to the origin
-	// TODO:  Make it so it adapts to any target.
-	POV.target = [mvMatrix[12], mvMatrix[13], mvMatrix[14]];
 
 	shaders[0].use();
 	// Placing each ship in the scene
