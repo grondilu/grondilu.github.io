@@ -102,7 +102,7 @@ function Compass(context, ship) {
 	var orientation_conjug = quat.create();
 	quat.conjugate(orientation_conjug, orientation);
 	var p = vec3.create();
-	vec3.subtract(p, ship.target, ship.position);
+	vec3.subtract(p, ship.target.position, ship.position);
 	var q = quat.create();
 	quat.set(q, p[0], p[1], p[2], 0);
 	quat.mul(q, orientation, q);
