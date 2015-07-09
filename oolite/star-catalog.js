@@ -52,7 +52,7 @@ function StarCatalog(webGLContext, catalog) {
 		    radius * Math.cos(de)*Math.cos(ra),
 		    radius * Math.cos(de)*Math.sin(ra),
 		    radius * Math.sin(de),
-		    Math.min(1.0, Math.pow(2.52, 1.5 - ma))
+		    Math.min(1.0, Math.pow(2.52, 1.2 - ma))
 	    );
 	}
     }
