@@ -9,13 +9,14 @@ function StarCatalog(webGLContext, catalog) {
 	].join("\n"),
 	vertex : [
 	"attribute vec4 aStar;",
+	"attribute float aIntensity;",
 	"uniform mat4 uMVMatrix;",
 	"uniform mat4 uPMatrix;",
 	"varying float vIntensity;",
 	"void main(void) {",
 	    "gl_PointSize = 1.0;",
-	    "gl_Position = uPMatrix * uMVMatrix * vec4(aStar.xyz, 1.0);",
-	    "vIntensity = aStar.w;",
+	    "gl_Position = uPMatrix * uMVMatrix * aStar;",
+	    "vIntensity = aIntensity;",
 	    "}"
 	].join("\n")
     };
@@ -33,46 +34,69 @@ function StarCatalog(webGLContext, catalog) {
     webGLContext.linkProgram(shaderProgram);
 
     webGLContext.enableVertexAttribArray(webGLContext.getAttribLocation(shaderProgram, "aStar"));
+    webGLContext.enableVertexAttribArray(webGLContext.getAttribLocation(shaderProgram, "aIntensity"));
 
-    var glBuffer = webGLContext.createBuffer();
-    webGLContext.bindBuffer(webGLContext.ARRAY_BUFFER, glBuffer);
-    var tmparray = [ ];
+    var tmpPositionArray = [ ];
+    var tmpIntensityArray = [ ];
     if (Math.floor(catalog.length / 3) * 3 !== catalog.length) {
 	alert("unexpected star catalog size");
 	return;
     } else {
 	//
-	var radius = 1e6;
 	for (var i = 0, ra, de, ma; catalog[i]; i+=3) {
 	    // expected format is Right Ascention, Declination, Magnitude
 	    ra = catalog[i];
 	    de = catalog[i+1];
 	    ma = catalog[i+2];
-	    tmparray.push(
-		    radius * Math.cos(de)*Math.cos(ra),
-		    radius * Math.cos(de)*Math.sin(ra),
-		    radius * Math.sin(de),
-		    Math.min(1.0, Math.pow(2.52, 1.1 - ma))
+	    tmpPositionArray.push(
+		    Math.cos(de)*Math.cos(ra),
+		    Math.cos(de)*Math.sin(ra),
+		    Math.sin(de),
+		    1e-6
+	    );
+	    tmpIntensityArray.push(
+		    1 // Math.min(1.0, Math.pow(2.52, 1.1 - ma))
 	    );
 	}
     }
-    webGLContext.bufferData(webGLContext.ARRAY_BUFFER, new Float32Array(tmparray), webGLContext.STATIC_DRAW);
-    glBuffer.itemSize = 4;
-    glBuffer.numItems = Math.floor(tmparray.length / 4);
+    var glPositionBuffer = webGLContext.createBuffer();
+    webGLContext.bindBuffer(webGLContext.ARRAY_BUFFER, glPositionBuffer);
+    webGLContext.bufferData(webGLContext.ARRAY_BUFFER, new Float32Array(tmpPositionArray), webGLContext.STATIC_DRAW);
+    glPositionBuffer.itemSize = 4;
+    glPositionBuffer.numItems = Math.floor(tmpPositionArray.length / 4);
+
+    var glIntensityBuffer = webGLContext.createBuffer();
+    webGLContext.bindBuffer(webGLContext.ARRAY_BUFFER, glIntensityBuffer);
+    webGLContext.bufferData(webGLContext.ARRAY_BUFFER, new Float32Array(tmpIntensityArray), webGLContext.STATIC_DRAW);
+    glIntensityBuffer.itemSize = 1;
+    glIntensityBuffer.numItems = tmpIntensityArray.length;
 
     this.draw = function (projectionMatrix, modelViewMatrix) {
 	webGLContext.useProgram(shaderProgram);
-	webGLContext.bindBuffer(webGLContext.ARRAY_BUFFER, glBuffer);
-	webGLContext.vertexAttribPointer(shaderProgram.vertexPositionAttribute, glBuffer.itemSize, webGLContext.FLOAT, false, 0, 0);
 
+	// Set attributes
+	webGLContext.bindBuffer(webGLContext.ARRAY_BUFFER, glPositionBuffer);
+	webGLContext.vertexAttribPointer(
+		webGLContext.getAttribLocation(shaderProgram, "aStar"),
+		glPositionBuffer.itemSize, webGLContext.FLOAT, false, 0, 0
+		);
+	webGLContext.bindBuffer(webGLContext.ARRAY_BUFFER, glIntensityBuffer);
+	webGLContext.vertexAttribPointer(
+		webGLContext.getAttribLocation(shaderProgram, "aIntensity"),
+		glIntensityBuffer.itemSize, webGLContext.FLOAT, false, 0, 0
+		);
+
+	// Set uniforms
 	webGLContext.uniformMatrix4fv(webGLContext.getUniformLocation(shaderProgram, "uPMatrix"), false, [
 		projectionMatrix[0], 0,  0,  0,
 		0, projectionMatrix[5],  0,  0,
-		0,                   0, -1,  -1,
-		0,                   0, -2,  0
+		0,                   0,  -1,  -1,
+		0,                   0,  -2, -0
 		]
 	);
 	webGLContext.uniformMatrix4fv(webGLContext.getUniformLocation(shaderProgram, "uMVMatrix"), false, modelViewMatrix);
-	webGLContext.drawArrays(webGLContext.POINTS, 0, glBuffer.numItems);
+
+	// Draw points
+	webGLContext.drawArrays(webGLContext.POINTS, 0, glPositionBuffer.numItems);
     }
 }
