@@ -9,13 +9,14 @@ function Hud(canvas, ship, scene) {
     this.speedIndicator = new Gauge(context, function() {return ship.speed;}, 200);
     this.sight = new Sight(context);
     this.scanner = new Scanner(context, ship, scene);
+    this.clear = function () { context.clearRect(0, 0, 100, 100) }
     this.draw = function (tx, ty, sx, sy) {
 	context.save();
-	context.clearRect(0, 0, 100, 100);
 	context.strokeStyle = "green";
 	context.fillStyle = "green";
 	if ( tx || ty ) { context.translate(tx, ty); }
 	if ( sx || sy ) { context.scale(sx, sy); }
+	this.clear();
 	this.rollIndicator.draw( 75, 75,     0.25, 0.25);
 	this.pitchIndicator.draw(75, 75 + 3, 0.25, 0.25);
 	this.speedIndicator.draw(75, 75 + 6, 0.25, 0.25);

@@ -36,7 +36,6 @@
     var hud;
     var images = {};
     var shipSelector;
-    var theForm;
     var currentShader = 0;
     var hipparcos;
 
@@ -303,7 +302,11 @@
         requestAnimFrame(tick);
 	handleKeys();
         drawScene();
-	hud.draw();
+	if (document.querySelector("#showHUD").checked) {
+	    hud.draw();
+	} else {
+	    hud.clear();
+	}
         animate();
     }
 
@@ -363,7 +366,6 @@
     }
 
     function start() {
-	theForm = document.getElementById("theForm");
 	methodSelector = document.getElementById("methodSelector");
 	hud = new Hud(document.getElementById("hud"), POV, ships);
 	document.onkeydown = handleKeyDown;
@@ -435,8 +437,7 @@
     </div>
 
     <output id=debug></debug>
-    <form id=theForm>
-    </form>
+    <input type=checkbox id=showHUD checked=true>Show HUD</input>
 </body>
 
 </html>
