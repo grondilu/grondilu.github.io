@@ -3,7 +3,7 @@ function Hud(canvas, ship, scene) {
     context.scale(canvas.width / 100, canvas.height / 100);
     this.context = context;
     this.ship = ship;
-    this.compass = new Compass(context, function() { return ship.target });
+    this.compass = new Compass(context, ship);
     this.pitchIndicator = new AngularRateIndicator(context, function () { return ship.pitch });
     this.rollIndicator  = new AngularRateIndicator(context, function () { return ship.roll });
     this.speedIndicator = new Gauge(context, function() {return ship.speed;}, 200);
@@ -53,7 +53,6 @@ function Scanner(context, ship, scene) {
 			quat.mul(q, q, orientation_conjug);
 			vec3.set(p, q[0], q[1], q[2]);
 			vec3.scale(p, p, 50 / range);
-			if (sy) { p[1] /= sy }
 			context.beginPath();
 			context.moveTo(0, 0);
 			context.lineTo(p[0], p[2]);
@@ -95,11 +94,21 @@ function Gauge(context, value, max) {
 	context.restore();
     }
 }
-function Compass(context, target) {
+function Compass(context, ship) {
     var dotsize = 10;
     this.draw = function (tx, ty, sx, sy) {
-	var xyz = target();
-	var x = xyz[0], y = xyz[1], z = xyz[2];
+	var orientation = quat.create();
+	quat.copy(orientation, ship.orientation);
+	var orientation_conjug = quat.create();
+	quat.conjugate(orientation_conjug, orientation);
+	var p = vec3.create();
+	vec3.subtract(p, ship.target, ship.position);
+	var q = quat.create();
+	quat.set(q, p[0], p[1], p[2], 0);
+	quat.mul(q, orientation, q);
+	quat.mul(q, q, orientation_conjug);
+
+	var x = q[0], y = q[1], z = q[2];
 	var n = Math.sqrt(x*x + y*y);
 	context.save();
 	if ( tx || ty ) { context.translate(tx, ty); }
@@ -107,6 +116,7 @@ function Compass(context, target) {
 	context.beginPath();
 	context.arc(50, 50, 50, 0, 2*Math.PI);
 	context.stroke();
+
 	context.beginPath();
 	if (n == 0) {
 	    context.arc(50,50, dotsize, 0, 2*Math.PI);
