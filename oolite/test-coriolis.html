@@ -20,12 +20,14 @@
 
 <meta charset="utf-8">
 
-<script type="text/javascript" src="gl-matrix-min.js"></script>
-<script type="text/javascript" src="webgl-utils.js"></script>
-<script type="text/javascript" src="ships.js"></script>
-<script type="text/javascript" src="coriolis.js"></script>
-<script type="text/javascript" src="shaders.js"></script>
-<script type="text/javascript" src="hud.js"></script>
+<script src="gl-matrix-min.js"></script>
+<script src="webgl-utils.js"></script>
+<script src="ships.js"></script>
+<script src="coriolis.js"></script>
+<script src="shaders.js"></script>
+<script src="hud.js"></script>
+<script src="hipparcos-extract.js"></script>
+<script src="star-catalog.js"></script>
 
 <script type="text/javascript">
 
@@ -36,6 +38,7 @@
     var shipSelector;
     var theForm;
     var currentShader = 0;
+    var hipparcos;
 
     function initGL(canvas) {
         try {
@@ -217,12 +220,15 @@
         mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 5000.0);
 
 	mat4.fromQuat(mvMatrix, POV.orientation);
+	hipparcos.draw(pMatrix, mvMatrix);
+
 	mat4.translate(mvMatrix, mvMatrix, [-POV.position[0], -POV.position[1], -POV.position[2]]);
 
 	// this is for a constant target to the origin
 	// TODO:  Make it so it adapts to any target.
 	POV.target = [mvMatrix[12], mvMatrix[13], mvMatrix[14]];
 
+	shaders[0].use();
 	// Placing each ship in the scene
 	for (var i = 0, ship; ship = ships[i]; i++) {
 	    var models = ship.models || [ ship.model ];
@@ -348,8 +354,7 @@
         initGL(canvas);
 	compileShaders();
 	linkShaders();
-
-	shaders[0].use();
+        hipparcos = new StarCatalog(gl, hipparcos_extract);
 
         initBuffers();
         initTexture();
