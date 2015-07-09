@@ -55,7 +55,7 @@ function StarCatalog(webGLContext, catalog) {
 		    1e-6
 	    );
 	    tmpIntensityArray.push(
-		    1 // Math.min(1.0, Math.pow(2.52, 1.1 - ma))
+		    Math.min(1.0, Math.pow(2.52, 1.1 - ma))
 	    );
 	}
     }
