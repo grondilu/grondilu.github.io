@@ -52,7 +52,7 @@ function StarCatalog(webGLContext, catalog) {
 		    radius * Math.cos(de)*Math.cos(ra),
 		    radius * Math.cos(de)*Math.sin(ra),
 		    radius * Math.sin(de),
-		    Math.pow(2.52, -1.4 + ma)
+		    Math.min(1.0, Math.pow(2.52, 1.5 - ma))
 	    );
 	}
     }
@@ -69,7 +69,7 @@ function StarCatalog(webGLContext, catalog) {
 		projectionMatrix[0], 0,  0,  0,
 		0, projectionMatrix[5],  0,  0,
 		0,                   0, -1,  -1,
-		0,                   0, -1,  0
+		0,                   0, -2,  0
 		]
 	);
 	webGLContext.uniformMatrix4fv(webGLContext.getUniformLocation(shaderProgram, "uMVMatrix"), false, modelViewMatrix);
