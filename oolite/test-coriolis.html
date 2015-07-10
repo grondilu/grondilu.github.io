@@ -218,12 +218,14 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 5000.0);
-	pMatrix[10] = -0.9999;
-	pMatrix[11] = -1;
-	pMatrix[14] = -1;
-	pMatrix[15] = 1;
+
+	// Let's modify the projection matrix to get an infinite frustrum
+	pMatrix[10] = -0.9999; pMatrix[11] = -1;
+	pMatrix[14] = -1;      pMatrix[15] =  1;
 
 	mat4.fromQuat(mvMatrix, POV.orientation);
+
+	// Drawing the stars
 	hipparcos.draw(pMatrix, mvMatrix);
 
 	mat4.translate(mvMatrix, mvMatrix, [-POV.position[0], -POV.position[1], -POV.position[2]]);
