@@ -218,6 +218,10 @@
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         mat4.perspective(pMatrix, 45, gl.viewportWidth / gl.viewportHeight, 0.1, 5000.0);
+	pMatrix[10] = -0.9999;
+	pMatrix[11] = -1;
+	pMatrix[14] = -1;
+	pMatrix[15] = 1;
 
 	mat4.fromQuat(mvMatrix, POV.orientation);
 	hipparcos.draw(pMatrix, mvMatrix);

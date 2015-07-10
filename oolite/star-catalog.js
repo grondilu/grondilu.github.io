@@ -52,7 +52,7 @@ function StarCatalog(webGLContext, catalog) {
                     Math.cos(de)*Math.cos(ra),
                     Math.cos(de)*Math.sin(ra),
                     Math.sin(de),
-                    1e-6
+                    0
             );
             tmpIntensityArray.push(
                     Math.min(1.0, Math.pow(2.52, 1.1 - ma))
@@ -90,7 +90,7 @@ function StarCatalog(webGLContext, catalog) {
         webGLContext.uniformMatrix4fv(webGLContext.getUniformLocation(shaderProgram, "uPMatrix"), false, [
                 projectionMatrix[0], 0,  0,  0,
                 0, projectionMatrix[5],  0,  0,
-                0,                   0, -1, -1,
+                0,                   0, -0.9999, -1,
                 0,                   0, -1,  1
                 ]
         );
