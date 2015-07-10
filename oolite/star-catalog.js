@@ -52,7 +52,7 @@ function StarCatalog(webGLContext, catalog) {
                     Math.cos(de)*Math.cos(ra),
                     Math.cos(de)*Math.sin(ra),
                     Math.sin(de),
-                    1e-15
+                    0
             );
             tmpIntensityArray.push(
                     Math.min(1.0, Math.pow(2.52, 1.1 - ma))
