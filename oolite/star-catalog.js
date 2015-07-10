@@ -14,7 +14,7 @@ function StarCatalog(webGLContext, catalog) {
 	"uniform mat4 uPMatrix;",
 	"varying float vIntensity;",
 	"void main(void) {",
-	    "gl_PointSize = 1.0;",
+	    "gl_PointSize = 2.0;",
 	    "gl_Position = uPMatrix * uMVMatrix * aStar;",
 	    "vIntensity = aIntensity;",
 	    "}"
@@ -91,7 +91,7 @@ function StarCatalog(webGLContext, catalog) {
 		projectionMatrix[0], 0,  0,  0,
 		0, projectionMatrix[5],  0,  0,
 		0,                   0,  -1,  -1,
-		0,                   0,  -2, -0
+		0,                   0,  -1, 1
 		]
 	);
 	webGLContext.uniformMatrix4fv(webGLContext.getUniformLocation(shaderProgram, "uMVMatrix"), false, modelViewMatrix);
