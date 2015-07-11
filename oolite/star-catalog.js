@@ -1,37 +1,26 @@
 function StarCatalog(webGLContext, catalog) {
-    var shader_sources = {
-        fragment : [
-        "precision mediump float;",
-        "varying float vIntensity;",
-        "void main(void) {",
-        "    gl_FragColor = vec4(vIntensity, vIntensity, vIntensity, 1.0);",
-        "}"
-        ].join("\n"),
-        vertex : [
-        "attribute vec4 aStar;",
-        "attribute float aIntensity;",
-        "uniform mat4 uMVMatrix;",
-        "uniform mat4 uPMatrix;",
-        "varying float vIntensity;",
-        "void main(void) {",
-            "gl_PointSize = 2.0;",
-            "gl_Position = uPMatrix * uMVMatrix * aStar;",
-            "vIntensity = aIntensity;",
-            "}"
-        ].join("\n")
-    };
-
-    var fragmentShader = webGLContext.createShader(webGLContext.FRAGMENT_SHADER),
-    vertexShader = webGLContext.createShader(webGLContext.VERTEX_SHADER);
-    webGLContext.shaderSource(fragmentShader, shader_sources.fragment);
-    webGLContext.shaderSource(vertexShader, shader_sources.vertex);
-    webGLContext.compileShader(fragmentShader);
-    webGLContext.compileShader(vertexShader);
-
-    var shaderProgram = webGLContext.createProgram();
-    webGLContext.attachShader(shaderProgram, vertexShader);
-    webGLContext.attachShader(shaderProgram, fragmentShader);
-    webGLContext.linkProgram(shaderProgram);
+    var shaderProgram = compileShader(webGLContext, {
+	fragment : [
+	"precision mediump float;",
+	"varying float vIntensity;",
+	"void main(void) {",
+	"    gl_FragColor = vec4(vIntensity, vIntensity, vIntensity, 1.0);",
+	"}"
+	].join("\n"),
+	vertex : [
+	"attribute vec4 aStar;",
+	"attribute float aIntensity;",
+	"uniform mat4 uMVMatrix;",
+	"uniform mat4 uPMatrix;",
+	"varying float vIntensity;",
+	"void main(void) {",
+	"gl_PointSize = 1.0;",
+	"gl_Position = uPMatrix * uMVMatrix * aStar;",
+	"vIntensity = aIntensity;",
+	"}"
+	].join("\n")
+    }
+    );
 
     webGLContext.enableVertexAttribArray(webGLContext.getAttribLocation(shaderProgram, "aStar"));
     webGLContext.enableVertexAttribArray(webGLContext.getAttribLocation(shaderProgram, "aIntensity"));
@@ -49,13 +38,13 @@ function StarCatalog(webGLContext, catalog) {
             de = catalog[i+1];
             ma = catalog[i+2];
             tmpPositionArray.push(
-                    Math.cos(de)*Math.cos(ra),
-                    Math.cos(de)*Math.sin(ra),
-                    Math.sin(de),
-                    0
+		Math.cos(de)*Math.cos(ra),
+		Math.cos(de)*Math.sin(ra),
+		Math.sin(de),
+		0
             );
             tmpIntensityArray.push(
-                    Math.min(1.0, Math.pow(2.52, 1.1 - ma))
+		Math.min(1.0, Math.pow(2.52, 1.1 - ma))
             );
         }
     }
