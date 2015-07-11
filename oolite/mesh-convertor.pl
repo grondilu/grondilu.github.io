@@ -11,14 +11,16 @@ my $float = qr{[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?};
 my (@vertices, @faces, @texture, %image, @names);
 
 my $texture_images_dir = '../images/textures';
+my $texture_image;
+my (%new_vertices, @new_vertices);
 my ($nverts, $nfaces, $nnames) = (0, 0, 0);
 
 unless (caller) {
     gather_data();
 
     # pick one!
-    #dumb_mesh_maker();
     not_completely_dumb_mesher();
+    show_results();
 }
 
 sub gather_data {
@@ -63,8 +65,6 @@ sub gather_data {
 		my @fields = split /\s+/, $line;
 		my $image = shift @fields;
 		$image{$image}++;
-		keys(%image) == 1
-		    or die "can't deal with multi-level textures yet (@{[keys %image]}), sorry";
 		#$fields[0] == 1 && $fields[1] == 1 or die "unexpected range in the texture (line is $line)";
 		$fields[$_]/=$fields[0] for 2, 4, 6;
 		$fields[$_]/=$fields[1] for 3, 5, 7;
@@ -88,8 +88,7 @@ sub gather_data {
 
 sub not_completely_dumb_mesher {
 
-    my $texture_image = $texture[0]->{'image'};
-    my %new_vertices;
+    $texture_image = $texture[0]->{'image'};
     for my $f (0 .. $#faces) {
 	my @vertex_indices = @{$faces[$f]->{'vertex_indices'}};
 	my @coord = @{$texture[$f]->{'coord'}};
@@ -111,7 +110,6 @@ sub not_completely_dumb_mesher {
 	$faces[$_]->{'vertex_indices'} = [ @vertex_indices ];
     }
 
-    my @new_vertices;
     for (@faces) {
 	state %cache;
 	for (@{$_->{'vertex_indices'}}) {
@@ -123,13 +121,12 @@ sub not_completely_dumb_mesher {
 	$new_vertices{$new_vertices[$_]} = $_;
     }
 
-    my @new_vertex_coordinates =
-    map { @{$vertices[$_]} }
-    map { (split ':')[0] }
-    @new_vertices;
+}
+
+sub show_results {
 
     print <<EOF
-model : {
+{
     dat_file : "UNSPECIFIED",
     vertices : [ @{[
 	join ',',
@@ -150,29 +147,6 @@ model : {
 }
 EOF
     ;
-
-}
-
-sub dumb_mesh_maker {
-    my $texture_image = $texture[0]->{'image'};
-    my @vertex_coordinates;
-    for (0 .. $#faces) {
-	for (@{$faces[$_]->{'vertex_indices'}}) {
-	    push @vertex_coordinates, @{$vertices[$_]};
-	}
-    }
-    print <<EOF
-{
-    comment : "This is a very unoptimized mesh.  Consider checking for redundancy for a better version",
-    faces : [ @{[ join ',', 0 .. 3 * @faces - 1 ]} ],
-    vertices : [ @{[ join ',', @vertex_coordinates ]} ],
-    texture : {
-	 image : "$texture_images_dir/$texture_image",
-	 coord : [ @{[ join ',', map { join ',', @{$_->{'coord'}} } @texture ]} ]
-	 },
-    normals : [ @{[ join ',', map { join ',', @{$_->{'normal'}} } @faces ]} ]
-}
-EOF
 
 }
 
