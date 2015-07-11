@@ -6,13 +6,15 @@ function loadImage(url, callback) {
 }
 function loadImages(urls, callback) {
     var count = 0;
+    document.getElementById("debugline").innerHTML = ("loading " + urls[count++]);
     var imagesToLoad = urls.length;
     // Called each time an image finished loading.
     var onImageLoad = function() {
 	--imagesToLoad;
-	console.log("Loaded " + urls[count++]);
+	document.getElementById("debugline").innerHTML = ("loading " + urls[count++]);
 	// If all the images are loaded call the callback.
 	if (imagesToLoad == 0) {
+	    document.getElementById("debugline").innerHTML = '';
 	    callback();
 	}
     };
