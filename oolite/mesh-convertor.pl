@@ -11,7 +11,7 @@ my $float = qr{[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?};
 my (@vertices, @faces, @texture, %image, @names);
 
 my $texture_images_dir = '../images/textures';
-my $texture_image;
+my (@images, @offsets);
 my (%new_vertices, @new_vertices);
 my ($nverts, $nfaces, $nnames) = (0, 0, 0);
 
@@ -88,7 +88,6 @@ sub gather_data {
 
 sub not_completely_dumb_mesher {
 
-    $texture_image = $texture[0]->{'image'};
     for my $f (0 .. $#faces) {
 	my @vertex_indices = @{$faces[$f]->{'vertex_indices'}};
 	my @coord = @{$texture[$f]->{'coord'}};
@@ -104,8 +103,9 @@ sub not_completely_dumb_mesher {
     for (0 .. $#faces) {
 	my @vertex_indices = @{$faces[$_]->{'vertex_indices'}};
 	my @texture_coordinates = @{$texture[$_]->{'coord'}};
+	my $image = $texture[$_]->{'image'};
 	for (0 .. 2) {
-	    $vertex_indices[$_] .= ':' . $texture_coordinates[$_];
+	    $vertex_indices[$_] .= ":$texture_coordinates[$_]:$image";
 	}
 	$faces[$_]->{'vertex_indices'} = [ @vertex_indices ];
     }
@@ -117,8 +117,23 @@ sub not_completely_dumb_mesher {
 	}
     }
 
+    @new_vertices = @new_vertices[
+	sort {
+	    (split ':', $new_vertices[$a])[2]
+	    cmp
+	    (split ':', $new_vertices[$b])[2]
+	} 0 .. $#new_vertices
+    ];
+
     for (0 .. $#new_vertices) {
-	$new_vertices{$new_vertices[$_]} = $_;
+	state %cache;
+	my $new_vertex = $new_vertices[$_];
+	$new_vertices{$new_vertex} = $_;
+	my $image = (split ':', $new_vertex)[2];
+	if (!$cache{$image}++) {
+	    push @offsets, $_;
+	    push @images, $image;
+	}
     }
 
 }
@@ -141,7 +156,8 @@ sub show_results {
 	@faces
     ]} ],
     texture : {
-	images : [ "$texture_image" ],
+	offsets : [ @offsets ],
+	images : [ @{[join ', ', map { qq{"$_"} } @images ]} ],
 	coordinates : [ @{[ join ',', map { (split ':')[1] } @new_vertices ]} ]
     }
 }
