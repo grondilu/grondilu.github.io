@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<meta charset="utf-8">
+	<title>My first Three.js app</title>
+	<style>
+	    body {
+	      background-color: #ffffff;
+	      margin: 0;
+	      overflow: hidden;
+	    }
+	</style>
+	<script src="js/three.js"></script>
+    </head>
+    <body>
+      <label for=distance>Z</label><input type=range min=0 max=2000 value=200 id=distance></input>
+	<script>
+	    var camera, scene, renderer;
+	    var geometry, material, mesh;
+
+	    init();
+	    //animate();
+
+	    function animate() {
+
+	      requestAnimationFrame( animate );
+
+	      mesh.rotation.x = Date.now() * 0.0002;
+	      mesh.rotation.y = Date.now() * 0.0003;
+	      mesh.rotation.z = Date.now() * 0.0005;
+
+	      camera.position.z = document.getElementById("distance").value;
+
+	      renderer.render( scene, camera );
+
+	    };
+
+	    function init() {
+
+		renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
+		(function () {
+		    var elements = camera.projectionMatrix.elements;
+		    elements[10] = -0.99;
+		    elements[11] = elements[14] = -1;
+		    elements[15] = 1;
+		})();
+
+		camera.position.z = document.getElementById("distance").value;
+
+		scene = new THREE.Scene();
+
+		var gmtry = (function () {
+		    var gmtry = new THREE.Geometry();
+		    gmtry.vertices.push(
+			new THREE.Vector3( 0.00000,15.00000,0.00000 ),
+			new THREE.Vector3( 16.00000,-0.50000,32.50000 ),
+			new THREE.Vector3( -16.00000,-0.50000,32.50000 ),
+			new THREE.Vector3( 16.00000,-15.00000,-32.50000 ),
+			new THREE.Vector3( -16.00000,-15.00000,-32.50000 ),
+			new THREE.Vector3( -44.00000,10.00000,-32.50000 ),
+			new THREE.Vector3( -60.00000,-3.00000,-13.00000 ),
+			new THREE.Vector3( -65.00000,-3.00000,-32.50000 ),
+			new THREE.Vector3( 44.00000,10.00000,-32.50000 ),
+			new THREE.Vector3( 60.00000,-3.00000,-13.00000 ),
+			new THREE.Vector3( 65.00000,-3.00000,-32.50000 ),
+			new THREE.Vector3( 0.00000,15.00000,-32.50000 )
+		    );
+		    gmtry.faces.push(
+			new THREE.Face3( 1,8,0 ),
+			new THREE.Face3( 2,1,0 ),
+			new THREE.Face3( 3,9,1 ),
+			new THREE.Face3( 4,1,2 ),
+			new THREE.Face3( 4,3,1 ),
+			new THREE.Face3( 4,6,7 ),
+			new THREE.Face3( 5,2,0 ),
+			new THREE.Face3( 5,6,2 ),
+			new THREE.Face3( 6,4,2 ),
+			new THREE.Face3( 7,6,5 ),
+			new THREE.Face3( 8,11,0 ),
+			new THREE.Face3( 8,5,11 ),
+			new THREE.Face3( 8,7,5 ),
+			new THREE.Face3( 8,4,7 ),
+			new THREE.Face3( 8,3,4 ),
+			new THREE.Face3( 8,10,3 ),
+			new THREE.Face3( 9,8,1 ),
+			new THREE.Face3( 9,10,8 ),
+			new THREE.Face3( 9,3,10 ),
+			new THREE.Face3( 11,5,0 )
+		    );
+		    gmtry.faceVertexUvs[0].push(
+			[ new THREE.Vector2(0.597272,0.40327),new THREE.Vector2(0.989045,0.235094),new THREE.Vector2(0.807101,0.501509) ] ,
+			[ new THREE.Vector2(0.59715,0.599785),new THREE.Vector2(0.597272,0.40327),new THREE.Vector2(0.807101,0.501509) ] ,
+			[ new THREE.Vector2(0.187142,0.402521),new THREE.Vector2(0.320941,0.127925),new THREE.Vector2(0.597272,0.40327) ] ,
+			[ new THREE.Vector2(0.187173,0.59978),new THREE.Vector2(0.597272,0.40327),new THREE.Vector2(0.59715,0.599785) ] ,
+			[ new THREE.Vector2(0.187173,0.59978),new THREE.Vector2(0.187142,0.402521),new THREE.Vector2(0.597272,0.40327) ] ,
+			[ new THREE.Vector2(0.187173,0.59978),new THREE.Vector2(0.320416,0.874519),new THREE.Vector2(0.201678,0.91) ] ,
+			[ new THREE.Vector2(0.989458,0.768069),new THREE.Vector2(0.59715,0.599785),new THREE.Vector2(0.807101,0.501509) ] ,
+			[ new THREE.Vector2(0.989458,0.768069),new THREE.Vector2(0.85732,0.874027),new THREE.Vector2(0.59715,0.599785) ] ,
+			[ new THREE.Vector2(0.320416,0.874519),new THREE.Vector2(0.187173,0.59978),new THREE.Vector2(0.59715,0.599785) ] ,
+			[ new THREE.Vector2(0.970709,0.914429),new THREE.Vector2(0.85732,0.874027),new THREE.Vector2(0.989458,0.768069) ] ,
+			[ new THREE.Vector2(0.989045,0.235094),new THREE.Vector2(0.997979,0.501436),new THREE.Vector2(0.807101,0.501509) ] ,
+			[ new THREE.Vector2(0.03188,0.22963),new THREE.Vector2(0.033533,0.772816),new THREE.Vector2(0.001961,0.501656) ] ,
+			[ new THREE.Vector2(0.03188,0.22963),new THREE.Vector2(0.114031,0.902052),new THREE.Vector2(0.033533,0.772816) ] ,
+			[ new THREE.Vector2(0.03188,0.22963),new THREE.Vector2(0.187173,0.59978),new THREE.Vector2(0.114031,0.902052) ] ,
+			[ new THREE.Vector2(0.03188,0.22963),new THREE.Vector2(0.187142,0.402521),new THREE.Vector2(0.187173,0.59978) ] ,
+			[ new THREE.Vector2(0.03188,0.22963),new THREE.Vector2(0.111804,0.099227),new THREE.Vector2(0.187142,0.402521) ] ,
+			[ new THREE.Vector2(0.85704,0.129422),new THREE.Vector2(0.989045,0.235094),new THREE.Vector2(0.597272,0.40327) ] ,
+			[ new THREE.Vector2(0.85704,0.129422),new THREE.Vector2(0.970035,0.089156),new THREE.Vector2(0.989045,0.235094) ] ,
+			[ new THREE.Vector2(0.320941,0.127925),new THREE.Vector2(0.187142,0.402521),new THREE.Vector2(0.202224,0.092212) ] ,
+			[ new THREE.Vector2(0.997979,0.501436),new THREE.Vector2(0.989458,0.768069),new THREE.Vector2(0.807101,0.501509) ] 
+			);
+		    return gmtry;
+		})()
+
+		THREE.ImageUtils.loadTexture(
+		'../images/textures/cobra3_redux.png',
+		undefined,
+		function(texture) {
+		    mesh = new THREE.Mesh(
+		    gmtry,
+		    new THREE.MeshFaceMaterial( [ new THREE.MeshBasicMaterial({map : texture}) ] )
+		    );
+		    console.log("adding the mesh!");
+		    scene.add( mesh );
+		    animate();
+		}
+		);
+
+		THREE.ImageUtils.loadTexture('../images/earth.jpg', undefined, function(texture)
+		{
+		    geometry = new THREE.SphereGeometry(280, 20, 20);
+		    material = new THREE.MeshBasicMaterial({map: texture, overdraw:
+			true});
+		    var mesh = new THREE.Mesh(geometry, material);
+		    mesh.rotation.x = 30 * Math.PI / 180;
+		    mesh.scale.x = mesh.scale.y = mesh.scale.z = 1000;
+		    mesh.position.z = -1000000;
+		    //scene.add(mesh);
+		});
+
+	    };
+
+	</script>
+    </body>
+</html>
