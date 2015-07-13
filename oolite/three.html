@@ -10,7 +10,7 @@
 	      overflow: hidden;
 	    }
 	</style>
-	<script src="js/three.js"></script>
+	<script src="js/three.min.js"></script>
     </head>
     <body>
       <label for=distance>Z</label><input type=range min=0 max=2000 value=200 id=distance></input>
@@ -19,7 +19,6 @@
 	    var geometry, material, mesh;
 
 	    init();
-	    //animate();
 
 	    function animate() {
 
@@ -124,12 +123,12 @@
 		    gmtry,
 		    new THREE.MeshFaceMaterial( [ new THREE.MeshBasicMaterial({map : texture}) ] )
 		    );
-		    console.log("adding the mesh!");
 		    scene.add( mesh );
 		    animate();
 		}
 		);
 
+		/*
 		THREE.ImageUtils.loadTexture('../images/earth.jpg', undefined, function(texture)
 		{
 		    geometry = new THREE.SphereGeometry(280, 20, 20);
@@ -139,8 +138,9 @@
 		    mesh.rotation.x = 30 * Math.PI / 180;
 		    mesh.scale.x = mesh.scale.y = mesh.scale.z = 1000;
 		    mesh.position.z = -1000000;
-		    //scene.add(mesh);
+		    scene.add(mesh);
 		});
+		*/
 
 	    };
 
