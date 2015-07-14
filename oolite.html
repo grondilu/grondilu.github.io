@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<meta charset="utf-8">
+	<title>Various HTML5 tests</title>
+	<script src=webgl-utils.js></script>
+	<script src=gl-matrix-min.js></script>
+	<script src=oolite/hipparcos-extract.js></script>
+	<script src=oolite.js></script>
+    </head>
+    <body>
+	<canvas id=oolite></canvas>
+	<script>
+	    var canvas = document.querySelector("#oolite");
+	    var gl = WebGLUtils.setupWebGL(canvas);
+	    var renderer = new Oolite.Renderer(gl);
+	    var stars = new Oolite.PointCloud(new Oolite.Stars(hipparcos_extract));
+	    var cam = new Oolite.Camera();
+
+	    var now = Date.now();
+	    (function animate() {
+		requestAnimFrame(animate);
+		var elapsed = Date.now() - now;
+		mat4.rotateX(cam.matrix, cam.matrix, elapsed * 0.00002);
+		mat4.rotateY(cam.matrix, cam.matrix, elapsed * 0.00003);
+		mat4.rotateZ(cam.matrix, cam.matrix, elapsed * 0.00005);
+		renderer.render([ stars ], cam);
+		now = Date.now();
+	    })();
+	</script>
+    </body>
+</html>
