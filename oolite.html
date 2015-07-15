@@ -6,27 +6,32 @@
 	<script src=webgl-utils.js></script>
 	<script src=gl-matrix-min.js></script>
 	<script src=oolite/hipparcos-extract.js></script>
+	<script src=oolite/image-preloader.js></script>
 	<script src=oolite.js></script>
+	<script src=cobra3.js></script>
     </head>
     <body>
 	<canvas id=oolite></canvas>
+	<div id=debugline></div>
 	<script>
 	    var canvas = document.querySelector("#oolite");
 	    var gl = WebGLUtils.setupWebGL(canvas);
 	    var renderer = new Oolite.Renderer(gl);
-	    var stars = new Oolite.PointCloud(new Oolite.Stars(hipparcos_extract));
+	    var stars = new Oolite.PointCloud(Oolite.convertStarCatalog(hipparcos_extract));
 	    var cam = new Oolite.Camera();
+	    cobra3.translate([0, 0, -100]);
 
 	    var now = Date.now();
-	    (function animate() {
+	    loadImages( ["images/textures/oolite_cobra3_subents.png", "images/textures/oolite_cobra3_diffuse.png"], animate );
+	    function animate() {
 		requestAnimFrame(animate);
 		var elapsed = Date.now() - now;
-		mat4.rotateX(cam.matrix, cam.matrix, elapsed * 0.00002);
-		mat4.rotateY(cam.matrix, cam.matrix, elapsed * 0.00003);
-		mat4.rotateZ(cam.matrix, cam.matrix, elapsed * 0.00005);
-		renderer.render([ stars ], cam);
+		renderer.render([ stars, cobra3 ], cam);
+		//cam.rotateX(elapsed * 0.00002);
+		cam.rotateY(elapsed * 0.0003);
+		//cam.rotateZ(elapsed * 0.00005);
 		now = Date.now();
-	    })();
+	    };
 	</script>
     </body>
 </html>
