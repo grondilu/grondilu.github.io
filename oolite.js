@@ -53,7 +53,7 @@ var Oolite = Oolite || function () {
     function Camera(fovy, aspect) {
         Object3D.call(this);
         fovy = fovy || Math.PI/4;
-        aspect = aspect || 1;
+        aspect = aspect || canvas.width / canvas.height;
         this.pMatrix = (function () {
             var f = 1.0 / Math.tan(fovy / 2);
             var pMatrix = mat4.create();
@@ -87,8 +87,8 @@ var Oolite = Oolite || function () {
         if (!webGLContext) { console.log("no WebGL context provided"); return null }
         var gl = webGLContext;
         gl.viewport(0, 0,
-                gl.canvas.width = 500, // window.innerWidth,
-                gl.canvas.height = 500 // window.innerHeight
+                gl.canvas.width = window.innerWidth,
+                gl.canvas.height = window.innerHeight
                 );
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
