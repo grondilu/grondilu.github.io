@@ -9,28 +9,43 @@
 	<script src=oolite/image-preloader.js></script>
 	<script src=oolite.js></script>
 	<script src=cobra3.js></script>
+	<script src=coriolis.js></script>
     </head>
     <body>
 	<canvas id=oolite></canvas>
 	<div id=debugline></div>
+	<input type=range min=-1 max=1 step=0.1 value=0 id=X></input>
+	<input type=range min=-1 max=1 step=0.1 value=0 id=Y></input>
+	<input type=range min=-1 max=1 step=0.1 value=0 id=Z></input>
 	<script>
 	    var canvas = document.querySelector("#oolite");
 	    var gl = WebGLUtils.setupWebGL(canvas);
 	    var renderer = new Oolite.Renderer(gl);
 	    var stars = new Oolite.PointCloud(Oolite.convertStarCatalog(hipparcos_extract));
 	    var cam = new Oolite.Camera();
-	    cobra3.translate([0, 0, -100]);
+	    var scene = new Oolite.Scene(stars, cobra3);
+	    cam.translate([0, 0, 200]);
 
-	    var now = Date.now();
-	    loadImages( ["images/textures/oolite_cobra3_subents.png", "images/textures/oolite_cobra3_diffuse.png"], animate );
+	    loadImages( [
+	    "images/textures/oolite_cobra3_subents.png",
+	    "images/textures/oolite_cobra3_diffuse.png",
+	    "images/textures/oolite_coriolis_dock_diffuse.png",
+	    "images/textures/oolite_coriolis_tris_diffuse.png",
+	    "images/textures/oolite_coriolis_faceplate_diffuse.png",
+	    "images/textures/oolite_coriolis_diffuse.png",
+	    ],
+	    animate
+	    );
+	    var now;
 	    function animate() {
 		requestAnimFrame(animate);
-		var elapsed = Date.now() - now;
-		renderer.render([ stars, cobra3 ], cam);
-		//cam.rotateX(elapsed * 0.00002);
-		cam.rotateY(elapsed * 0.0003);
-		//cam.rotateZ(elapsed * 0.00005);
+		var then = now;
 		now = Date.now();
+		var elapsed = then ? (now - then) / 1000 : 0;
+		cobra3.rotateX(parseFloat(document.querySelector("#X").value) * elapsed);
+		cobra3.rotateY(parseFloat(document.querySelector("#Y").value) * elapsed);
+		cobra3.rotateZ(parseFloat(document.querySelector("#Z").value) * elapsed);
+		renderer.render(scene, cam);
 	    };
 	</script>
     </body>
