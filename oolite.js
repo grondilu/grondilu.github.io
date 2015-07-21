@@ -166,24 +166,29 @@ var Oolite = Oolite || function () {
 	var meshProgram = compileShader({
 	    vertex : [
 	    "attribute vec3 aVertexPosition;",
-	    //"attribute vec3 aVertexNormal;",
+	    "attribute vec3 aVertexNormal;",
 	    "attribute vec2 aTextureCoord;",
 	    "uniform mat4 uMVMatrix;",
 	    "uniform mat4 uPMatrix;",
 	    "varying vec2 vTextureCoord;",
 
+	    "varying float vDiffuseFactor;",
+
 	    "void main(void) {",
 	    "    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
+	    "    vec4 projectedNormal = uMVMatrix * vec4(aVertexNormal, 0.0);",
+	    "    vDiffuseFactor = max(0.0, -projectedNormal.x);",
 	    "    vTextureCoord = aTextureCoord;",
 	    "}"
 	    ].join("\n"),
 	    fragment : [
 	    "precision mediump float;",
 	    "varying vec2 vTextureCoord;",
+	    "varying float vDiffuseFactor;",
 	    "uniform sampler2D uSampler;",
 
 	    "void main(void) {",
-	    "     vec4 color = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));",
+	    "     vec4 color = vDiffuseFactor * texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));",
 	    "     gl_FragColor = vec4(color.r, color.g, color.b, 1.0);",
 	    "}",
 	    ].join("\n")
@@ -265,7 +270,8 @@ var Oolite = Oolite || function () {
 
 		var attributeLocation = {
 		    aVertexPosition : gl.getAttribLocation(program, "aVertexPosition"),
-		    aTextureCoord : gl.getAttribLocation(program, "aTextureCoord")
+		    aTextureCoord : gl.getAttribLocation(program, "aTextureCoord"),
+		    aVertexNormal : gl.getAttribLocation(program, "aVertexNormal")
 		};
 		gl.enableVertexAttribArray(attributeLocation.aVertexPosition);
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffers[obj.id].vertices);
@@ -274,6 +280,10 @@ var Oolite = Oolite || function () {
 		gl.enableVertexAttribArray(attributeLocation.aTextureCoord);
 		gl.bindBuffer(gl.ARRAY_BUFFER, buffers[obj.id].texture.coordinates);
 		gl.vertexAttribPointer(attributeLocation.aTextureCoord, 2, gl.FLOAT, false, 0, 0);
+
+		gl.enableVertexAttribArray(attributeLocation.aVertexNormal);
+		gl.bindBuffer(gl.ARRAY_BUFFER, buffers[obj.id].normals);
+		gl.vertexAttribPointer(attributeLocation.aVertexNormal, 3, gl.FLOAT, false, 0, 0);
 
 		for (var i = 0, texture; texture = buffers[obj.id].texture[i]; i++) {
 		    gl.activeTexture(gl.TEXTURE0 + i);
