@@ -8,6 +8,7 @@
 	<script src=oolite/hipparcos-extract.js></script>
 	<script src=oolite/image-preloader.js></script>
 	<script src=oolite.js></script>
+	<script src=sphere.js></script>
 	<script src=cobra3.js></script>
 	<script src=coriolis.js></script>
     </head>
@@ -23,7 +24,19 @@
 	    var renderer = new Oolite.Renderer(gl);
 	    var stars = new Oolite.PointCloud(Oolite.convertStarCatalog(hipparcos_extract));
 	    var cam = new Oolite.Camera();
-	    var scene = new Oolite.Scene(stars, cobra3);
+
+	    var sphere = makeSphere(400, 50, 50);
+	    sphere.texture = {
+		offsets : [0],
+		images : [ "mars512x512.png" ],
+		coordinates : sphere.uv
+	    };
+	    var mars = new Oolite.Mesh(sphere);
+	    mars.translate([0, 0, -1000]);
+
+	    var scene = new Oolite.Scene(stars, mars, cobra3);
+
+
 	    cam.translate([0, 0, 200]);
 
 	    loadImages( [
@@ -33,6 +46,7 @@
 	    "images/textures/oolite_coriolis_tris_diffuse.png",
 	    "images/textures/oolite_coriolis_faceplate_diffuse.png",
 	    "images/textures/oolite_coriolis_diffuse.png",
+	    "images/textures/mars512x512.png",
 	    ],
 	    animate
 	    );
@@ -45,6 +59,7 @@
 		cobra3.rotateX(parseFloat(document.querySelector("#X").value) * elapsed);
 		cobra3.rotateY(parseFloat(document.querySelector("#Y").value) * elapsed);
 		cobra3.rotateZ(parseFloat(document.querySelector("#Z").value) * elapsed);
+		mars.rotateY( 0.01 * elapsed);
 		renderer.render(scene, cam);
 	    };
 	</script>
