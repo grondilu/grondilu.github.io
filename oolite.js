@@ -34,6 +34,7 @@ var Oolite = Oolite || function () {
     // This ia a base class for objects in a scene (the scene itself being a particular Object3D)
     // They are mainly characterized by an Euclidean transform represented as a matrix
     // They can have children, whose matrix is a local transformation
+    // * Constructor
     var Object3D = (function () {
 	var count = 0;
 	return function () {
@@ -45,6 +46,7 @@ var Oolite = Oolite || function () {
 	    }
 	}
     })();
+    // * Methods
     Object3D.prototype.rotateX = function (angle) { mat4.rotateX(this.matrix, this.matrix, angle); return this; }
     Object3D.prototype.rotateY = function (angle) { mat4.rotateY(this.matrix, this.matrix, angle); return this; }
     Object3D.prototype.rotateZ = function (angle) { mat4.rotateZ(this.matrix, this.matrix, angle); return this; }
@@ -69,6 +71,7 @@ var Oolite = Oolite || function () {
     Scene.prototype = Object.create(Object3D.prototype);
     Scene.prototype.constructor = Scene;
 
+    // POINTCLOUD
     var PointCloud = function ( data ) {
 	Object3D.call(this);
 	this.positionArray = data.position;
@@ -78,21 +81,20 @@ var Oolite = Oolite || function () {
     PointCloud.prototype.constructor = PointCloud;
 
     // CAMERA
-    function Camera(fovy, aspect) {
+    function Camera(fovy, aspect, near) {
 	Object3D.call(this);
 	fovy = fovy || Math.PI/4;
 	aspect = aspect || canvas.width / canvas.height;
-	this.pMatrix = (function () {
-	    var f = 1.0 / Math.tan(fovy / 2);
-	    var pMatrix = mat4.create();
-	    pMatrix[0] = f / aspect;
-	    pMatrix[5] = f;
-	    pMatrix[10] = -0.9999;
-	    pMatrix[11] = -1;
-	    pMatrix[14] = -1
-	    pMatrix[15] = 1;
-	return pMatrix;
-	})();
+	var pMatrix = mat4.create();
+	var f = 1.0 / Math.tan(fovy / 2);
+	pMatrix[0] = f / aspect;
+	pMatrix[5] = f;
+	pMatrix[10] = -0.99999;   pMatrix[11] = -1;
+	pMatrix[14] = -1;         pMatrix[15] = 0;
+	this.pMatrix = function (near) {
+	    pMatrix[14] = -2*(near || 0.5);
+	    return pMatrix;
+	};
     }
     Camera.prototype = Object.create(Object3D.prototype);
     Camera.prototype.constructor = Camera;
@@ -125,6 +127,8 @@ var Oolite = Oolite || function () {
 	gl.enable(gl.DEPTH_TEST);
 
 	var buffers = {};
+
+	// matrix stack 
 	mat4.stack = [ ];
 	mat4.pushProduct = function (matrix) {
 	    if (mat4.stack.length == 0) { mat4.stack.push(matrix) }
@@ -177,7 +181,7 @@ var Oolite = Oolite || function () {
 	    "void main(void) {",
 	    "    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
 	    "    vec4 projectedNormal = uMVMatrix * vec4(aVertexNormal, 0.0);",
-	    "    vDiffuseFactor = max(0.0, -projectedNormal.x);",
+	    "    vDiffuseFactor = max(0.0, projectedNormal.z);",
 	    "    vTextureCoord = aTextureCoord;",
 	    "}"
 	    ].join("\n"),
@@ -201,7 +205,7 @@ var Oolite = Oolite || function () {
 	    "uniform mat4 uPMatrix;",
 	    "varying float vIntensity;",
 	    "void main(void) {",
-	    "    gl_PointSize = 2.0;",
+	    "    gl_PointSize = 4.0;",
 	    "    gl_Position = uPMatrix * uMVMatrix * aPoint;",
 	    "vIntensity = aIntensity;",
 	    "}"
@@ -258,7 +262,7 @@ var Oolite = Oolite || function () {
 
 		if (!mat4.top()) { console.log("unexpected nul top matrix for object id " + obj.id); return null; }
 		gl.uniformMatrix4fv(gl.getUniformLocation(program, "uMVMatrix"), false, mat4.top());
-		gl.uniformMatrix4fv(gl.getUniformLocation(program, "uPMatrix"), false, camera.pMatrix);
+		gl.uniformMatrix4fv(gl.getUniformLocation(program, "uPMatrix"), false, camera.pMatrix());
 
 		gl.drawArrays(gl.POINTS, 0, Math.floor(obj.positionArray.length / 4));
 	    } else if (obj instanceof Mesh) {
@@ -266,7 +270,7 @@ var Oolite = Oolite || function () {
 		gl.useProgram(program);
 		if (!mat4.top()) { console.log("unexpected nul top matrix for object id " + obj.id); return null; }
 		gl.uniformMatrix4fv(gl.getUniformLocation(program, "uMVMatrix"), false, mat4.top());
-		gl.uniformMatrix4fv(gl.getUniformLocation(program, "uPMatrix"), false, camera.pMatrix);
+		gl.uniformMatrix4fv(gl.getUniformLocation(program, "uPMatrix"), false, camera.pMatrix(obj.near));
 
 		var attributeLocation = {
 		    aVertexPosition : gl.getAttribLocation(program, "aVertexPosition"),
@@ -296,7 +300,6 @@ var Oolite = Oolite || function () {
 		    gl.drawElements(gl.TRIANGLES, 3*numFaces, gl.UNSIGNED_SHORT, 3*2*offset);
 		}
 	    }
-	    //console.log("popping for id " + obj.id);
 	    mat4.pop();
 
 	};
@@ -310,7 +313,7 @@ var Oolite = Oolite || function () {
 		gl.bufferData(gl.ARRAY_BUFFER, obj.intensityArray, gl.STATIC_DRAW);
 	    } else if (obj instanceof Mesh) {
 		gl.bindBuffer(gl.ARRAY_BUFFER, bufs.vertices = gl.createBuffer());
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(obj.vertices), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array( obj.vertices ), gl.STATIC_DRAW);
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufs.faces = gl.createBuffer());
 		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(obj.faces), gl.STATIC_DRAW);

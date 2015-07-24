@@ -18,6 +18,7 @@
 	<input type=range min=-1 max=1 step=0.1 value=0 id=X></input>
 	<input type=range min=-1 max=1 step=0.1 value=0 id=Y></input>
 	<input type=range min=-1 max=1 step=0.1 value=0 id=Z></input>
+	<input type=range min=0 max=500 step=0.1 value=0 id=distance></input>
 	<script>
 	    var canvas = document.querySelector("#oolite");
 	    var gl = WebGLUtils.setupWebGL(canvas);
@@ -25,18 +26,24 @@
 	    var stars = new Oolite.PointCloud(Oolite.convertStarCatalog(hipparcos_extract));
 	    var cam = new Oolite.Camera();
 
-	    var sphere = makeSphere(400, 50, 50);
+	    var sphere = makeSphere(3400e3, 50, 50);
 	    sphere.texture = {
 		offsets : [0],
-		images : [ "mars512x512.png" ],
+		images : [ "planets/mars2k.png" ],
 		coordinates : sphere.uv
 	    };
 	    var mars = new Oolite.Mesh(sphere);
-	    mars.translate([0, 0, -1000]);
+	    mars.near = 1000;
+	    mars.translate([0, 0, -30000e3]);
 
 	    var scene = new Oolite.Scene(stars, mars, cobra3);
 
-
+	    var theta = 2*Math.PI * Math.random();
+	    var phi = Math.PI / (Math.random() - 1);
+	    var distance = 4000;
+	    var c = Math.cos, s = Math.sin;
+	    //coriolis.translate([distance*c(phi)*c(theta), distance*c(phi)*s(theta), distance*s(phi) - 30000]);
+	    //cobra3.translate([0, 0, 0]); 
 	    cam.translate([0, 0, 200]);
 
 	    loadImages( [
@@ -47,6 +54,7 @@
 	    "images/textures/oolite_coriolis_faceplate_diffuse.png",
 	    "images/textures/oolite_coriolis_diffuse.png",
 	    "images/textures/mars512x512.png",
+	    "images/textures/planets/mars2k.png",
 	    ],
 	    animate
 	    );
@@ -56,10 +64,13 @@
 		var then = now;
 		now = Date.now();
 		var elapsed = then ? (now - then) / 1000 : 0;
-		cobra3.rotateX(parseFloat(document.querySelector("#X").value) * elapsed);
-		cobra3.rotateY(parseFloat(document.querySelector("#Y").value) * elapsed);
-		cobra3.rotateZ(parseFloat(document.querySelector("#Z").value) * elapsed);
-		mars.rotateY( 0.01 * elapsed);
+		var pov = mars;
+		cam.matrix[14] = parseFloat(document.querySelector("#distance").value);
+		pov.rotateX(parseFloat(document.querySelector("#X").value) * elapsed);
+		pov.rotateY(parseFloat(document.querySelector("#Y").value) * elapsed);
+		pov.rotateZ(parseFloat(document.querySelector("#Z").value) * elapsed);
+		coriolis.rotateZ(0.1 * elapsed);
+		mars.rotateY(0.0001 * elapsed);
 		renderer.render(scene, cam);
 	    };
 	</script>
