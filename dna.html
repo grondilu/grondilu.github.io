@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 
 	<title>DNA visualization</title>
-	<script src="http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/gl-matrix.js"></script>
+	<script src=gl-matrix-min.js></script>
 	<script src=webgl-utils.js></script>
 	<script>
 	    var gl, points;
@@ -90,14 +90,14 @@
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-		mat4.perspective(45, gl.canvas.width / gl.canvas.height, 0.1, 100.0, pMatrix);
+		mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, 0.1, 100.0);
 
 		mat4.identity(mvMatrix);
 
-		mat4.translate(mvMatrix, [-1.5, 0.0, -document.querySelector('#distance').value]);
-		mat4.rotateX(mvMatrix, document.querySelector('#rotX').value / 360 * 2 * Math.PI);
-		mat4.rotateY(mvMatrix, document.querySelector('#rotY').value / 360 * 2 * Math.PI);
-		mat4.rotateZ(mvMatrix, document.querySelector('#rotZ').value / 360 * 2 * Math.PI);
+		mat4.translate(mvMatrix, mvMatrix, [-1.5, 0.0, -document.querySelector('#distance').value]);
+		mat4.rotateX(mvMatrix, mvMatrix, document.querySelector('#rotX').value / 360 * 2 * Math.PI);
+		mat4.rotateY(mvMatrix, mvMatrix, document.querySelector('#rotY').value / 360 * 2 * Math.PI);
+		mat4.rotateZ(mvMatrix, mvMatrix, document.querySelector('#rotZ').value / 360 * 2 * Math.PI);
 		gl.bindBuffer(gl.ARRAY_BUFFER, pointsPositionBuffer);
 		gl.vertexAttribPointer(gl.shaderProgram.vertexPositionAttribute, pointsPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bindBuffer(gl.ARRAY_BUFFER, pointsColorBuffer);
@@ -119,7 +119,7 @@
 		var vertices = [];
 		for (var i = 0; i < dna.length; i++) {
 		    if (!nucleotids[dna[i]]) { alert("unexpected character: " + dna[i]); return null; }
-		    vec3.add(point, nucleotids[dna[i]].direction);
+		    vec3.add(point, point, nucleotids[dna[i]].direction);
 		    for (var j = 0; j < 3; j++) { vertices.push(point[j]); }
 		}
 		gl.bindBuffer(gl.ARRAY_BUFFER, pointsPositionBuffer);
@@ -144,6 +144,8 @@
     </head>
 
     <body onload="start()";>
+	<p>This DNA visualization is inspired from <a href=http://www.cs.ucr.edu/~eamonn/DNA/>this academic work</a>.
+	See also <a href=https://news.ycombinator.com/item?id=10322424>the corresponding HN entry</a>.</p>
 	<form>
 	    <label for=sequence>DNA sequence:</label>
 	    <input id=sequence onchange="makePoints();"
@@ -157,7 +159,7 @@
 	</form>
 	<p>
 	<canvas id="canvas" style="border: none;" width="500" height="500"></canvas>
-	<p><a href=http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/pointsVaryingColor.html>This is a modified version of this WebGL demo</a></p>
+	<p><a href=http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/pointsVaryingColor.html>The WebGL code is a modified version of this WebGL demo</a></p>
     </body>
 
 </html>
