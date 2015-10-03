@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+	<meta charset="utf-8">
+
+	<title>DNA visualization</title>
+	<script src="http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/gl-matrix.js"></script>
+	<script src=webgl-utils.js></script>
+	<script>
+	    var gl, points;
+
+	    var mvMatrix = mat4.create();
+	    var pMatrix = mat4.create();
+
+	    var pointsPositionBuffer, pointsColorBuffer;
+	    function createShaderProgram() {
+		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+		gl.shaderSource(
+		fragmentShader, [
+		"precision mediump float;",
+		"varying vec4 vColor;",
+		"void main(void) {",
+		    "gl_FragColor = vColor;",
+		    "}"
+		].join("\n")
+		);
+		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(
+		vertexShader,
+		[
+		"attribute vec3 aVertexPosition;",
+		"attribute vec4 aVertexColor;",
+		"uniform mat4 uMVMatrix;",
+		"uniform mat4 uPMatrix;",
+		"varying vec4 vColor;",
+		"void main(void) {",
+		    "vColor = aVertexColor;",
+		    "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
+		    "gl_PointSize = 5.0;",
+		    "}"
+		].join("\n")
+		);
+		gl.compileShader(fragmentShader);
+		if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) { alert(gl.getShaderInfoLog(fragmentShader)); return null; }
+		gl.compileShader(vertexShader);
+		if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) { alert(gl.getShaderInfoLog(vertexShader)); return null; }
+
+		var program = gl.createProgram();
+		gl.attachShader(program, vertexShader);
+		gl.attachShader(program, fragmentShader);
+		gl.linkProgram(program);
+		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { alert("could not compile shader program"); return null; }
+
+		gl.useProgram(program);
+
+		gl.enableVertexAttribArray(program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition"));
+		gl.enableVertexAttribArray(program.vertexColorAttribute = gl.getAttribLocation(program, "aVertexColor"));
+
+		program.pMatrixUniform  = gl.getUniformLocation(program, "uPMatrix");
+		program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
+
+		program.setMatrixUniforms = function setMatrixUniforms() {
+		    gl.uniformMatrix4fv(program.pMatrixUniform, false, pMatrix);
+		    gl.uniformMatrix4fv(program.mvMatrixUniform, false, mvMatrix);
+		}
+		return program;
+	    };
+
+	    var nucleotids = {
+		A : { direction : [ 1.0,  1.0,  1.0], color : [1.0, 0.0, 0.0, 1.0] },
+		C : { direction : [ 1.0, -1.0, -1.0], color : [0.0, 1.0, 0.0, 1.0] },
+		G : { direction : [-1.0,  1.0, -1.0], color : [0.0, 0.0, 1.0, 1.0] },
+		T : { direction : [-1.0, -1.0,  1.0], color : [1.0, 1.0, 0.0, 1.0] },
+	    };
+
+	    function start() {
+		gl = WebGLUtils.setupWebGL(document.querySelector('#canvas'));
+		gl.shaderProgram = createShaderProgram();
+		makePoints();
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.enable(gl.DEPTH_TEST);
+		(function animate() {
+		    requestAnimFrame(animate);
+		    drawScene();
+		})();
+	    }
+
+	    function drawScene() {
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+		mat4.perspective(45, gl.canvas.width / gl.canvas.height, 0.1, 100.0, pMatrix);
+
+		mat4.identity(mvMatrix);
+
+		mat4.translate(mvMatrix, [-1.5, 0.0, -document.querySelector('#distance').value]);
+		mat4.rotateX(mvMatrix, document.querySelector('#rotX').value / 360 * 2 * Math.PI);
+		mat4.rotateY(mvMatrix, document.querySelector('#rotY').value / 360 * 2 * Math.PI);
+		mat4.rotateZ(mvMatrix, document.querySelector('#rotZ').value / 360 * 2 * Math.PI);
+		gl.bindBuffer(gl.ARRAY_BUFFER, pointsPositionBuffer);
+		gl.vertexAttribPointer(gl.shaderProgram.vertexPositionAttribute, pointsPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.bindBuffer(gl.ARRAY_BUFFER, pointsColorBuffer);
+		gl.vertexAttribPointer(gl.shaderProgram.vertexColorAttribute, pointsColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		gl.shaderProgram.setMatrixUniforms();
+
+		gl.lineWidth(5.0);
+		gl.drawArrays(gl.LINE_STRIP, 0, pointsPositionBuffer.numItems);
+
+	    }
+
+	    function makePoints() {
+		var dna = document.querySelector('#sequence').value.toUpperCase();
+
+		if (pointsPositionBuffer) { gl.deleteBuffer(pointsPositionBuffer); }
+		pointsPositionBuffer = gl.createBuffer();
+
+		var point = vec3.create();
+		var vertices = [];
+		for (var i = 0; i < dna.length; i++) {
+		    if (!nucleotids[dna[i]]) { alert("unexpected character: " + dna[i]); return null; }
+		    vec3.add(point, nucleotids[dna[i]].direction);
+		    for (var j = 0; j < 3; j++) { vertices.push(point[j]); }
+		}
+		gl.bindBuffer(gl.ARRAY_BUFFER, pointsPositionBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+		pointsPositionBuffer.itemSize = 3;
+		pointsPositionBuffer.numItems = dna.length;
+
+		if (pointsColorBuffer)    { gl.deleteBuffer(pointsColorBuffer);    }
+		pointsColorBuffer    = gl.createBuffer();
+		var colors = [];
+		for (var i = 0; i < dna.length; i++) {
+		    for (var j = 0; j < 4; j++) { colors.push(nucleotids[dna[i]].color[j]); }
+		}
+		gl.bindBuffer(gl.ARRAY_BUFFER, pointsColorBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+		pointsColorBuffer.itemSize = 4;
+		pointsColorBuffer.numItems = dna.length;
+	    }
+
+	</script>
+
+    </head>
+
+    <body onload="start()";>
+	<form>
+	    <label for=sequence>DNA sequence:</label>
+	    <input id=sequence onchange="makePoints();"
+	    value="gtttatgtagcttaccccctcaaagcaatacactgaaaatgtttcgacgggtttacatcaccccataaacaaacaggtttggtcctagcctttctattag">
+	    </input><br>
+	    <input id=distance type=range min=10 max=100 value=50></input><br>
+	    <label for=rotX>rotX</label><input id=rotX type=range min=-180 max=180 value=0></input><br>
+	    <label for=rotY>rotY</label><input id=rotY type=range min=-180 max=180 value=0></input><br>
+	    <label for=rotZ>rotZ</label><input id=rotZ type=range min=-180 max=180 value=0></input><br>
+	    <!-- <label for=scale>Scale:</label><input id=scale type=range min=1 max=10 value=1></input><br> -->
+	</form>
+	<p>
+	<canvas id="canvas" style="border: none;" width="500" height="500"></canvas>
+	<p><a href=http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/pointsVaryingColor.html>This is a modified version of this WebGL demo</a></p>
+    </body>
+
+</html>
