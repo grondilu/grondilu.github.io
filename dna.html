@@ -16,6 +16,8 @@
 	    var mvMatrix = mat4.create();
 	    var pMatrix = mat4.create();
 
+	    var objectMatrix = mat4.create();
+
 	    var mitochondrion = [ pig_mitochondrion, chimp_mitochondrion, human_mitochondrion ];
 	    var pointsPositionBuffer, pointsColorBuffer;
 	    function createShaderProgram() {
@@ -85,13 +87,16 @@
 		makePoints();
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
+		var t = Date.now();
 		(function animate() {
 		    requestAnimFrame(animate);
-		    drawScene();
+		    var now = Date.now();
+		    drawScene(now - t);
+		    t = now;
 		})();
 	    }
 
-	    function drawScene() {
+	    function drawScene(elapsed) {
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -102,11 +107,19 @@
 		var sliding = Math.floor(document.querySelector('#sliding').value * points.length);
 		var translate = vec3.clone(points[sliding]);
 		vec3.negate(translate, translate);
+
 		mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -document.querySelector('#distance').value]);
-		mat4.rotateX(mvMatrix, mvMatrix, document.querySelector('#rotX').value / 360 * 2 * Math.PI);
-		mat4.rotateY(mvMatrix, mvMatrix, document.querySelector('#rotY').value / 360 * 2 * Math.PI);
-		mat4.rotateZ(mvMatrix, mvMatrix, document.querySelector('#rotZ').value / 360 * 2 * Math.PI);
+		//mat4.rotateX(mvMatrix, mvMatrix, document.querySelector('#rotX').value / 360 * 2 * Math.PI);
+		//mat4.rotateY(mvMatrix, mvMatrix, document.querySelector('#rotY').value / 360 * 2 * Math.PI);
+		//mat4.rotateZ(mvMatrix, mvMatrix, document.querySelector('#rotZ').value / 360 * 2 * Math.PI);
+
+		mat4.multiply(mvMatrix, mvMatrix, objectMatrix);
+		var angle = elapsed / 2000 * document.querySelector('#speed').value;
+		mat4.rotateX(objectMatrix, objectMatrix, 3*angle);
+		mat4.rotateY(objectMatrix, objectMatrix, 2*angle);
+		//mat4.rotateZ(objectMatrix, objectMatrix, angle/5);
 		mat4.translate(mvMatrix, mvMatrix, translate);
+
 		gl.bindBuffer(gl.ARRAY_BUFFER, pointsPositionBuffer);
 		gl.vertexAttribPointer(gl.shaderProgram.vertexPositionAttribute, pointsPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 		gl.bindBuffer(gl.ARRAY_BUFFER, pointsColorBuffer);
@@ -171,9 +184,7 @@
 	    <br>
 	    <label for=distance>Zoom</label><input id=distance type=range min=10 max=40000 value=1000></input><br>
 	    <label for=sliding>Slide</label><input id=sliding type=range min=0 max=0.9999 value=0 step=0.0001></input><br>
-	    <label for=rotX>rotX</label><input id=rotX type=range min=-180 max=180 value=0></input><br>
-	    <label for=rotY>rotY</label><input id=rotY type=range min=-180 max=180 value=0></input><br>
-	    <label for=rotZ>rotZ</label><input id=rotZ type=range min=-180 max=180 value=0></input><br>
+	    <label for=speed>Speed</label><input id=speed type=range min=0 max=1 value=0.5 step=0.1></input><br>
 	    <!-- <label for=scale>Scale:</label><input id=scale type=range min=1 max=10 value=1></input><br> -->
 	</form>
 	<p>
