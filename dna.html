@@ -9,12 +9,14 @@
 	<script src=webgl-utils.js></script>
 	<script src=human-mitochondrion.js></script>
 	<script src=chimp-mitochondrion.js></script>
+	<script src=pig-mitochondrion.js></script>
 	<script>
 	    var gl, points;
 
 	    var mvMatrix = mat4.create();
 	    var pMatrix = mat4.create();
 
+	    var mitochondrion = [ pig_mitochondrion, chimp_mitochondrion, human_mitochondrion ];
 	    var pointsPositionBuffer, pointsColorBuffer;
 	    function createShaderProgram() {
 		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -117,7 +119,7 @@
 	    }
 
 	    function makePoints() {
-		var dna = 'N' + [chimp_mitochondrion, human_mitochondrion][document.querySelector('#species').selectedIndex];
+		var dna = 'N' + mitochondrion[document.querySelector('#species').selectedIndex];
 
 		if (pointsPositionBuffer) { gl.deleteBuffer(pointsPositionBuffer); }
 		pointsPositionBuffer = gl.createBuffer();
@@ -156,13 +158,14 @@
 	<p>This DNA visualization is inspired from <a href=http://www.cs.ucr.edu/~eamonn/DNA/>this academic work</a>.
 	See also <a href=https://news.ycombinator.com/item?id=10322424>the corresponding HN entry</a>.</p>
 	<form oninput="(function() {
-	    var dna = [chimp_mitochondrion, human_mitochondrion][species.selectedIndex];
+	    var dna = mitochondrion[species.selectedIndex];
 	    var start = Math.floor(sliding.value * dna.length);
 	    sequence.value = (start > 0 ? '...' : '') + dna.slice(start, start + 32) + (start + 32 < dna.length ? '...' : '');
 	    })();">
 	    <select id=species onchange="makePoints();">
-		<option>chimp mitochodrion</option>
-		<option>human mitochodrion</option>
+		<option>pig mitochondrion</option>
+		<option>chimp mitochondrion</option>
+		<option>human mitochondrion</option>
 	    </select>
 	    <output name=sequence></output>
 	    <br>
