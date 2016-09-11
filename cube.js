@@ -105,6 +105,7 @@ function main() {
     gl.viewport(0,0,canvas.width,canvas.height);
 
     function turn (X, Y) {
+	// for the math, see http://www.texpaste.com/n/ev3443eo
         var
             X2 = X*X, Y2 = Y*Y,
             q = 1 + X2 + Y2,
@@ -138,7 +139,6 @@ function main() {
     canvas.addEventListener("mousemove",
             function(e) {
                 if (!drag) return false;
-                // for the math, see http://www.texpaste.com/n/ev3443eo
                     X = -(e.pageX-old_x)/canvas.width,
                     Y = (e.pageY-old_y)/canvas.height;
                 turn(X, Y);
