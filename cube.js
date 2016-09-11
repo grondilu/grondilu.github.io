@@ -131,7 +131,7 @@ function main() {
 		var M = mat4.fromValues(
 			s2 + 4*(Y2 - X2), -8*X*Y,  4*s*X, 0,
 			-8*X*Y, s2 + 4*(X2 - Y2),  4*s*Y, 0,
-			-4*s*X, -4*s*Y, s2 + 4*(X2 + Y2), 0,
+			-4*s*X, -4*s*Y, s2 - 4*(X2 + Y2), 0,
 			 0, 0, 0, 1
 		);
 		M[0] /= q2; M[1] /= q2; M[2] /= q2;
