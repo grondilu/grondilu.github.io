@@ -104,9 +104,29 @@ function main() {
     gl.enable(gl.DEPTH_TEST);
     gl.viewport(0,0,canvas.width,canvas.height);
 
+    function turn (X, Y) {
+	var
+	    X2 = X**2, Y2 = Y**2,
+	    q = 1 + X2 + Y2,
+	    s = 1 - X2 - Y2,
+		q2 = q**2, s2 = s**2;
+	if (!(q2 > 0)) return false;
+	var M = mat4.fromValues(
+		s2 + 4*(Y2 - X2), -8*X*Y,  4*s*X, 0,
+		-8*X*Y, s2 + 4*(X2 - Y2),  4*s*Y, 0,
+		-4*s*X, -4*s*Y, s2 - 4*(X2 + Y2), 0,
+		0, 0, 0, 1
+		);
+	M[0] /= q2; M[1] /= q2; M[2] /= q2;
+	M[4] /= q2; M[5] /= q2; M[6] /= q2;
+	M[8] /= q2; M[9] /= q2; M[10] /= q2;
+	mat4.multiply(mo_matrix, M, mo_matrix);
+    }
     // MOUSE MANAGEMENT
+    var AMORTIZATION = 0.95;
     var drag = false;
     var old_x, old_y;
+    var X = 0, Y = 0;
 
     canvas.addEventListener("mousedown",
 	    function (e) {
@@ -120,24 +140,9 @@ function main() {
 	    function(e) {
 		if (!drag) return false;
 		// for the math, see http://www.texpaste.com/n/ev3443eo
-		var
 		    X = -(e.pageX-old_x)/canvas.width,
-		    Y = (e.pageY-old_y)/canvas.height,
-		    X2 = X**2, Y2 = Y**2,
-		    q = 1 + X2 + Y2,
-		    s = 1 - X2 - Y2,
-		    q2 = q**2, s2 = s**2;
-		if (!(q2 > 0)) return false;
-		var M = mat4.fromValues(
-			s2 + 4*(Y2 - X2), -8*X*Y,  4*s*X, 0,
-			-8*X*Y, s2 + 4*(X2 - Y2),  4*s*Y, 0,
-			-4*s*X, -4*s*Y, s2 - 4*(X2 + Y2), 0,
-			 0, 0, 0, 1
-		);
-		M[0] /= q2; M[1] /= q2; M[2] /= q2;
-		M[4] /= q2; M[5] /= q2; M[6] /= q2;
-		M[8] /= q2; M[9] /= q2; M[10] /= q2;
-		mat4.multiply(mo_matrix, M, mo_matrix);
+		    Y = (e.pageY-old_y)/canvas.height;
+		turn(X, Y);
 		old_x = e.pageX, old_y = e.pageY;
 		e.preventDefault();
 	    }, false
@@ -150,6 +155,11 @@ function main() {
 	gl.viewport(0.0, 0.0, canvas.width, canvas.height);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+	if (!drag) {
+	    X *= AMORTIZATION;
+	    Y *= AMORTIZATION;
+	    turn(X, Y);
+	}
 	gl.uniformMatrix4fv(_Pmatrix, false, proj_matrix);
 	gl.uniformMatrix4fv(_Vmatrix, false, view_matrix);
 	gl.uniformMatrix4fv(_Mmatrix, false, mo_matrix);
