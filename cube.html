@@ -1,0 +1,32 @@
+<html>
+    <head>
+	<script src="webgl-utils.js"></script>
+	<script src="gl-matrix-min.js"></script>
+	<script src="cube.js"></script>
+	<title>Rational rotation of a cube</title>
+    </head>
+
+    <body onload="main();">
+	<p>Below is a colored cube.  It's the same that can be found on this <a href=http://www.tutorialspoint.com/webgl/>this WebGL tutorial</a>.</p>
+	You should be able to change the view with your mouse.</p>
+
+	<canvas id="map-canvas" width="800" height="600" style="border:1px solid black;">
+	    Apparently your browser does not support HTML5 canvas.
+	</canvas>
+
+	<p>I've changed the code with the goal of implementing Norman Wildberger's idea of <a
+	    href=https://en.wikipedia.org/wiki/Rational_trigonometry>Rational
+	    trigonometry</a>.  Thus there is no trigonometric function (no
+	<code>Math.cos</code> nor <code>Math.sin</code>) and no
+	<code>Math.sqrt</code> call whatsoever.</p>
+
+	<p>It does not behave exactly quite as expected yet, but I thought it
+	was close enough to be worth showing.</p>
+
+	<p>The math I've tried can be found <a href=http://www.texpaste.com/n/ev3443eo>here</a>.</p>
+
+
+    </body>
+
+
+</html>
