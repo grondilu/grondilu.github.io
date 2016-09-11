@@ -109,20 +109,20 @@ function main() {
 	    X2 = X*X, Y2 = Y*Y,
 	    q = 1 + X2 + Y2,
 	    s = 1 - X2 - Y2,
-		q2 = q*q, s2 = s*s;
-	var M = mat4.fromValues(
-		s2 + 4*(Y2 - X2), -8*X*Y,  4*s*X, 0,
-		-8*X*Y, s2 + 4*(X2 - Y2),  4*s*Y, 0,
-		-4*s*X, -4*s*Y, s2 - 4*(X2 + Y2), 0,
-		0, 0, 0, 1
-		);
-	M[0] /= q2; M[1] /= q2; M[2] /= q2;
-	M[4] /= q2; M[5] /= q2; M[6] /= q2;
-	M[8] /= q2; M[9] /= q2; M[10] /= q2;
-	mat4.multiply(mo_matrix, M, mo_matrix);
+	    r2 = 1/(q*q), s2 = s*s,
+	    A = (s2 + 4*(Y2 - X2))*r2, B = -8*X*Y*r2, C = 4*s*X*r2,
+		D = (s2 + 4*(X2 - Y2))*r2, E = 4*s*Y*r2,
+		    F = (s2 - 4*(X2 + Y2))*r2;
+	mat4.multiply(mo_matrix, [
+		     A,  B, C, 0,
+		     B,  D, E, 0,
+		    -C, -E, F, 0,
+		     0,  0, 0, 1
+		    ],
+		mo_matrix);
     }
     // MOUSE MANAGEMENT
-    var AMORTIZATION = 0.95;
+    var AMORTIZATION = 0.9;
     var drag = false;
     var old_x, old_y;
     var X = 0, Y = 0;
