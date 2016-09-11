@@ -137,7 +137,7 @@ function main() {
 		M[0] /= q2; M[1] /= q2; M[2] /= q2;
 		M[4] /= q2; M[5] /= q2; M[6] /= q2;
 		M[8] /= q2; M[9] /= q2; M[10] /= q2;
-		mat4.multiply(mo_matrix, mo_matrix, M);
+		mat4.multiply(mo_matrix, M, mo_matrix);
 		old_x = e.pageX, old_y = e.pageY;
 		e.preventDefault();
 	    }, false
