@@ -110,7 +110,6 @@ function main() {
 	    q = 1 + X2 + Y2,
 	    s = 1 - X2 - Y2,
 		q2 = q**2, s2 = s**2;
-	if (!(q2 > 0)) return false;
 	var M = mat4.fromValues(
 		s2 + 4*(Y2 - X2), -8*X*Y,  4*s*X, 0,
 		-8*X*Y, s2 + 4*(X2 - Y2),  4*s*Y, 0,
