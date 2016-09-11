@@ -119,7 +119,7 @@ function main() {
     canvas.addEventListener("mousemove",
 	    function(e) {
 		if (!drag) return false;
-		// for the math, see http://mathb.in/80987
+		// for the math, see http://www.texpaste.com/n/ev3443eo
 		var
 		    X = -(e.pageX-old_x)/canvas.width,
 		    Y = (e.pageY-old_y)/canvas.height,
