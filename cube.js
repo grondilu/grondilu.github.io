@@ -1,5 +1,5 @@
 function main() {
-    var canvas = document.getElementById('map-canvas');
+    var canvas = document.getElementById('canvas');
     gl = WebGLUtils.setupWebGL(canvas);
 
     var vertices = [
