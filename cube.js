@@ -105,9 +105,28 @@ function main() {
     gl.viewport(0,0,canvas.width,canvas.height);
 
     function turn (X, Y) {
-	// for the math, see http://www.texpaste.com/n/ev3443eo
-        var
-            X2 = X*X, Y2 = Y*Y,
+        var X2 = X*X, Y2 = Y*Y;
+	if (document.getElementById("euler").checked) {
+	    var a = (1-X2)/(1+X2), b = 2*X/(1+X2);
+	    Yrot = [Yrot[0]*a - Yrot[1]*b, Yrot[0]*b +Yrot[1]*a];
+	    mat4.identity(mo_matrix);
+	    mat4.multiply(mo_matrix, mo_matrix, [
+		    Yrot[0], 0,  Yrot[1], 0,
+		    0,       1,        0, 0,
+		   -Yrot[1], 0,  Yrot[0], 0,
+		    0,       0,        0, 1
+	    ]);
+	    a = (1-Y2)/(1+Y2), b = 2*Y/(1+Y2);
+	    Xrot = [Xrot[0]*a - Xrot[1]*b, Xrot[0]*b +Xrot[1]*a];
+	    mat4.multiply(mo_matrix, [
+		    1, 0, 0, 0,
+		    0, Xrot[0], Xrot[1], 0,
+		    0, -Xrot[1], Xrot[0], 0,
+		    0, 0, 0, 1
+	    ], mo_matrix);
+	} else {
+	    // for the math, see http://www.texpaste.com/n/ev3443eo
+	    var
             q = 1 + X2 + Y2,
             s = 1 - X2 - Y2,
             r2 = 1/(q*q), s2 = s*s,
@@ -121,12 +140,15 @@ function main() {
                      0,  0, 0, 1
                     ],
                 mo_matrix);
+	}
     }
+
     // MOUSE MANAGEMENT
     var AMORTIZATION = 0.9;
     var drag = false;
     var old_x, old_y;
     var X = 0, Y = 0;
+    var Xrot = [1, 0], Yrot = [1, 0];
 
     canvas.addEventListener("mousedown",
             function (e) {
