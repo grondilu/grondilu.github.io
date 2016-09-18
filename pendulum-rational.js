@@ -58,8 +58,6 @@ function rational_pendulum() {
 	dotmu = 0,
 	then = Date.now()/1000;
 
-    draw(mu);
-
     (function animate() {
 	var now = Date.now()/1000;
 	var dt = Math.min(0.1, now - then);

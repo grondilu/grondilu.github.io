@@ -46,7 +46,6 @@ function simple_pendulum() {
     }
 
     var theta = -Math.PI/3, dottheta = 0, then = Date.now()/1000;
-    draw(theta);
 
     (function animate() {
 	var now = Date.now()/1000;
