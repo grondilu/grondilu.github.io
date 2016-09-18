@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+	<script type="text/javascript" async
+	 src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 	<script src="webgl-utils.js"></script>
 	<script src="gl-matrix-min.js"></script>
 	<script src="cube.js"></script>
@@ -8,6 +10,115 @@
     </head>
 
     <body onload="main();">
+
+	<h1>Rationale</h1>
+
+	<p>For any non-null complex number \(z\), it is possible to create an other complex number of modulus one:</p>
+
+	$$ \frac{z^2}{z\bar{z}} $$
+
+	<p>In the particular case \(z = 1 + ti\), an algebraic parametrization of the circle appears:</p>
+	$$ M(t) = (\frac{1 - t^2}{1 + t^2}, \frac{2t}{1+t^2}) $$
+
+	<p>Norman Wildberger suggests such transformation can and should be used to
+	perform rotations in the plane, instead of using trigonometric
+	functions (<a href="https://en.wikipedia.org/wiki/Rational_trigonometry">wikipedia article</a>).</p>
+
+	<p>Can it also be done in 3D space?  That is, for any two non-colinear vectors \(\mathbf{u}\) and \(\mathbf{v}\), how can we algebraically parametrize rotations in the \((\mathbf{u},\mathbf{v})\) plane?
+
+	<p>We first write:</p>
+	$$\mathbf{uv} = \mathbf{u}\cdot\mathbf{v} + \mathbf{u}\wedge\mathbf{v} $$
+
+	<p>It is known, notably as pointed out by <a href="https://en.wikipedia.org/wiki/David_Hestenes">David Hestenes</a>, that \(\mathbf{uv}\) behaves as a complex number, with \(\mathbf{u}\cdot\mathbf{v}\) being the real part and \(\mathbf{u}\wedge\mathbf{v}\) the imaginary one.</p>
+
+	<p>Thus we can verify that:</p>
+	$$ R = \frac{(\mathbf{uv})^2}{\mathbf{uvvu}} $$
+
+	<p>is of modulus one.</p>
+
+	<p>Therefore we can rotate any vector \(\mathbf{x}\) with a sandwich product:</p>
+	$$ \mathcal{R}(\mathbf{x}) = \tilde{R}\mathbf{x}R $$
+
+	<p>If we do it for three vectors of an orthonormal basis, we get the coefficients of the orthogonal matrix representation.</p>
+
+	<h1>Example</h1>
+
+	<p>Say we are visualizing an object through a computer graphics interface such as WebGL.  We want to write some code for rotating the object with the mouse.  The mouse will move on the screen and we want to interpret this two-dimensional motion as a rotation.</p>
+
+	<p>For simplicity, we shall reason in the Normalized Device Coordinates (see for instance <a href="http://www.songho.ca/opengl/gl_projectionmatrix.html">this</a>) with \((\mathbf{i},\mathbf{j},\mathbf{k})\)
+	as the orthonormal basis.</p>
+
+	<p>The motion of the mouse is thus:</p>
+	$$  \mathbf{m} =  x \mathbf{i} +  y \mathbf{j} $$
+
+	<p>We want to parametrize rotations that occur in the plane</p>
+	$$ (\mathbf{k},  \mathbf{m}) $$
+
+	<p>If we want to obtain a similar expression as above, we should rather use the following basis:</p>
+	$$ (\mathbf{u},\mathbf{v}) = (-\mathbf{k}, -\mathbf{k} +  \mathbf{m}) $$
+
+
+	<p>Then we have:</p>
+
+	$$ \mathbf{uv} = 1 + \mathbf{m}\wedge\mathbf{k} = 1 +  x\mathbf{i}\wedge\mathbf{k} +  y\mathbf{j}\wedge\mathbf{k} $$
+
+	$$ (\mathbf{uv})^2 = 1 - x^2 - y^2 + 2 x\mathbf{i}\wedge\mathbf{k} + 2 y\mathbf{j}\wedge\mathbf{k} $$
+
+	$$ \mathbf{uvvu} = 1 + x^2 + y^2 $$
+
+	<p>Let's note:</p>
+
+	$$ q = 1 + x^2 + y^2 $$
+
+	<p>and</p>
+
+	$$ s = 1 - x^2 - y^2 $$
+
+	<p>Then</p>
+
+	$$ R = \frac{s + 2 x\mathbf{i}\wedge\mathbf{k} + 2 y\mathbf{j}\wedge\mathbf{k}}{q} $$
+
+	$$ \begin{align*}
+	q^2\tilde{R}\mathbf{i}R
+	& = (s - 2 x\mathbf{i}\wedge\mathbf{k} - 2 y\mathbf{j}\wedge\mathbf{k})\mathbf{i}(s + 2 x\mathbf{i}\wedge\mathbf{k} + 2 y\mathbf{j}\wedge\mathbf{k})\\
+	& = (s - 2 x\mathbf{i}\wedge\mathbf{k} - 2 y\mathbf{j}\wedge\mathbf{k})(s\mathbf{i} + 2 x\mathbf{k} + 2 y\mathbf{i}\wedge\mathbf{j}\wedge\mathbf{k})\\
+	& = 
+	s^2\mathbf{i} + 2s x\mathbf{k} + 2s y\mathbf{i}\wedge\mathbf{j}\wedge\mathbf{k}
+	+ 2s x\mathbf{k} - 4 x^2\mathbf{i} - 4 xy\mathbf{j}
+	-  2s y\mathbf{i}\wedge\mathbf{j}\wedge\mathbf{k} - 4xy\mathbf{j} + 4y^2\mathbf{i}\\
+	& = (s^2 - 4 (x^2 - y^2))\mathbf{i} - 8 xy\mathbf{j} + 4s x\mathbf{k}
+	\end{align*}$$
+
+	$$\begin{align*}
+	q^2\tilde{R}\mathbf{j}R
+	& = (s - 2 x\mathbf{i}\wedge\mathbf{k} - 2 y\mathbf{j}\wedge\mathbf{k})\mathbf{j}(s + 2 x\mathbf{i}\wedge\mathbf{k} + 2 y\mathbf{j}\wedge\mathbf{k})\\
+	& = (s - 2 x\mathbf{i}\wedge\mathbf{k} - 2 y\mathbf{j}\wedge\mathbf{k})(s\mathbf{j} - 2x\mathbf{i}\wedge\mathbf{j}\wedge\mathbf{k} + 2y\mathbf{k})\\
+	& = s^2\mathbf{j} - 2sx\mathbf{i}\wedge\mathbf{j}\wedge\mathbf{k} + 2sy\mathbf{k}
+	+2sx\mathbf{i}\wedge\mathbf{j}\wedge\mathbf{k} +4x^2\mathbf{j} -4xy\mathbf{i}
+	+2sy\mathbf{k} - 4xy\mathbf{i} - 4y^2\mathbf{j}\\
+	& =-8xy\mathbf{i} + (s^2 + 4(x^2 - y^2))\mathbf{j} + 4sy\mathbf{k}
+	\end{align*}$$
+
+	$$\begin{align*}
+	q^2\tilde{R}\mathbf{k}R
+	& = (s - 2 x\mathbf{i}\wedge\mathbf{k} - 2 y\mathbf{j}\wedge\mathbf{k})\mathbf{k}(s + 2 x\mathbf{i}\wedge\mathbf{k} + 2 y\mathbf{j}\wedge\mathbf{k})\\
+	& = (s - 2 x\mathbf{i}\wedge\mathbf{k} - 2 y\mathbf{j}\wedge\mathbf{k})(s\mathbf{k} - 2 x\mathbf{i} - 2 y\mathbf{j})\\
+	& = s^2\mathbf{k} - 2sx\mathbf{i} - 2sy\mathbf{j}
+	-2sx\mathbf{i} -4x^2\mathbf{k} - 4xy\mathbf{i}\wedge\mathbf{j}\wedge\mathbf{k}
+	-2sy\mathbf{j}+4xy\mathbf{i}\wedge\mathbf{j}\wedge\mathbf{k} - 4y^2\mathbf{k}\\
+	& = -4sx\mathbf{i} - 4sy\mathbf{j} + (s^2 - 4(x^2 + y^2))\mathbf{k}
+	\end{align*}$$
+
+	<p>Which gives the matrix:</p>
+
+	$$\frac{1}{q^2}\begin{pmatrix}
+	s^2 + 4(y^2 - x^2) & -8xy & -4sx\\
+	-8xy & s^2 + 4(x^2 - y^2) & -4sy\\
+	4sx & 4sy & s^2 - 4(x^2 + y^2)
+	\end{pmatrix}$$
+
+	<h1>WebGL implementation</h1>
+
 	<p>Below is a colored cube.  It's the same that can be found on <a href=http://www.tutorialspoint.com/webgl/>this WebGL tutorial</a>.</p>
 	You should be able to rotate it with your mouse.</p>
 
@@ -17,13 +128,9 @@
 	<br>
 	<input id=euler type=checkbox>Euler-like</input>
 
-	<p>I've changed the code with the goal of implementing Norman Wildberger's idea of <a
-	    href=https://en.wikipedia.org/wiki/Rational_trigonometry>Rational
-	    trigonometry</a>.  Thus there is no trigonometric function (no
+	<p>In this code there is no trigonometric function (no
 	<code>Math.cos</code> nor <code>Math.sin</code>) and no
 	<code>Math.sqrt</code> call whatsoever.</p>
-
-	<p>The math can be found <a href=http://www.texpaste.com/n/ev3443eo>here</a>.</p>
 
     </body>
 
