@@ -15,7 +15,8 @@ function rational_pendulum() {
 	    (a[1] + 2*b[1] + 2*c[1] + d[1])/6
 	];
     }
-    var fps = 0.0;
+    var fps = 60, average_fps = fps;
+    var fps_sum = 60, count = 1;
 
     function draw(mu) {
 	var
@@ -27,8 +28,16 @@ function rational_pendulum() {
 	context.save();
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	context.fillStyle = "grey";
-	context.fillRect(0, 0, fps, 20);
-	context.fillText(fps.toPrecision(3) + " FPS", 100, 20);
+	context.fillText(
+		fps.toPrecision(3) +
+		" FPS (average " +
+		(
+		 fps > 1000 ?
+		 average_fps :
+		 (average_fps = (fps_sum += Math.min(fps, 120))/++count)
+		).toPrecision(3) + ")",
+		0, 20
+	);
 	context.translate(canvas.width/2, 10);
 	context.scale(20, 20);
 
