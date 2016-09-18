@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<title>Pendulums in HTML5</title>
+	<script type="text/javascript" async
+	 src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
+	<script src=pendulum-simple.js></script>
+	<script src=pendulum-rational.js></script>
+    </head>
+
+    <body>
+
+    </body>
+
+    <p>On this page I'll try to solve the two-dimensional pendulum problem
+    in various ways, including using <a href=https://en.wikipedia.org/wiki/Rational_trigonometry>rational trigonometry</a>.</p>
+
+    <p>I'll start with the simple pendulum, and then maybe the double one and arbitrary long ones.</p>
+
+    <h1>The Simple Pendulum</h1>
+
+    <h2>Using trigonometric functions</h2>
+    <p>The Lagrangian for the simple pendulum is
+    \( L = \frac{1}{2}mv^2 - mgh \), where the elevation \(h\) is \(l ( 1 - \cos(\theta))\).</p>
+
+    <p>With an appropriate choice of length, mass and time units, this equation
+    can be written:</p>
+
+    $$ L = \frac{\dot{\theta}^2}{2} + \cos(\theta) - 1 $$
+    
+    <p>The <a href="https://en.wikipedia.org/wiki/Euler%E2%80%93Lagrange_equation">Euler-Lagrance equation</a>
+    then gives:</p>
+
+    $$ \ddot{\theta} = -\sin{\theta} $$
+
+    <p>which we can turn into a first order derivative by considering
+    \(\dot{\theta}\) as an additional variable.</p>
+
+    <canvas id="simple-pendulum" width=400 height=300>
+	Your browser can't display canvas.
+    </canvas>
+    <script>simple_pendulum();</script>
+
+    <h2>Using only rational numbers</h2>
+
+    <p>We're going to use the following rational parametrization of the circle:</p>
+
+    $$\mathrm{M}(\mu) = (\frac{1-\mu^2}{1+\mu^2}, \frac{2\mu}{1+\mu^2}) $$
+
+    <p>The squared speed becomes:</p>
+
+    $$ v^2 = \frac{4\dot{\mu}^2}{(1+\mu^2)^2} $$
+
+    <p>Thus the Lagragian is now:</p>
+
+    $$ L = \frac{2\dot{\mu}^2}{(1+\mu^2)^2} + \frac{1-\mu^2}{1+\mu^2} - 1 $$
+
+    <p>And the Euler-Lagrange equation:</p>
+
+    $$ \frac{d}{dt}(\frac{4\dot{\mu}}{(1+\mu^2)^2}) =
+    -\frac{8\dot{\mu}^2\mu}{(1+\mu^2)^3}
+    - \frac{4\mu}{(1+\mu^2)^2}
+    $$
+
+    <p>...turns into:</p>
+
+    $$ \frac{4\ddot{\mu}}{(1+\mu^2)^2} - \frac{16\dot{\mu}^2\mu}{(1+\mu^2)^3} =
+    -\frac{8\dot{\mu}^2\mu}{(1+\mu^2)^3}
+    - \frac{4\mu}{(1+\mu^2)^2}
+    $$
+
+    $$ \ddot{\mu} = \frac{2\dot{\mu}^2\mu}{1+\mu^2} - \mu $$
+
+    <canvas id="rational-pendulum" width=400 height=300>
+	Your browser can't display canvas.
+    </canvas>
+    <script>rational_pendulum();</script>
+
+
+</html>
+
+
