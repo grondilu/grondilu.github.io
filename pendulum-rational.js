@@ -62,7 +62,7 @@ function rational_pendulum() {
 
     (function animate() {
 	var now = Date.now()/1000;
-	var dt = now - then;
+	var dt = Math.min(0.1, now - then);
 	fps = 1/dt;
 	var diff = rk4(dt, mu, dotmu);
 	then = now;
