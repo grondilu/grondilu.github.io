@@ -21,7 +21,7 @@ function rational_pendulum() {
 	var
 	    mu2 = mu*mu,
 	    s = 1 - mu2,
-	    q = 1 + mu*mu,
+	    q = 1 + mu2,
 		x = s/q,
 		y = 2*mu/q;
 	context.save();
