@@ -47,14 +47,14 @@ function rational_pendulum() {
     }
 
     var
-	orientation = +1.0,
+        orientation = +1.0,
         mu = 1/Math.sqrt(3),
         dotmu = 0,
         then = Date.now()/1000;
 
     function M(mu) {
-	var mu2 = mu*mu, s = 1 - mu2, q = 1 + mu2;
-	return [orientation*s/q, orientation*2*mu/q];
+        var mu2 = mu*mu, s = 1 - mu2, q = 1 + mu2;
+        return [orientation*s/q, orientation*2*mu/q];
     }
     function ddotmu(mu, dotmu) { return 2*dotmu*dotmu*mu/(1+mu*mu) - orientation*mu };
 
@@ -62,17 +62,17 @@ function rational_pendulum() {
         var now = Date.now()/1000;
         var dt = Math.min(0.1, now - then);
         fps = 1/dt;
-	var diff = rk4(dt, mu, dotmu, ddotmu);
+        var diff = rk4(dt, mu, dotmu, ddotmu);
         then = now;
         draw(...M(mu));
         mu += diff[0];
         dotmu += diff[1];
-	var mu2 = mu*mu;
-	if (mu2 > 1) {
-	    orientation *= -1;
-	    mu = -1/mu;
-	    dotmu /= mu2;
-	}
+        var mu2 = mu*mu;
+        if (mu2 > 1) {
+            orientation *= -1.0;
+            mu = -1/mu;
+            dotmu /= mu2;
+        }
         window.requestAnimationFrame(animate);
     })();
         
