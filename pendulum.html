@@ -7,6 +7,7 @@
         </script>
         <script src=pendulum-simple.js></script>
         <script src=pendulum-rational.js></script>
+        <script src=pendulum-rational-v2.js></script>
     </head>
 
     <body>
@@ -18,14 +19,24 @@
 
     <h1>The Simple Pendulum</h1>
 
-    <h2>Using trigonometric functions</h2>
+    <h2>Lagrangian</h2>
     <p>The Lagrangian for the simple pendulum is
-    \( L = \frac{1}{2}mv^2 - mgh \), where the elevation \(h\) is \(l ( 1 - \cos(\theta))\).</p>
+    $$ L = \frac{1}{2}mv^2 - mgh $$
+    </p>
 
-    <p>With an appropriate choice of length, mass and time units, this equation
-    can be written:</p>
+    <p>With an appropriate choice of length, mass and time units, this 
+    can be written:
+    $$ L = \frac{v^2}{2} - h $$
+    </p>
 
+    <h2>Using trigonometric functions</h2>
+    <p>With trigonometric functions, the speed \(v\) and elevation \(h\) become respectively \(\dot\theta\) and
+    \(1 - \cos(\theta)\).
+    </p>
+
+    <p>The Lagrangian then becomes:
     $$ L = \frac{\dot{\theta}^2}{2} + \cos(\theta) - 1 $$
+    </p>
     
     <p>The <a href="https://en.wikipedia.org/wiki/Euler%E2%80%93Lagrange_equation">Euler-Lagrange equation</a>
     then gives:</p>
@@ -46,13 +57,13 @@
 
     $$\mathrm{M}(\mu) = (\frac{1-\mu^2}{1+\mu^2}, \frac{2\mu}{1+\mu^2}) $$
 
-    <p>The squared speed becomes:</p>
-
+    <p>The squared speed becomes:
     $$ v^2 = \frac{4\dot{\mu}^2}{(1+\mu^2)^2} $$
+    </p>
 
-    <p>Thus the Lagragian is now:</p>
-
+    <p>Thus the Lagragian is now:
     $$ L = \frac{2\dot{\mu}^2}{(1+\mu^2)^2} + \frac{1-\mu^2}{1+\mu^2} - 1 $$
+    </p>
 
     <p>And the Euler-Lagrange equation:</p>
 
@@ -69,6 +80,35 @@
     $$
 
     $$ \ddot{\mu} = \frac{2\dot{\mu}^2\mu}{1+\mu^2} - \mu $$
+
+    <h3>Dealing with the exceptional case</h3>
+
+    <p>The naive approach described above has a major issue : it can not
+    deal with full swings.  Indeed the point
+    $$\lim_{\mu\to\infty}\mathrm{M}(\mu) = (-1, 0)$$
+    can never be reached with that parametrization.</p>
+
+    <p>A simple solution is to switch to a different parametrization when it is
+    expedient.
+    $$\mathrm{N}(\nu) = (-\frac{1-\nu^2}{1+\nu^2}, -\frac{2\nu}{1+\nu^2}) $$
+    </p>
+
+    <p>The dynamics should not be much different.  Indeed there is only one sign change:
+    $$ \ddot{\nu} = \frac{2\dot{\nu}^2\nu}{1+\nu^2} + \nu $$
+    </p>
+
+    <p>We then need a relation between \(\mu\) and \(\nu\). That is, we must find the solution
+    to
+    $$ \mathrm{M}(\mu) = \mathrm{N}(\nu)$$
+    </p>
+
+    <p>It is not too hard to see that
+    $$ \nu = -\frac{1}{\mu} $$
+    is a solution, as long as \(\mu\ne 0\).
+    </p>
+
+    <p>From this we can derive the relation between the generalized velocities
+    $$ \dot{\nu} = \frac{\dot\mu}{\mu^2},\qquad \dot{\mu} = \frac{\dot\nu}{\nu^2} $$
 
     <canvas id="rational-pendulum" width=400 height=300>
         Your browser can't display canvas.

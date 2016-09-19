@@ -3,13 +3,12 @@ function rational_pendulum() {
     var canvas = document.getElementById("rational-pendulum");
     var context = canvas.getContext("2d");
 
-    function ddotmu(mu, dotmu) { return 2*dotmu*dotmu*mu/(1+mu*mu) - mu }
-    function rk4(dt, mu, dotmu) {
+    function rk4(dt, tau, dottau, ddottau) {
         var
-            a = [ dotmu         , ddotmu(mu         , dotmu        ) ].map(x => dt * x),
-            b = [ dotmu + a[1]/2, ddotmu(mu + a[0]/2, dotmu + a[1]/2)].map(x => dt * x),
-            c = [ dotmu + b[1]/2, ddotmu(mu + b[0]/2, dotmu + b[1]/2)].map(x => dt * x),
-            d = [ dotmu + c[1]  , ddotmu(mu + c[0]  , dotmu + c[1]  )].map(x => dt * x);
+            a = [ (dottau         )*dt, ddottau(tau         , dottau         )*dt],
+            b = [ (dottau + a[1]/2)*dt, ddottau(tau + a[0]/2, dottau + a[1]/2)*dt],
+            c = [ (dottau + b[1]/2)*dt, ddottau(tau + b[0]/2, dottau + b[1]/2)*dt],
+            d = [ (dottau + c[1]  )*dt, ddottau(tau + c[0]  , dottau + c[1]  )*dt];
         return [
             (a[0] + 2*b[0] + 2*c[0] + d[0])/6,
             (a[1] + 2*b[1] + 2*c[1] + d[1])/6
@@ -18,13 +17,7 @@ function rational_pendulum() {
     var fps = 60, average_fps = fps;
     var fps_sum = 60, count = 1;
 
-    function draw(mu) {
-        var
-            mu2 = mu*mu,
-            s = 1 - mu2,
-            q = 1 + mu2,
-                x = s/q,
-                y = 2*mu/q;
+    function draw(x, y) {
         context.save();
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = "grey";
@@ -54,19 +47,32 @@ function rational_pendulum() {
     }
 
     var
+	orientation = +1.0,
         mu = 1/Math.sqrt(3),
         dotmu = 0,
         then = Date.now()/1000;
+
+    function M(mu) {
+	var mu2 = mu*mu, s = 1 - mu2, q = 1 + mu2;
+	return [orientation*s/q, orientation*2*mu/q];
+    }
+    function ddotmu(mu, dotmu) { return 2*dotmu*dotmu*mu/(1+mu*mu) - orientation*mu };
 
     (function animate() {
         var now = Date.now()/1000;
         var dt = Math.min(0.1, now - then);
         fps = 1/dt;
-        var diff = rk4(dt, mu, dotmu);
+	var diff = rk4(dt, mu, dotmu, ddotmu);
         then = now;
-        draw(mu);
+        draw(...M(mu));
         mu += diff[0];
         dotmu += diff[1];
+	var mu2 = mu*mu;
+	if (mu2 > 1) {
+	    orientation *= -1;
+	    mu = -1/mu;
+	    dotmu /= mu2;
+	}
         window.requestAnimationFrame(animate);
     })();
         
