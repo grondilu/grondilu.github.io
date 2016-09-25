@@ -7,189 +7,26 @@
 	<title>DNA visualization</title>
 	<script src=gl-matrix-min.js></script>
 	<script src=webgl-utils.js></script>
-	<script src=human-mitochondrion.js></script>
-	<script src=chimp-mitochondrion.js></script>
-	<script src=pig-mitochondrion.js></script>
-	<script>
-	    var gl, points;
-
-	    var mvMatrix = mat4.create();
-	    var pMatrix = mat4.create();
-
-	    var objectMatrix = mat4.create();
-
-	    var mitochondrion = [ pig_mitochondrion, chimp_mitochondrion, human_mitochondrion ];
-	    var pointsPositionBuffer, pointsColorBuffer;
-	    function createShaderProgram() {
-		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		gl.shaderSource(
-		fragmentShader, [
-		"precision mediump float;",
-		"varying vec4 vColor;",
-		"void main(void) {",
-		    "gl_FragColor = vColor;",
-		    "}"
-		].join("\n")
-		);
-		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-		gl.shaderSource(
-		vertexShader,
-		[
-		"attribute vec3 aVertexPosition;",
-		"attribute vec4 aVertexColor;",
-		"uniform mat4 uMVMatrix;",
-		"uniform mat4 uPMatrix;",
-		"varying vec4 vColor;",
-		"void main(void) {",
-		    "vColor = aVertexColor;",
-		    "gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);",
-		    "gl_PointSize = 5.0;",
-		    "}"
-		].join("\n")
-		);
-		gl.compileShader(fragmentShader);
-		if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) { alert(gl.getShaderInfoLog(fragmentShader)); return null; }
-		gl.compileShader(vertexShader);
-		if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) { alert(gl.getShaderInfoLog(vertexShader)); return null; }
-
-		var program = gl.createProgram();
-		gl.attachShader(program, vertexShader);
-		gl.attachShader(program, fragmentShader);
-		gl.linkProgram(program);
-		if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { alert("could not compile shader program"); return null; }
-
-		gl.useProgram(program);
-
-		gl.enableVertexAttribArray(program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition"));
-		gl.enableVertexAttribArray(program.vertexColorAttribute = gl.getAttribLocation(program, "aVertexColor"));
-
-		program.pMatrixUniform  = gl.getUniformLocation(program, "uPMatrix");
-		program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
-
-		program.setMatrixUniforms = function setMatrixUniforms() {
-		    gl.uniformMatrix4fv(program.pMatrixUniform, false, pMatrix);
-		    gl.uniformMatrix4fv(program.mvMatrixUniform, false, mvMatrix);
-		}
-		return program;
-	    };
-
-	    var nucleotids = {
-		A : { direction : [ 1.0,  1.0,  1.0], color : [1.0, 0.0, 0.0, 1.0] },
-		C : { direction : [ 1.0, -1.0, -1.0], color : [0.0, 1.0, 0.0, 1.0] },
-		G : { direction : [-1.0,  1.0, -1.0], color : [0.0, 0.0, 1.0, 1.0] },
-		T : { direction : [-1.0, -1.0,  1.0], color : [1.0, 1.0, 0.0, 1.0] },
-		N : { direction : [ 0.0,  0.0,  0.0], color : [0.0, 0.0, 0.0, 1.0] },
-	    };
-
-	    function start() {
-		gl = WebGLUtils.setupWebGL(document.querySelector('#canvas'));
-		gl.shaderProgram = createShaderProgram();
-		makePoints();
-		gl.clearColor(0.0, 0.0, 0.0, 1.0);
-		gl.enable(gl.DEPTH_TEST);
-		var t = Date.now();
-		(function animate() {
-		    requestAnimFrame(animate);
-		    var now = Date.now();
-		    drawScene(now - t);
-		    t = now;
-		})();
-	    }
-
-	    function drawScene(elapsed) {
-		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-		mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, 0.1, 100000.0);
-
-		mat4.identity(mvMatrix);
-
-		var sliding = Math.floor(document.querySelector('#sliding').value * points.length);
-		var translate = vec3.clone(points[sliding]);
-		vec3.negate(translate, translate);
-
-		mat4.translate(mvMatrix, mvMatrix, [0.0, 0.0, -document.querySelector('#distance').value]);
-		//mat4.rotateX(mvMatrix, mvMatrix, document.querySelector('#rotX').value / 360 * 2 * Math.PI);
-		//mat4.rotateY(mvMatrix, mvMatrix, document.querySelector('#rotY').value / 360 * 2 * Math.PI);
-		//mat4.rotateZ(mvMatrix, mvMatrix, document.querySelector('#rotZ').value / 360 * 2 * Math.PI);
-
-		mat4.multiply(mvMatrix, mvMatrix, objectMatrix);
-		var angle = elapsed / 2000 * document.querySelector('#speed').value;
-		mat4.rotateX(objectMatrix, objectMatrix, 3*angle);
-		mat4.rotateY(objectMatrix, objectMatrix, 2*angle);
-		//mat4.rotateZ(objectMatrix, objectMatrix, angle/5);
-		mat4.translate(mvMatrix, mvMatrix, translate);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, pointsPositionBuffer);
-		gl.vertexAttribPointer(gl.shaderProgram.vertexPositionAttribute, pointsPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.bindBuffer(gl.ARRAY_BUFFER, pointsColorBuffer);
-		gl.vertexAttribPointer(gl.shaderProgram.vertexColorAttribute, pointsColorBuffer.itemSize, gl.FLOAT, false, 0, 0);
-		gl.shaderProgram.setMatrixUniforms();
-
-		gl.lineWidth(5.0);
-		gl.drawArrays(gl.LINE_STRIP, 0, pointsPositionBuffer.numItems);
-
-	    }
-
-	    function makePoints() {
-		var dna = 'N' + mitochondrion[document.querySelector('#species').selectedIndex];
-
-		if (pointsPositionBuffer) { gl.deleteBuffer(pointsPositionBuffer); }
-		pointsPositionBuffer = gl.createBuffer();
-
-		var point = vec3.create();
-		points = [];
-		var vertices = [];
-		for (var i = 0; i < dna.length; i++) {
-		    if (!nucleotids[dna[i]]) { alert("unexpected character: " + dna[i]); return null; }
-		    vec3.add(point, point, nucleotids[dna[i]].direction);
-		    points.push(vec3.clone(point));
-		    for (var j = 0; j < 3; j++) { vertices.push(point[j]); }
-		}
-		gl.bindBuffer(gl.ARRAY_BUFFER, pointsPositionBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-		pointsPositionBuffer.itemSize = 3;
-		pointsPositionBuffer.numItems = dna.length;
-
-		if (pointsColorBuffer)    { gl.deleteBuffer(pointsColorBuffer);    }
-		pointsColorBuffer    = gl.createBuffer();
-		var colors = [];
-		for (var i = 0; i < dna.length; i++) {
-		    for (var j = 0; j < 4; j++) { colors.push(nucleotids[dna[i]].color[j]); }
-		}
-		gl.bindBuffer(gl.ARRAY_BUFFER, pointsColorBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-		pointsColorBuffer.itemSize = 4;
-		pointsColorBuffer.numItems = dna.length;
-	    }
-
-	</script>
+	<script src=dna.js></script>
 
     </head>
 
-    <body onload="start()";>
-	<p>This DNA visualization is inspired from <a href=http://www.cs.ucr.edu/~eamonn/DNA/>this academic work</a>.
-	See also <a href=https://news.ycombinator.com/item?id=10322424>the corresponding HN entry</a>.</p>
-	<form oninput="(function() {
-	    var dna = mitochondrion[species.selectedIndex];
-	    var start = Math.floor(sliding.value * dna.length);
-	    sequence.value = (start > 0 ? '...' : '') + dna.slice(start, start + 32) + (start + 32 < dna.length ? '...' : '');
-	    })();">
-	    <select id=species onchange="makePoints();">
-		<option>pig mitochondrion</option>
-		<option>chimp mitochondrion</option>
-		<option>human mitochondrion</option>
-	    </select>
-	    <output name=sequence></output>
-	    <br>
-	    <label for=distance>Zoom</label><input id=distance type=range min=10 max=40000 value=1000></input><br>
-	    <label for=sliding>Slide</label><input id=sliding type=range min=0 max=0.9999 value=0 step=0.0001></input><br>
-	    <label for=speed>Speed</label><input id=speed type=range min=0 max=1 value=0.5 step=0.1></input><br>
-	    <!-- <label for=scale>Scale:</label><input id=scale type=range min=1 max=10 value=1></input><br> -->
-	</form>
-	<p>
-	<canvas id="canvas" style="border: none;" width="500" height="500"></canvas>
-	<p><a href=http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/pointsVaryingColor.html>The WebGL code is a modified version of this WebGL demo</a></p>
+    <body onload="main()";>
+	<h1>Three dimensional visualization of DNA sequences</h1>
+	<p>What this is about is best explained <a href="https://www.youtube.com/watch?v=IjGZ6kF2gbQ">in this video</a>.  See also the credits section below.</p>
+	    <label for=fasta>Enter a DNA sequence (newlines are allowed):</label><br>
+	    <textarea id=sequence cols=80 rows=10>ACGT</textarea><br>
+	<input type=submit id=submit>
+	</p>
+	<p>See the result here.  You can use your mouse to rotate the view, and the mouse wheel to zoom.<br>
+	<canvas id="canvas" style="border: none;" width="800" height="600"></canvas>
+	</p>
+	<h2>Credits</h2>
+	<ul>
+	    <li>This is an implementation of <a href=http://www.cs.ucr.edu/~eamonn/DNA/>this academic work</a></li>
+	    <li>The WebGL code is inspired from <a href=http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/pointsVaryingColor.html>this demo</a></li>
+	    <li>The mouse-controlled rotation is done with an unorthodox method.  See <a href=http://grondilu.github.io/cube.html>this for more details</a>.</li>
+	</ul>
     </body>
 
 </html>
