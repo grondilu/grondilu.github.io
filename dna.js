@@ -1,17 +1,37 @@
+/****************************************************************************
+ * Copyright (c) 2016 Lucien Grondin <grondilu@yahoo.fr>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *****************************************************************************/
+
 function rotation_matrix (X, Y) {
     var X2 = X*X, Y2 = Y*Y;
-    var
-        q = 1 + X2 + Y2,
-        s = 1 - X2 - Y2,
+    var q = 1 + X2 + Y2, s = 1 - X2 - Y2,
         r2 = 1/(q*q), s2 = s*s,
-            A = (s2 + 4*(Y2 - X2))*r2, B = -8*X*Y*r2, C = 4*s*X*r2,
-            D = (s2 + 4*(X2 - Y2))*r2, E = 4*s*Y*r2,
-                F = (s2 - 4*(X2 + Y2))*r2;
+        A = (s2 + 4*(Y2 - X2))*r2, B = -8*X*Y*r2,
+        C = 4*s*X*r2, D = (s2 + 4*(X2 - Y2))*r2,
+        E = 4*s*Y*r2, F = (s2 - 4*(X2 + Y2))*r2;
     return mat4.fromValues(
-         A,  B, C, 0,
-         B,  D, E, 0,
-        -C, -E, F, 0,
-         0,  0, 0, 1
+        A,  B, C, 0,
+        B,  D, E, 0,
+       -C, -E, F, 0,
+        0,  0, 0, 1
     );
 }
 
@@ -79,7 +99,7 @@ function show_dna_sequence(gl, sequence) {
     })();
 
     var processSequence = (function () {
-	var buffers = {};
+        var buffers = {};
         var nucleotids = {
             A : { direction : [ 1.0,  1.0,  1.0], color : [1.0, 0.0, 0.0, 1.0] },
             C : { direction : [ 1.0, -1.0, -1.0], color : [0.0, 1.0, 0.0, 1.0] },
@@ -88,40 +108,40 @@ function show_dna_sequence(gl, sequence) {
             N : { direction : [ 0.0,  0.0,  0.0], color : [0.0, 0.0, 0.0, 1.0] },
         };
 
-	return function (sequence) {
-	    var positions = [];
-	    sequence = checkValidity(sequence);
-	    if (buffers.vertices) { gl.deleteBuffer(buffers.vertices) }
-	    if (buffers.colors)   { gl.deleteBuffer(buffers.colors)   }
-	    var vertices = [], colors = [], vertex = vec3.create();
-	    sequence.split("").map(n => nucleotids[n]).forEach(
-		function (dc) {
-		    vec3.add(vertex, vertex, dc.direction);
-		    var v = vertex.slice();
-		    vertices.push(...v);
-		    positions.push(v);
-		    colors.push(...dc.color);
-		}
-	    );
-	    buffers.vertices = gl.createBuffer();
-	    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
-	    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-	    buffers.vertices.itemSize = 3;
-	    buffers.vertices.numItems = sequence.length;
-	    gl.vertexAttribPointer(program.vertexPositionAttribute, buffers.vertices.itemSize, gl.FLOAT, false, 0, 0);
+        return function (sequence) {
+            var positions = [];
+            sequence = checkValidity(sequence);
+            if (buffers.vertices) { gl.deleteBuffer(buffers.vertices) }
+            if (buffers.colors)   { gl.deleteBuffer(buffers.colors)   }
+            var vertices = [], colors = [], vertex = vec3.create();
+            sequence.split("").map(n => nucleotids[n]).forEach(
+                function (dc) {
+                    vec3.add(vertex, vertex, dc.direction);
+                    var v = vertex.slice();
+                    vertices.push(...v);
+                    positions.push(v);
+                    colors.push(...dc.color);
+                }
+            );
+            buffers.vertices = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+            buffers.vertices.itemSize = 3;
+            buffers.vertices.numItems = sequence.length;
+            gl.vertexAttribPointer(program.vertexPositionAttribute, buffers.vertices.itemSize, gl.FLOAT, false, 0, 0);
 
-	    buffers.colors = gl.createBuffer();
-	    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
-	    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-	    buffers.colors.itemSize = 4;
-	    buffers.colors.numItems = sequence.length;
-	    gl.vertexAttribPointer(program.vertexColorAttribute, buffers.colors.itemSize, gl.FLOAT, false, 0, 0);
+            buffers.colors = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.colors);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+            buffers.colors.itemSize = 4;
+            buffers.colors.numItems = sequence.length;
+            gl.vertexAttribPointer(program.vertexColorAttribute, buffers.colors.itemSize, gl.FLOAT, false, 0, 0);
 
-	    return {
-		buffers: buffers,
-		positions: positions,
-	    };
-	}
+            return {
+                buffers: buffers,
+                positions: positions,
+            };
+        }
     })();
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -133,18 +153,18 @@ function show_dna_sequence(gl, sequence) {
         var vMatrix = mat4.create();
         var pMatrix = mat4.create();
         mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, 0.1, 100000.0);
-	mat4.translate(vMatrix, vMatrix, [0, 0, -10]);
+        mat4.translate(vMatrix, vMatrix, [0, 0, -10]);
 
-	gl.canvas.addEventListener("wheel", function (e) {
-	    mat4.translate(vMatrix, vMatrix, [0, 0, e.deltaY]);
-	    e.preventDefault();
-	});
+        gl.canvas.addEventListener("wheel", function (e) {
+            mat4.translate(vMatrix, vMatrix, [0, 0, e.deltaY]);
+            e.preventDefault();
+        });
 
-	var processedSequence = processSequence(sequence.value);
-	var buffers = processedSequence.buffers;
+        var processedSequence = processSequence(sequence.value);
+        var buffers = processedSequence.buffers;
 
-	var middle = processedSequence.positions[Math.floor(sequence.value.length/2)];
-	mat4.translate(mMatrix, mMatrix, middle.map(x => -x));
+        var middle = processedSequence.positions[Math.floor(sequence.value.length/2)];
+        mat4.translate(mMatrix, mMatrix, middle.map(x => -x));
 
         var drag, X, Y, oldPageX, oldPageY;
         gl.canvas.addEventListener("mouseup", function (e) { drag = false });
@@ -173,10 +193,10 @@ function show_dna_sequence(gl, sequence) {
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             program.setMatrixUniforms({
-		projection: pMatrix,
-		motion:     mMatrix,
-		view:       vMatrix
-	    });
+                projection: pMatrix,
+                motion:     mMatrix,
+                view:       vMatrix
+            });
             gl.drawArrays(gl.LINE_STRIP, 0, buffers.vertices.numItems);
         }
     }
@@ -184,7 +204,7 @@ function show_dna_sequence(gl, sequence) {
     var drawScene = buildDrawSceneFunction();
 
     document.getElementById("submit").addEventListener("click",
-	    function () { drawScene = buildDrawSceneFunction(); }
+            function () { drawScene = buildDrawSceneFunction(); }
     );
     (function animate() { drawScene(); window.requestAnimationFrame(animate); })();
 }
