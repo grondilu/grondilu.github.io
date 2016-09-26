@@ -130,6 +130,7 @@ function show_dna_sequence(gl, sequence) {
                     colors.push(...dc.color);
                 }
             );
+	    var radius = Math.sqrt(Math.max(...positions.map(function (v) { return v[0]*v[0] + v[1]*v[1] + v[2]*v[2] })));
             buffers.vertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -147,6 +148,7 @@ function show_dna_sequence(gl, sequence) {
             return {
                 buffers: buffers,
                 positions: positions,
+		radius: radius
             };
         }
     })();
@@ -160,14 +162,16 @@ function show_dna_sequence(gl, sequence) {
         var vMatrix = mat4.create();
         var pMatrix = mat4.create();
         mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, 0.1, 100000.0);
-        mat4.translate(vMatrix, vMatrix, [0, 0, -10]);
+        var processedSequence = processSequence(sequence.value);
+
+	var distance = processedSequence.radius * 1.1;
+        mat4.translate(vMatrix, vMatrix, [0, 0, -distance]);
 
         gl.canvas.addEventListener("wheel", function (e) {
-	    vMatrix[14] = Math.min(vMatrix[14]+e.deltaY/2, -10);
+	    vMatrix[14] = Math.min(vMatrix[14]+e.deltaY/2, 0);
             e.preventDefault();
         });
 
-        var processedSequence = processSequence(sequence.value);
         var buffers = processedSequence.buffers;
 
         var middle = vec3.scale([], processedSequence.positions.reduce((a, b) => vec3.add([], a, b), vec3.create()), 1/processedSequence.positions.length);
