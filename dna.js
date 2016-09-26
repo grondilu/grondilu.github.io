@@ -35,6 +35,13 @@ function rotation_matrix (X, Y) {
     );
 }
 
+function generate(length) {
+    document.getElementById("sequence").value = 
+    [...Array(length)].map(
+	x => "ACGT".substr(Math.floor(Math.random()*4), 1)
+    ).join("");
+}
+
 function checkValidity(sequence) {
     sequence = sequence.replace(/(\r\n|\n|\r)/gm,"");
     if (sequence.match(/[^CGATN]/)) {
