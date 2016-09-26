@@ -213,6 +213,9 @@ function show_dna_sequence(gl, sequence) {
     document.getElementById("submit").addEventListener("click",
             function () { drawScene = buildDrawSceneFunction(); }
     );
+    document.getElementById("random").addEventListener("click",
+            function () { generate(1000); drawScene = buildDrawSceneFunction(); }
+    );
     (function animate() { drawScene(); window.requestAnimationFrame(animate); })();
 }
 
