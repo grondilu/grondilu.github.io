@@ -130,7 +130,6 @@ function show_dna_sequence(gl, sequence) {
                     colors.push(...dc.color);
                 }
             );
-	    console.log("creating WebGL buffers");
             buffers.vertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
