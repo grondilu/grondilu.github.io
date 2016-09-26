@@ -156,7 +156,7 @@ function show_dna_sequence(gl, sequence) {
         mat4.translate(vMatrix, vMatrix, [0, 0, -10]);
 
         gl.canvas.addEventListener("wheel", function (e) {
-            mat4.translate(vMatrix, vMatrix, [0, 0, e.deltaY]);
+	    vMatrix[14] = Math.min(vMatrix[14]+e.deltaY, -10);
             e.preventDefault();
         });
 
