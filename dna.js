@@ -130,6 +130,7 @@ function show_dna_sequence(gl, sequence) {
                     colors.push(...dc.color);
                 }
             );
+	    console.log("creating WebGL buffers");
             buffers.vertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -170,7 +171,7 @@ function show_dna_sequence(gl, sequence) {
         var processedSequence = processSequence(sequence.value);
         var buffers = processedSequence.buffers;
 
-        var middle = processedSequence.positions[Math.floor(sequence.value.length/2)];
+        var middle = vec3.scale([], processedSequence.positions.reduce((a, b) => vec3.add([], a, b), vec3.create()), 1/processedSequence.positions.length);
         mat4.translate(mMatrix, mMatrix, middle.map(x => -x));
 
         var drag, X, Y, oldPageX, oldPageY;
