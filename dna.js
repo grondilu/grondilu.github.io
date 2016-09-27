@@ -38,7 +38,7 @@ function rotation_matrix (X, Y) {
 function generate(length) {
     document.getElementById("sequence").value = 
     [...Array(length)].map(
-	x => "ACGT".substr(Math.floor(Math.random()*4), 1)
+        x => "ACGT".substr(Math.floor(Math.random()*4), 1)
     ).join("");
 }
 
@@ -130,7 +130,7 @@ function show_dna_sequence(gl, sequence) {
                     colors.push(...dc.color);
                 }
             );
-	    var radius = Math.sqrt(positions.reduce((a, b) => Math.max(a, b[0]*b[0] + b[1]*b[1] + b[2]*b[2]), 0));
+            var radius = Math.sqrt(positions.reduce((a, b) => Math.max(a, b[0]*b[0] + b[1]*b[1] + b[2]*b[2]), 0));
             buffers.vertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -148,7 +148,7 @@ function show_dna_sequence(gl, sequence) {
             return {
                 buffers: buffers,
                 positions: positions,
-		radius: radius
+                radius: radius
             };
         }
     })();
@@ -164,11 +164,11 @@ function show_dna_sequence(gl, sequence) {
         mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, 0.1, 100000.0);
         var processedSequence = processSequence(sequence.value);
 
-	var distance = processedSequence.radius * 1.1;
+        var distance = processedSequence.radius * 1.1;
         mat4.translate(vMatrix, vMatrix, [0, 0, -distance]);
 
         gl.canvas.addEventListener("wheel", function (e) {
-	    vMatrix[14] = Math.min(vMatrix[14]+e.deltaY/2, 0);
+            vMatrix[14] = Math.min(vMatrix[14]+e.deltaY/2, 0);
             e.preventDefault();
         });
 
