@@ -161,12 +161,12 @@ function show_dna_sequence(gl, sequence) {
         var mMatrix = mat4.create();
         var vMatrix = mat4.create();
         var pMatrix = mat4.create();
-	(function () {
-	    var near = 0.1, far = 1000.0; 
-	    mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, near, far);
-	    // put far plane at infinity
-	    pMatrix[10] = -1, pMatrix[14] = -2*near;
-	})();
+        (function () {
+            var near = 0.1, far = 1000.0; 
+            mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, near, far);
+            // put far plane at infinity
+            pMatrix[10] = -1, pMatrix[14] = -2*near;
+        })();
         var processedSequence = processSequence(sequence.value);
 
         var distance = processedSequence.radius * 1.1;
@@ -185,26 +185,26 @@ function show_dna_sequence(gl, sequence) {
         var drag, X, Y, oldPageX, oldPageY;
         gl.canvas.addEventListener("mouseup", function (e) { drag = false });
         gl.canvas.addEventListener("mousedown",
-            function (e) {
-                if (e.button == 1) {
-                    console.log("middle button pressed");
-                } else if (e.button == 0) {
-                    drag = true, oldPageX = e.pageX, oldPageY = e.pageY;
-                    e.preventDefault();
-                }
-                return false;
-            }, false
-        );
+                function (e) {
+                    if (e.button == 1) {
+                        console.log("middle button pressed");
+                    } else if (e.button == 0) {
+                        drag = true, oldPageX = e.pageX, oldPageY = e.pageY;
+                        e.preventDefault();
+                    }
+                    return false;
+                }, false
+                );
         gl.canvas.addEventListener("mousemove",
-            function(e) {
-                if (!drag) return false;
-                X = -(e.pageX-oldPageX)/canvas.width,
-                    Y = (e.pageY-oldPageY)/canvas.height;
-                mat4.multiply(mMatrix, rotation_matrix(X, Y), mMatrix);
-                oldPageX = e.pageX, oldPageY = e.pageY;
-                e.preventDefault();
-            }, false
-        );
+                function(e) {
+                    if (!drag) return false;
+                    X = -(e.pageX-oldPageX)/canvas.width,
+                        Y = (e.pageY-oldPageY)/canvas.height;
+                    mat4.multiply(mMatrix, rotation_matrix(X, Y), mMatrix);
+                    oldPageX = e.pageX, oldPageY = e.pageY;
+                    e.preventDefault();
+                }, false
+                );
         return function () {
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
