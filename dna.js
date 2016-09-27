@@ -161,7 +161,12 @@ function show_dna_sequence(gl, sequence) {
         var mMatrix = mat4.create();
         var vMatrix = mat4.create();
         var pMatrix = mat4.create();
-        mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, 0.1, 100000.0);
+	(function () {
+	    var near = 0.1, far = 1000.0; 
+	    mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, near, far);
+	    // put far plane at infinity
+	    pMatrix[10] = -1, pMatrix[14] = -2*near;
+	})();
         var processedSequence = processSequence(sequence.value);
 
         var distance = processedSequence.radius * 1.1;
