@@ -130,7 +130,7 @@ function show_dna_sequence(gl, sequence) {
                     colors.push(...dc.color);
                 }
             );
-	    var radius = Math.sqrt(Math.max(...positions.map(function (v) { return v[0]*v[0] + v[1]*v[1] + v[2]*v[2] })));
+	    var radius = Math.sqrt(positions.reduce((a, b) => Math.max(a, b[0]*b[0] + b[1]*b[1] + b[2]*b[2]), 0));
             buffers.vertices = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertices);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
