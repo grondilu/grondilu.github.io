@@ -21,6 +21,19 @@
  *****************************************************************************/
 
 var utils = {
+    DNA: {
+	generate: function (length) {
+	    return [...Array(length)].map(
+		    x => "ACGT".substr(Math.floor(Math.random()*4), 1)
+		    ).join("");
+	},
+	checkValidity: function (sequence) {
+	    sequence = sequence.replace(/(\r\n|\n|\r)/gm,"");
+	    if (sequence.match(/[^CGATN]/)) {
+		throw "given string does not look like a DNA sequence";
+	    }
+	}
+    },
     rotation_matrix: function (X, Y) {
 	var
 	    X2 = X*X, Y2 = Y*Y,
@@ -90,19 +103,6 @@ function buildProgram(gl) {
     }
     return program;
 }
-var DNA = {
-    generate: function (length) {
-        return [...Array(length)].map(
-            x => "ACGT".substr(Math.floor(Math.random()*4), 1)
-        ).join("");
-    },
-    checkValidity: function (sequence) {
-        sequence = sequence.replace(/(\r\n|\n|\r)/gm,"");
-        if (sequence.match(/[^CGATN]/)) {
-            throw "given string does not look like a DNA sequence";
-        }
-    }
-};
 var buildModel = (function () {
     var model = { glBuffers: {} };
     var nucleotids = {
@@ -115,7 +115,7 @@ var buildModel = (function () {
     return function (gl, sequence) {
         if (model.glBuffers.vertices) { gl.deleteBuffer(model.glBuffers.vertices) }
         if (model.glBuffers.colors)   { gl.deleteBuffer(model.glBuffers.colors)   }
-        DNA.checkValidity(sequence);
+        utils.DNA.checkValidity(sequence);
         var
             positions = [], vertices = [], colors = [],
             vertex = vec3.create();
@@ -157,6 +157,8 @@ function main() {
         sequence = document.getElementById("sequence"),
         gl     = WebGLUtils.setupWebGL(canvas),
         program = buildProgram(gl);
+
+    var fileSelector = document.getElementById("file");
 
     var matrices = {
         model:      mat4.create(),
@@ -205,7 +207,7 @@ function main() {
     document.getElementById("submit").addEventListener("click", function () { updateWebGLBuffers(sequence.value) } );
     document.getElementById("random").addEventListener("click",
             function () {
-                sequence.value = DNA.generate(1000);
+                sequence.value = utils.DNA.generate(1000);
                 updateWebGLBuffers(sequence.value);
             }
     );
@@ -220,7 +222,6 @@ function main() {
         requestAnimationFrame(animate);
     })();
 
-    var fileSelector = document.getElementById("file");
     fileSelector.addEventListener("change",
         function () {
             if (fileSelector.files.length > 1) {
