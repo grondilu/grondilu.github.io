@@ -2,40 +2,33 @@
 <html>
 
     <head>
-	<meta charset="utf-8">
+        <meta charset="utf-8">
 
-	<title>DNA visualization</title>
-	<script src=gl-matrix-min.js></script>
-	<script src=webgl-utils.js></script>
-	<script src=dna.js></script>
+        <title>DNA visualization</title>
+        <script src=gl-matrix-min.js></script>
+        <script src=webgl-utils.js></script>
+        <script src=dna.js></script>
 
     </head>
 
     <body onload="main()";>
-	<h1>Three dimensional visualization of DNA sequences</h1>
-	<p>What this is about is best explained <a href="https://www.youtube.com/watch?v=IjGZ6kF2gbQ">in this video</a>.  See also the credits section below.</p>
-	    <label for=fasta>Enter a DNA sequence (newlines are allowed):</label><br>
-	    <textarea id=sequence cols=80 rows=10>ACGT</textarea><br>
-	<input type=submit id=submit>
-	<input type=button id=random value="generate a random one">
-	</p>
-	<p>See the result here.  You can use your mouse to rotate the view, and the mouse wheel to zoom.<br>
-	<canvas id="canvas" style="border: none;" width="800" height="600"></canvas>
-	</p>
-	<h2>Viewing a long sequence</h2>
-	<p>The <tt>textarea</tt> above can not quite be used for very long DNA sequences.  To do so you may first download it as a file
-	in <a href=https://en.wikipedia.org/wiki/FASTA>FASTA</a> format:<br>
-	    <input type=file id=file>
-	</p>
-	<p>Lots of nucleotid sequences from actual biological data are available for free on various websites, such as USA's <a href=https://www.ncbi.nlm.nih.gov/>National Center for Biotechnology Information</a>.
-	On this particular website, you may select the "nucleotide" database, enter keywords such as "homo sapiens chromosome 7", click on FASTA and then in the "send" menu, pick the "file" destination.</p>
-
-	<h2>Credits</h2>
-	<ul>
-	    <li>This is an implementation of <a href=http://www.cs.ucr.edu/~eamonn/DNA/>this academic work</a></li>
-	    <li>The WebGL code is inspired from <a href=http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/pointsVaryingColor.html>this demo</a></li>
-	    <li>The mouse-controlled rotation is done with an unorthodox method.  See <a href=http://grondilu.github.io/cube.html>this for more details</a>.</li>
-	</ul>
+        <h1>Three dimensional visualization of DNA sequences</h1>
+        <p>What this is about is best explained <a href="https://www.youtube.com/watch?v=IjGZ6kF2gbQ">in this video</a>.  See also the credits section below.</p>
+        <p>Enter a DNA sequence.  FASTA is allowed.  If you use the file selector, this text area will display the first thousand characters.<br>
+        <textarea id=sequence cols=80 rows=10>ACGT</textarea></p>
+        <input type=submit id=submit>
+        <input type=button id=random value="generate a random one">
+        <input type=file id=file>
+        </p>
+        <p>See the result here.  You can use your mouse to rotate the view, and the mouse wheel to zoom.<br>
+        <canvas id="canvas" style="border: none;" width="800" height="600"></canvas>
+        </p>
+        <h2>Credits</h2>
+        <ul>
+            <li>This is an implementation of <a href=http://www.cs.ucr.edu/~eamonn/DNA/>this academic work</a></li>
+            <li>The WebGL code is inspired from <a href=http://imagine.inrialpes.fr/people/Francois.Faure/htmlCourses/WebGL/pointsVaryingColor.html>this demo</a></li>
+            <li>The mouse-controlled rotation is done with an unorthodox method.  See <a href=http://grondilu.github.io/cube.html>this for more details</a>.</li>
+        </ul>
     </body>
 
 </html>

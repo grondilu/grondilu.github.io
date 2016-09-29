@@ -28,10 +28,12 @@ var utils = {
 		    ).join("");
 	},
 	checkValidity: function (sequence) {
-	    sequence = sequence.replace(/(\r\n|\n|\r)/gm,"");
+	    sequence = sequence.replace(/(^>.*)?(\r\n|\n|\r)/gm,"");
 	    if (sequence.match(/[^CGATN]/)) {
+		console.log(sequence);
 		throw "given string does not look like a DNA sequence";
 	    }
+	    return sequence;
 	}
     },
     rotation_matrix: function (X, Y) {
@@ -55,28 +57,28 @@ var utils = {
 function buildProgram(gl) {
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(
-            fragmentShader,
-            `precision mediump float;
-            varying vec4 vColor;
-            void main(void) {
-                gl_FragColor = vColor;
-            }`
-            ); 
+	fragmentShader,
+	`precision mediump float;
+	varying vec4 vColor;
+	void main(void) {
+	    gl_FragColor = vColor;
+	}`
+    ); 
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(
-            vertexShader,
-            `attribute vec3 aVertexPosition;
-            attribute vec4 aVertexColor;
-            uniform mat4 uVMatrix;
-            uniform mat4 uMMatrix;
-            uniform mat4 uPMatrix;
-            varying vec4 vColor;
-            void main(void) {
-                vColor = aVertexColor;
-                gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
-                gl_PointSize = 5.0;
-            }`
-            );
+	vertexShader,
+	`attribute vec3 aVertexPosition;
+	attribute vec4 aVertexColor;
+	uniform mat4 uVMatrix;
+	uniform mat4 uMMatrix;
+	uniform mat4 uPMatrix;
+	varying vec4 vColor;
+	void main(void) {
+	    vColor = aVertexColor;
+	    gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
+	    gl_PointSize = 5.0;
+	}`
+    );
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) { alert(gl.getShaderInfoLog(fragmentShader)); return null; }
     gl.compileShader(vertexShader);
@@ -115,7 +117,7 @@ var buildModel = (function () {
     return function (gl, sequence) {
         if (model.glBuffers.vertices) { gl.deleteBuffer(model.glBuffers.vertices) }
         if (model.glBuffers.colors)   { gl.deleteBuffer(model.glBuffers.colors)   }
-        utils.DNA.checkValidity(sequence);
+        sequence = utils.DNA.checkValidity(sequence);
         var
             positions = [], vertices = [], colors = [],
             vertex = vec3.create();
@@ -158,7 +160,8 @@ function main() {
         gl     = WebGLUtils.setupWebGL(canvas),
         program = buildProgram(gl);
 
-    var fileSelector = document.getElementById("file");
+    var
+	fileSelector = document.getElementById("file");
 
     var matrices = {
         model:      mat4.create(),
@@ -228,7 +231,12 @@ function main() {
                 alert("please select only one file");
                 return;
             }
-            console.log("picked file " + fileSelector.files[0].name);
+	    var reader = new FileReader();
+	    reader.readAsText(fileSelector.files[0]);
+	    reader.onload = function () {
+		sequence.value = reader.result.substr(0, 1000);
+                updateWebGLBuffers(utils.DNA.checkValidity(reader.result.substr(0, 5000000)));
+	    }
         }
     );
 
