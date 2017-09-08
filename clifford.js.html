@@ -11,8 +11,9 @@
             <div class="slides">
                 <section><h1>Clifford.JS</h1>
                     <h3>A Javascript library for geometric algebra</h3>
+                    <h4>Work In Progress</h4>
                     <p>
-                    <small><a href="http://github.com/grondilu/clifford/js">github</a></small>
+                    <small><a href="https://github.com/grondilu/clifford/tree/master/js">github</a></small>
                     </p>
                 </section>
 
@@ -215,6 +216,9 @@
                         <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
                     </a>
                     </section>
+                    <section>
+                        <p>This subsection is yet to be written</p>
+                        <p>For now, you can look at <a href=https://github.com/grondilu/clifford/blob/master/js/clifford.js>the code</a></p>
                 </section>
 
                 <section>
@@ -222,6 +226,30 @@
                     <p>That part is actually easy,
                     thanks to the excellent <a href=http://pegjs.org>PEG.js</a>
                     library.</p>
+                </section>
+
+                <section>
+                    <h2>What works now</h2>
+                    <ul>
+                        <li>the parser works fine (see test.js file)</li>
+                        <li>the object model is rich enough to perform
+                            basic arithmetics and simplifications
+                            on basis blades, which is encouraging
+                            for the feasability of the whole concept
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>TODO</h2>
+                    <ul>
+                        <li>Improve the object model : complete classes for involution,
+                            scaled multivectors, write `simplify()` methods...
+                        </li>
+                        <li>Design an efficient caching system, for we don't
+                            want to compute the same kind of operations
+                            twice!</li>
+                    </ul>
                 </section>
 
 
