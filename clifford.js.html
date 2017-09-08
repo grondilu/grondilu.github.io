@@ -12,7 +12,7 @@
                 <section><h1>Clifford.JS</h1>
                     <h3>A Javascript library for geometric algebra</h3>
                     <p>
-                    <small><a href="http://github.com/grondilu/clifford">github</a></small>
+                    <small><a href="http://github.com/grondilu/clifford/js">github</a></small>
                     </p>
                 </section>
 
@@ -202,18 +202,28 @@
                         <li>Write a grammar to parse expressions such as :
                             <pre>M = pi/2 * e0∧e1 - a·b + 2.1*no∧ni∧ē3</pre>
                         </li>
-                        <li>Have that grammar return an AST whose nodes
+                        <li>Have that parser return an AST whose nodes
                             are instances of the Object Model</li>
                         <li>Process this AST to perform symbolic calculus</li>
                     </ul>
                 </section>
 
                 <section>
+                    <section>
                     <h2>The Object Model</h2>
                     <a href="#" class="navigate-down">
                         <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
                     </a>
+                    </section>
                 </section>
+
+                <section>
+                    <h2>The Grammar</h2>
+                    <p>That part is actually easy,
+                    thanks to the excellent <a href=http://pegjs.org>PEG.js</a>
+                    library.</p>
+                </section>
+
 
             </div>
         </div>
