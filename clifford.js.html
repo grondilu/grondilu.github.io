@@ -1,5 +1,6 @@
 <html>
     <head>
+		<meta charset="utf-8">
         <title>Geometric Algebra for Javascript</title>
         <link rel="stylesheet" href="css/reveal.css">
         <link rel="stylesheet" href="css/theme/black.css">
@@ -48,6 +49,10 @@
                 <section>
                     <section>
                         <h2>Quick Primer on Geometric Algebra</h2>
+
+						<a href="#" class="navigate-down">
+							<img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
+						</a>
                     </section>
                     <section>
                         <p>A geometric algebra is an associative algebra with a twist :</p>
@@ -61,6 +66,8 @@
                         \mathbf{v}^2\in\mathbb{R}$$
                         </p>
                     </section>
+
+                    <!-- looks wrong:  1 + v is not a vector!
                     <section>
                         <p>That means that all vectorial spaces are geometric algebras,
                         albeit trivial ones : their "vectorial subspace" is the real
@@ -69,6 +76,8 @@
                         of the vectorial subspace is more than one, and different 
                         from the dimension of the algebra.</p>
                     </section>
+                    -->
+
                     <section>
                         <p>Although all associative algebras have a natural vectorial
                         space structure, we reserve the word <em>vector</em>
@@ -76,6 +85,8 @@
                         </p>
                         <p>We usually denote vectors with a lowercase,
                         bold roman letter.</p>
+                        <p>A generic element of the algebra is called a
+                        <em>multivector</em>.</p>
                     </section>
                     <section>
                         <p>Multiplication is called the <em>geometric product</em>.</p>
@@ -100,7 +111,8 @@
                             <li>The inner product defines a <em>scalar product</em>
                                 in the usual sense of the expression.</li>
                             <li>Only the outer product is easily generalized
-                                to any element of the algebra.</li>
+                                to any element of the algebra. It is fully
+                                associative and anti-symetric.</li>
                             <li>Along with the geometric product, those two operations are the main tools of GA</li>
                     </section>
 
@@ -112,9 +124,10 @@
                         and negative-squared ones
                         <nobr>(\(\mathbf{v}^2 \lt 0\))</nobr>
                         </p>
-                        <p>Such algebra is sometimes called
-                        the <b>Universal Alegebra</b>
+                        <p>Such algebra is called
+                        the <b>Universal Algebra</b>
                         </p>
+                        <p>This is what we want to implement</p>
                     </section>
                     <section>
                         <p>The vector space of the universal algebra
@@ -134,14 +147,73 @@
                         <p>The linear combination of an euclidean vector
                         with an anti-euclidean one can have a null square.
                         Such vector is called a <em>null vector</em>.</p>
-                        <p>Two nul vectors are important for the so-called
-                        <em>conformal model</em>, which will be discussed later.
-                        For now, you can just remember the name and notations
-                        for those two : they are called <em>origin</em> and
-                        <em>infinity</em> and noted \(o\) and \(\infty\).
-                        In the JS code we'll note them `no` and `ni`.
+                        <p>Two particular null vectors are important for the
+                        so-called <em>conformal model</em>, which will be
+                        discussed later.  For now, you can just remember the
+                        names and notations for those two : they are called
+                        <em>origin</em> and <em>infinity</em> and noted \(o\)
+                        and \(\infty\).  In the JS code we'll note them `no`
+                        and `ni`.
                         </p>
                     </section>
+
+                    <section>
+                        <p>The geometric product of several distinct base
+                        vectors is equal to its outer product :
+                        $$
+                        \mathbf{b_{i_1}}\mathbf{b_{i_2}}\ldots\mathbf{b_{i_n}}
+                        =
+                        \mathbf{b_{i_1}}\wedge\mathbf{b_{i_2}}\wedge\ldots\wedge\mathbf{b_{i_n}}
+                        $$
+                        where \(\mathbf{b}\) is a placeholder for either
+                        \(\mathbf{e}\), \(\mathbf{\bar{e}}\), \(o\)
+                        or \(\infty\).</p>
+
+                        <p>Such product forms an <em>irreducible</em>
+                        multivector.  It is called a <em>basis blade</em>.</p>
+
+                        <p>All basis blades form a base of the algebra in the
+                        vectorial sense.  Our goal is to be able to write any
+                        multivector in that base.</p>
+                    </section>
+
+                    <section>
+                        <p>This was the bare minimum you need
+                        to know in order to understand the rest
+                        of this slideshow.</p>
+
+                        <p>A good entry point to learn more about geometric
+                        algebra is the <a href=https://en.wikipedia.org/wiki/Geometric_algebra>Wikipedia article</a>.
+                        
+                        <p>Notable authors on the subject are for instance
+                        David Hestenes and Chris Doran.  Pablo Colapinto is
+                        also notable for having written <em>Versor</em>, a
+                        highly efficient library in C++, that was then
+                        translated to javascript.</p>
+                        
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Strategy</h2>
+                    <ul>
+                        <li>Write an extensive Object Model reflecting
+                            most characteristics of the Universal Algebra</li>
+                        <li>Write a grammar to parse expressions such as :
+                            <pre>M = pi/2 * e0∧e1 - a·b + 2.1*no∧ni∧ē3</pre>
+                        </li>
+                        <li>Have that grammar return an AST whose nodes
+                            are instances of the Object Model</li>
+                        <li>Process this AST to perform symbolic calculus</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>The Object Model</h2>
+                    <a href="#" class="navigate-down">
+                        <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
+                    </a>
+                </section>
 
             </div>
         </div>
