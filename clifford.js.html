@@ -198,14 +198,16 @@
                 <section>
                     <h2>Strategy</h2>
                     <ul>
-                        <li>Write an extensive Object Model reflecting
+                        <li>Write an Object-Oriented Model reflecting
                             most characteristics of the Universal Algebra</li>
                         <li>Write a grammar to parse expressions such as :
                             <pre>M = pi/2 * e0∧e1 - a·b + 2.1*no∧ni∧ē3</pre>
+                            This will produce an AST.
                         </li>
-                        <li>Have that parser return an AST whose nodes
-                            are instances of the Object Model</li>
-                        <li>Process this AST to perform symbolic calculus</li>
+                        <li>Translate this AST into a structure in the
+                            object model.</li>
+                        <li>Process this object structure to perform symbolic
+                            calculus</li>
                     </ul>
                 </section>
 
@@ -227,6 +229,9 @@
                     <p>That part is actually easy,
                     thanks to the excellent <a href=http://pegjs.org>PEG.js</a>
                     library.</p>
+                    <p>To write <a href=http://github.com/grondilu/clifford.js/src/algebra.pegjs>the grammar</a>,
+                    I took inspiration from the <a href=https://github.com/pegjs/pegjs/blob/master/examples/javascript.pegjs>javascript example</a>.
+                    </p>
                 </section>
 
                 <section>
