@@ -8,12 +8,9 @@ function get_projection(angle, a, zMin, zMax) {
     );
 }
 
-let proj_matrix = get_projection(40, 1920/1080, 1, 100),
-    mo_matrix   = mat4.create(),
-    view_matrix = mat4.create();
+let mo_matrix   = mat4.create();
 
 mo_matrix.copy = mat4.create();
-view_matrix[14] = view_matrix[14]-6;
 
 function turn(X, Y) {
     let X2 = X*X, Y2 = Y*Y,
@@ -58,7 +55,6 @@ function turn(X, Y) {
                 document.body.style.transform =
                     "matrix3d(" + mo_matrix.join(",") + ")";
                 e.preventDefault();
-                console.log(document.body.style.transform);
             }, false
         );
     }
