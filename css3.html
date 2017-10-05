@@ -1,0 +1,25 @@
+<!doctype HTML>
+<html>
+    <header>
+        <title>CSS3 Transform example</title>
+        <script src="gl-matrix-min.js"></script>
+        <script src="css3.js"></script>
+        <style>
+body { transform; }
+        </style>
+    </header>
+    <body>
+        <h1>CSS3 Transform</h1>
+        <p>Did you know that with <a href=https://www.w3schools.com/css/css3_3dtransforms.asp>CSS3 transforms</a>,
+        you can basically do 3D without using WebGL, or even canvas?</p>
+        <p>Well, the elements you define in html are still flat,
+        but they are immersed in a projective space and you can apply
+        any linear tranformation to them, including those you'd normally
+        use with WebGL.</p>
+        <p>It could include any kind of HTML elements, even an iframe
+        playing a video:</p>
+        <iframe width="854" height="480" src="https://www.youtube.com/embed/YE7VzlLtp-4" frameborder="0" allowfullscreen></iframe>
+        <p>Give it a try : click and move your mouse (not inside the video though,
+        but anywhere else in the body of the document).</p>
+    </body>
+</html>
