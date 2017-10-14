@@ -137,7 +137,7 @@ function main() {
             }, false
         );
         canvas.addEventListener("mouseup", function (e) { drag = false; });
-        canvas.addEventListener("mousemove",
+        document.addEventListener("mousemove",
             function(e) {
                 if (!drag) return false;
                 turn(
