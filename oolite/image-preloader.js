@@ -20,6 +20,7 @@ function loadImages(urls, callback) {
         // If all the images are loaded call the callback.
         if (imagesToLoad == 0) {
             debug('all images are loaded');
+            setTimeout(() => debug(''), 5000);
             callback();
         }
     };
