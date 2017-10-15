@@ -81,7 +81,9 @@ function drawScene(gl, scene) {
 
     var mvMatrix = mat4.create(),
         pMatrix  = mat4.create();
-    mat4.perspective(pMatrix, 45, 1, 0.01, 200.0);
+    mat4.perspective(
+        pMatrix, 45, gl.canvas.width/gl.canvas.height, 0.01, 200.0
+    );
 
     mat4.translate(mvMatrix, mvMatrix, [0, 0, -100]);
     mat4.rotateX(mvMatrix, mvMatrix, rotateX += .01);
