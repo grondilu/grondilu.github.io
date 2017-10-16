@@ -64,9 +64,10 @@ function multiply(out, a, b) {
 }
 
 function main() {
-    let canvas   = document.getElementById('canvas'),
-        gl       = WebGLUtils.setupWebGL(canvas),
-        cube     = {
+    let canvas    = document.getElementById('canvas'),
+        container = document.getElementById('canvas-container'),
+        gl        = WebGLUtils.setupWebGL(canvas),
+        cube      = {
             vertices: [
                 -1, -1, -1, +1, -1, -1, +1, +1, -1, -1, +1, -1,
                 -1, -1, +1, +1, -1, +1, +1, +1, +1, -1, +1, +1,
@@ -175,7 +176,7 @@ function main() {
         // MOUSE MANAGEMENT
         let drag = false, old_x, old_y;
 
-        canvas.addEventListener("mousedown",
+        container.addEventListener("mousedown",
             function (e) {
                 mo_matrix.copy = mo_matrix.map(x => bigRat(x));
                 drag = true, old_x = e.pageX, old_y = e.pageY;
