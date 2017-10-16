@@ -152,16 +152,16 @@ function main() {
 
     function get_projection(angle, a, zMin, zMax) {
         let ang = Math.tan((angle*.5)*Math.PI/180);//angle*.5
-        return mat4.fromValues(
+        return [
             0.5/ang, 0 , 0, 0,
             0, 0.5*a/ang, 0, 0,
             0, 0, -(zMax+zMin)/(zMax-zMin), -1,
             0, 0, (-2*zMax*zMin)/(zMax-zMin), 0 
-        );
+        ];
     }
 
     let proj_matrix = get_projection(40, canvas.width/canvas.height, 1, 100),
-        view_matrix = mat4.create();
+        view_matrix = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
 
     view_matrix[14] = view_matrix[14]-6;
     mo_matrix.copy = mo_matrix.map(x => bigRat(x));
