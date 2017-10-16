@@ -11,14 +11,16 @@
 
     </head>
 
-    <body onload="main()";>
+    <body onload="main();">
         <h1>Three dimensional visualization of DNA sequences</h1>
-        <p>What this is about is best explained <a href="https://www.youtube.com/watch?v=IjGZ6kF2gbQ">in this video</a>.  See also the credits section below.</p>
+        <iframe width="854" height="480" src="https://www.youtube.com/embed/IjGZ6kF2gbQ" frameborder="0" allowfullscreen></iframe>
         <p>Enter a DNA sequence.  FASTA is allowed.  If you use the file selector, this text area will display the first thousand characters.<br>
-        <textarea id=sequence cols=80 rows=10>ACGT</textarea></p>
-        <input type=submit id=submit>
-        <input type=button id=random value="generate a random one">
-        <input type=file id=file>
+        <form>
+        <input id=sequence size=80 pattern="[ACGTN]+" title="DNA sequence (accepted characters are ACGTN)" value=ACGT></p>
+        <input id=submit type=submit>
+        <input id=random type=button value="generate a random one">
+        <input id=file   type=file>
+        </form>
         </p>
         <p>See the result here.  You can use your mouse to rotate the view, and the mouse wheel to zoom.<br>
         <canvas id="canvas" style="border: none;" width="800" height="600"></canvas>
