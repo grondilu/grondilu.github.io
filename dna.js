@@ -22,34 +22,34 @@
 
 var utils = {
     DNA: {
-	generate: function (length) {
-	    return [...Array(length)].map(
-		    x => "ACGT".substr(Math.floor(Math.random()*4), 1)
-		    ).join("");
-	},
-	checkValidity: function (sequence) {
-	    sequence = sequence.replace(/(^>.*)?(\r\n|\n|\r)/gm,"");
-	    if (sequence.match(/[^CGATN]/)) {
-		console.log(sequence);
-		throw "given string does not look like a DNA sequence";
-	    }
-	    return sequence;
-	}
+        generate: function (length) {
+            return [...Array(length)].map(
+                    x => "ACGT".substr(Math.floor(Math.random()*4), 1)
+                    ).join("");
+        },
+        checkValidity: function (sequence) {
+            sequence = sequence.replace(/(^>.*)?(\r\n|\n|\r)/gm,"");
+            if (sequence.match(/[^CGATN]/)) {
+                console.log(sequence);
+                throw "given string does not look like a DNA sequence";
+            }
+            return sequence;
+        }
     },
     rotation_matrix: function (X, Y) {
-	var
-	    X2 = X*X, Y2 = Y*Y,
-	    q = 1 + X2 + Y2, s = 1 - X2 - Y2,
-	    r2 = 1/(q*q), s2 = s*s,
-	    A = (s2 + 4*(Y2 - X2))*r2, B = -8*X*Y*r2,
-	    C = 4*s*X*r2, D = (s2 + 4*(X2 - Y2))*r2,
-	    E = 4*s*Y*r2, F = (s2 - 4*(X2 + Y2))*r2;
-	return mat4.fromValues(
-	    A,  B, C, 0,
-	    B,  D, E, 0,
-	   -C, -E, F, 0,
-	    0,  0, 0, 1
-	);
+        var
+            X2 = X*X, Y2 = Y*Y,
+            q = 1 + X2 + Y2, s = 1 - X2 - Y2,
+            r2 = 1/(q*q), s2 = s*s,
+            A = (s2 + 4*(Y2 - X2))*r2, B = -8*X*Y*r2,
+            C = 4*s*X*r2, D = (s2 + 4*(X2 - Y2))*r2,
+            E = 4*s*Y*r2, F = (s2 - 4*(X2 + Y2))*r2;
+        return mat4.fromValues(
+            A,  B, C, 0,
+            B,  D, E, 0,
+           -C, -E, F, 0,
+            0,  0, 0, 1
+        );
     },
     quadrance: function (v) { return v[0]*v[0]+v[1]*v[1]+v[2]*v[2]; }
 }
@@ -57,27 +57,27 @@ var utils = {
 function buildProgram(gl) {
     var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(
-	fragmentShader,
-	`precision mediump float;
-	varying vec4 vColor;
-	void main(void) {
-	    gl_FragColor = vColor;
-	}`
-    ); 
+        fragmentShader,
+        `precision mediump float;
+        varying vec4 vColor;
+        void main(void) {
+            gl_FragColor = vColor;
+        }`
+    );
     var vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(
-	vertexShader,
-	`attribute vec3 aVertexPosition;
-	attribute vec4 aVertexColor;
-	uniform mat4 uVMatrix;
-	uniform mat4 uMMatrix;
-	uniform mat4 uPMatrix;
-	varying vec4 vColor;
-	void main(void) {
-	    vColor = aVertexColor;
-	    gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
-	    gl_PointSize = 5.0;
-	}`
+        vertexShader,
+        `attribute vec3 aVertexPosition;
+        attribute vec4 aVertexColor;
+        uniform mat4 uVMatrix;
+        uniform mat4 uMMatrix;
+        uniform mat4 uPMatrix;
+        varying vec4 vColor;
+        void main(void) {
+            vColor = aVertexColor;
+            gl_Position = uPMatrix * uVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
+            gl_PointSize = 5.0;
+        }`
     );
     gl.compileShader(fragmentShader);
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) { alert(gl.getShaderInfoLog(fragmentShader)); return null; }
@@ -131,8 +131,8 @@ var buildModel = (function () {
         }
         model.barycenter = vec3.scale([], positions.reduce((a, b) => vec3.add([], a, b), vec3.create()), 1/positions.length);
         model.radius = (function () {
-	    return Math.sqrt(positions.reduce((a, b) => Math.max(a, utils.quadrance(vec3.subtract([], b, model.barycenter))), 0));
-	})();
+            return Math.sqrt(positions.reduce((a, b) => Math.max(a, utils.quadrance(vec3.subtract([], b, model.barycenter))), 0));
+        })();
 
         model.glBuffers.vertices = gl.createBuffer();
         model.glBuffers.vertices.itemSize = 3;
@@ -153,7 +153,7 @@ var buildModel = (function () {
 })();
 
 function main() {
-    
+
     var
         canvas = document.getElementById("canvas"),
         sequence = document.getElementById("sequence"),
@@ -161,28 +161,49 @@ function main() {
         program = buildProgram(gl);
 
     var
-	fileSelector = document.getElementById("file");
+        fileSelector = document.getElementById("file");
 
     var matrices = {
         model:      mat4.create(),
         view:       mat4.create(),
         projection: (function () {
             var pMatrix = [];
-            var near = 0.1, far = 1000.0; 
+            var near = 0.1, far = 1000.0;
             mat4.perspective(pMatrix, 45, gl.canvas.width / gl.canvas.height, near, far);
             // put far plane at infinity
             pMatrix[10] = -1, pMatrix[14] = -2*near;
             return pMatrix;
         })()
     };
+    matrices.model.copy = mat4.create();
 
     var model;
     (function () {
         // mouse management
         var drag, X, Y, oldPageX, oldPageY, distance = m => m.radius * 2;
-        gl.canvas.addEventListener("mouseup",   function (e) { drag = false });
-        gl.canvas.addEventListener("mousedown", function (e) { if (e.button == 1) { console.log("middle button pressed"); } else if (e.button == 0) { drag = true, oldPageX = e.pageX, oldPageY = e.pageY; e.preventDefault(); }; return false; }, false);
-        gl.canvas.addEventListener("mousemove", function (e) { if (!drag) return false; X = -(e.pageX-oldPageX)/canvas.width, Y = (e.pageY-oldPageY)/canvas.height; mat4.multiply( matrices.model, utils.rotation_matrix(X, Y), matrices.model); oldPageX = e.pageX, oldPageY = e.pageY; e.preventDefault(); }, false);
+        document.addEventListener("mouseup",   function (e) { drag = false });
+        gl.canvas.addEventListener(
+            "mousedown", function (e) {
+                if (e.button == 1) { console.log("middle button pressed");
+                } else if (e.button == 0) {
+                    mat4.copy(matrices.model.copy, matrices.model);
+                    drag = true, oldPageX = e.pageX, oldPageY = e.pageY;
+                    e.preventDefault(); }; return false;
+            }, false
+        );
+        document.addEventListener(
+            "mousemove", function (e) {
+                if (!drag) return false;
+                X = -(e.pageX-oldPageX)/canvas.width,
+                    Y = (e.pageY-oldPageY)/canvas.height;
+                mat4.multiply(
+                    matrices.model,
+                    utils.rotation_matrix(X, Y),
+                    matrices.model.copy
+                );
+                e.preventDefault();
+            }, false
+        );
         gl.canvas.addEventListener("wheel", function (e) { matrices.view[14] = Math.min(0, matrices.view[14]+e.deltaY/1000*distance(model)); e.preventDefault() });
     })();
 
@@ -193,7 +214,7 @@ function main() {
     function updateWebGLBuffers(sequence) {
         matrices.view  = mat4.create();
         if (model) { mat4.multiply(matrices.model, matrices.model, mat4.translate([], mat4.create(), model.barycenter)); }
-        
+
         model = buildModel(gl, 'N' + sequence);
 
         distance = model.radius * 2;
@@ -206,11 +227,11 @@ function main() {
         gl.vertexAttribPointer(program.vertexColorAttribute, model.glBuffers.colors.itemSize, gl.FLOAT, false, 0, 0);
     }
     updateWebGLBuffers(sequence.value);
-        
+
     document.getElementById("submit").addEventListener("click", function () { updateWebGLBuffers(sequence.value) } );
     document.getElementById("random").addEventListener("click",
             function () {
-                sequence.value = utils.DNA.generate(1000);
+                sequence.value = utils.DNA.generate(100000);
                 updateWebGLBuffers(sequence.value);
             }
     );
@@ -231,12 +252,12 @@ function main() {
                 alert("please select only one file");
                 return;
             }
-	    var reader = new FileReader();
-	    reader.readAsText(fileSelector.files[0]);
-	    reader.onload = function () {
-		sequence.value = reader.result.substr(0, 1000);
-                updateWebGLBuffers(utils.DNA.checkValidity(reader.result.substr(0, 5000000)));
-	    }
+            var reader = new FileReader();
+            reader.readAsText(fileSelector.files[0]);
+            reader.onload = function () {
+            sequence.value = reader.result.substr(0, 10000);
+                    updateWebGLBuffers(utils.DNA.checkValidity(reader.result.substr(0, 5000000)));
+            }
         }
     );
 
