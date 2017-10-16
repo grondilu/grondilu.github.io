@@ -212,7 +212,7 @@ function main() {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
         gl.drawElements(gl.TRIANGLES, cube.indices.length, gl.UNSIGNED_SHORT, 0);
 
-        a00.innerHTML = mo_matrix[0].toString();
+        a00.innerHTML = 'a00 = ' + mo_matrix[0].toString();
         window.requestAnimationFrame(animate);
     }
 
