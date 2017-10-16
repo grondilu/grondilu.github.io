@@ -200,8 +200,7 @@ function main() {
         );
     }
 
-    let a00 = document.getElementById("a00"),
-        matrix = document.getElementById("matrix");
+    let matrices = document.getElementById("matrices");
     let animate = function () {
         gl.clearColor(0.5, 0.5, 0.5, 0.9);
         gl.clearDepth(1.0);
@@ -215,10 +214,24 @@ function main() {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
         gl.drawElements(gl.TRIANGLES, cube.indices.length, gl.UNSIGNED_SHORT, 0);
 
-        a00.innerHTML = 'a00 = ' + mo_matrix[0].toString();
-        let V = mo_matrix.map(x => x.valueOf().toPrecision(6));
-        matrix.innerHTML = 'matrix &cong; ' +
-            `<table>
+        let D = mo_matrix.map(x => x.denom.valueOf().toPrecision(6)),
+            N = mo_matrix.map(x => x.num.valueOf().toPrecision(6)),
+            V = mo_matrix.map(x => x.valueOf().toPrecision(6));
+        matrices.innerHTML =
+            `numerators &cong;
+            <table>
+            <tr><td>${N[0]}</td><td>${N[1]}</td><td>${N[2]}</tr></tr>
+            <tr><td>${N[4]}</td><td>${N[5]}</td><td>${N[6]}</tr></tr>
+            <tr><td>${N[8]}</td><td>${N[9]}</td><td>${N[10]}</tr></tr>
+            </table><br>
+            denominators &cong;
+            <table>
+            <tr><td>${D[0]}</td><td>${D[1]}</td><td>${D[2]}</tr></tr>
+            <tr><td>${D[4]}</td><td>${D[5]}</td><td>${D[6]}</tr></tr>
+            <tr><td>${D[8]}</td><td>${D[9]}</td><td>${D[10]}</tr></tr>
+            </table><br>
+            values &cong;
+            <table>
             <tr><td>${V[0]}</td><td>${V[1]}</td><td>${V[2]}</tr></tr>
             <tr><td>${V[4]}</td><td>${V[5]}</td><td>${V[6]}</tr></tr>
             <tr><td>${V[8]}</td><td>${V[9]}</td><td>${V[10]}</tr></tr>
