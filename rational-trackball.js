@@ -201,7 +201,7 @@ function main() {
     }
 
     let a00 = document.getElementById("a00"),
-        a00value = document.getElementById("a00value");
+        matrix = document.getElementById("matrix");
     let animate = function () {
         gl.clearColor(0.5, 0.5, 0.5, 0.9);
         gl.clearDepth(1.0);
@@ -216,7 +216,14 @@ function main() {
         gl.drawElements(gl.TRIANGLES, cube.indices.length, gl.UNSIGNED_SHORT, 0);
 
         a00.innerHTML = 'a00 = ' + mo_matrix[0].toString();
-        a00value.innerHTML = 'a00.valueOf() = ' + mo_matrix[0].valueOf();
+        let V = mo_matrix.map(x => x.valueOf().toPrecision(6));
+        matrix.innerHTML = 'matrix &cong; ' +
+            `<table>
+            <tr><td>${V[0]}</td><td>${V[1]}</td><td>${V[2]}</tr></tr>
+            <tr><td>${V[4]}</td><td>${V[5]}</td><td>${V[6]}</tr></tr>
+            <tr><td>${V[8]}</td><td>${V[9]}</td><td>${V[10]}</tr></tr>
+            </table>`
+        ;
         window.requestAnimationFrame(animate);
     }
 
