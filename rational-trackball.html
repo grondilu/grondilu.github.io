@@ -37,19 +37,20 @@
     <p>So I picked a <a href="http://peterolson.github.com/BigRational.js">javascript bigrational library</a>
     and gave it a shot:</p>
 
-	<canvas id="canvas" width="800" height="600" style="border:1px solid black;">
+    <div>
+        <div id=a00 style="position:absolute;">Yo!</div>
+	<canvas id="canvas" width="800" height="600" style="border:1px solid black, position: absolute;">
 	    Apparently your browser does not support HTML5 canvas.
 	</canvas>
+    </div>
 	<br>
     <button type=reset id=reset onclick="reset();">Reset</button>
 
     <p>As you can see, things go smooth at first, but if you keeping
     rotating the cube around, soon enough you'll notice some horrible lag.
     That's because the numerators and denominators in the matrix become 
-    bigger and bigger.  Here is the real time values for the first element
-    of the matrix:<br>
-    
-    <div id=a00></div>
+    bigger and bigger.  The real time values for the first element
+    of the matrix is shown above the canvas.<br>
 
     </body>
 
