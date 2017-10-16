@@ -11,7 +11,7 @@ function reset() {
 }
 reset();
 
-function turn(out, matrix, X, Y) {
+function turn(X, Y) {
     let X2 = X.multiply(X), Y2 = Y.multiply(Y),
         q  = bigRat(1).add     (X2.add(Y2)),
         s  = bigRat(1).subtract(X2.add(Y2)),
@@ -21,14 +21,13 @@ function turn(out, matrix, X, Y) {
         C = bigRat(4).multiply(s).multiply(X).divide(q2),
         D = s2.add(bigRat(4).multiply(X2.subtract(Y2))).divide(q2),
         E = bigRat(4).multiply(s).multiply(Y).divide(q2),
-        F = s2.subtract(bigRat(4).multiply(X2.add(Y2))).divide(q2),
-        bigRatMat = [
+        F = s2.subtract(bigRat(4).multiply(X2.add(Y2))).divide(q2);
+        return [
             A         , B         , C         , bigRat(0) ,
             B         , D         , E         , bigRat(0) ,
             C.negate(), E.negate(), F         , bigRat(0) ,
             bigRat(0) , bigRat(0) , bigRat(0) , bigRat(1)
         ];
-    multiply(out, bigRatMat, matrix);
 }
 
 function multiply(out, a, b) {
@@ -170,6 +169,7 @@ function main() {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
     gl.viewport(0,0,canvas.width,canvas.height);
+    canvas.maxLength = Math.max(canvas.width, canvas.height);
 
     {
         // MOUSE MANAGEMENT
@@ -187,12 +187,14 @@ function main() {
         document.addEventListener("mousemove",
             function(e) {
                 if (!drag) return false;
-                turn(
+                multiply(
                     mo_matrix,
-                    mo_matrix.copy,
-                    bigRat(-(e.pageX-old_x),canvas.width),
-                    bigRat(+(e.pageY-old_y),canvas.height)
-                )
+                    turn(
+                        bigRat(-(e.pageX-old_x),canvas.maxLength),
+                        bigRat(+(e.pageY-old_y),canvas.maxLength)
+                    ),
+                    mo_matrix.copy
+                );
                 e.preventDefault();
             }, false
         );
