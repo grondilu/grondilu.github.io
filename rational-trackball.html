@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang=en>
+    <head>
+        <meta charset=UTF-8>
+        <script type="text/javascript" async
+                src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+        <script src="http://peterolson.github.com/BigRational.js/BigInt_BigRat.min.js"></script>
+        <script src="webgl-utils.js"></script>
+        <script src="gl-matrix-min.js"></script>
+        <script src="js/parser.js"></script>
+        <script src="rational-trackball.js"></script>
+        <title>Implementing a trackball with rational numbers</title>
+    </head>
+
+    <body onload="main();">
+
+    <p>Some time ago, I implemented a <a href=grondilu.github.io/cube.html>
+        trackball without any trigonometric function</a>.
+    In a nutshell, I did it with the following matrix:</p>
+
+	$$\frac{1}{q^2}\begin{pmatrix}
+	s^2 + 4(y^2 - x^2) & -8xy & -4sx\\
+	-8xy & s^2 + 4(x^2 - y^2) & -4sy\\
+	4sx & 4sy & s^2 - 4(x^2 + y^2)
+	\end{pmatrix}$$
+
+    <p>where \(x\) and \(y\) are the displacements of the mouse on the screen
+    and \(q\) and \(s\) are short for \(1 + x^2 + y^2\) and \(1 - x^2 - y^2\)
+    respectively.</p>
+
+    <p>It worked very well and I was happy about it, but there was a little concern: floating point
+    approximations.  Since this matrix is made purely out of rational numbers, I was
+    wondering if I could try to do exact calculations.  I was expecting things
+    to be slower, but I wanted to see how bad it'd be.</p>
+
+    <p>So I picked a <a href="http://peterolson.github.com/BigRational.js">javascript bigrational library</a>
+    and gave it a shot:</p>
+
+	<canvas id="canvas" width="800" height="600" style="border:1px solid black;">
+	    Apparently your browser does not support HTML5 canvas.
+	</canvas>
+	<br>
+    <button type=reset id=reset onclick="reset();">Reset</button>
+
+    <p>As you can see, things go smooth at first, but if you keeping
+    rotating the cube around, soon enough you'll notice some horrible lag.
+    That's because the numerators and denominators in the matrix become 
+    bigger and bigger.  Here is the real time values for the first element
+    of the matrix:<br>
+    
+    <div id=a00></div>
+
+    </body>
+
+
+</html>
