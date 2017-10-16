@@ -1,3 +1,19 @@
+function turn(X, Y) {
+    let X2 = X*X, Y2 = Y*Y,
+        q  = 1 + X2 + Y2,
+        s  = 1 - X2 - Y2,
+        r2 = 1/(q*q), s2 = s*s,
+        A  = (s2 + 4*(Y2 - X2))*r2, B = -8*X*Y*r2, C = 4*s*X*r2,
+        D  = (s2 + 4*(X2 - Y2))*r2, E = 4*s*Y*r2,
+        F  = (s2 - 4*(X2 + Y2))*r2;
+    return [
+        A, B, C, 0,
+        B, D, E, 0,
+        -C,-E, F, 0,
+        0, 0, 0, 1
+    ];
+}
+
 function main() {
     let canvas   = document.getElementById('canvas'),
         gl       = WebGLUtils.setupWebGL(canvas),
@@ -105,24 +121,7 @@ function main() {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
     gl.viewport(0,0,canvas.width,canvas.height);
-
-    function turn(X, Y) {
-        let X2 = X*X, Y2 = Y*Y,
-            q  = 1 + X2 + Y2,
-            s  = 1 - X2 - Y2,
-            r2 = 1/(q*q), s2 = s*s,
-            A  = (s2 + 4*(Y2 - X2))*r2, B = -8*X*Y*r2, C = 4*s*X*r2,
-            D  = (s2 + 4*(X2 - Y2))*r2, E = 4*s*Y*r2,
-            F  = (s2 - 4*(X2 + Y2))*r2;
-        mat4.multiply(
-            mo_matrix, [
-                 A, B, C, 0,
-                 B, D, E, 0,
-                -C,-E, F, 0,
-                 0, 0, 0, 1
-            ], mo_matrix.copy
-        );
-    }
+    canvas.maxLength = Math.max(canvas.width, canvas.height);
 
     {
         // MOUSE MANAGEMENT
@@ -140,10 +139,14 @@ function main() {
         document.addEventListener("mousemove",
             function(e) {
                 if (!drag) return false;
-                turn(
-                    -(e.pageX-old_x)/canvas.width,
-                    +(e.pageY-old_y)/canvas.height
-                )
+                mat4.multiply(
+                    mo_matrix,
+                    turn(
+                        -(e.pageX-old_x)/canvas.maxLength,
+                        +(e.pageY-old_y)/canvas.maxLength
+                    ),
+                    mo_matrix.copy
+                );
                 e.preventDefault();
             }, false
         );
