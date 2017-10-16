@@ -8,7 +8,6 @@
         <script src="http://peterolson.github.com/BigRational.js/BigInt_BigRat.min.js"></script>
         <script src="webgl-utils.js"></script>
         <script src="gl-matrix-min.js"></script>
-        <script src="js/parser.js"></script>
         <script src="rational-trackball.js"></script>
         <title>Implementing a trackball with rational numbers</title>
     </head>
@@ -39,11 +38,11 @@
 
     <div>
         <div id=a00 style="position:absolute;">Yo!</div>
-	<canvas id="canvas" width="800" height="600" style="border:1px solid black, position: absolute;">
-	    Apparently your browser does not support HTML5 canvas.
-	</canvas>
+        <canvas id="canvas" width="800" height="600" style="border:1px solid black, position: absolute;">
+            Apparently your browser does not support HTML5 canvas.
+        </canvas>
     </div>
-	<br>
+    <br>
     <button type=reset id=reset onclick="reset();">Reset</button>
 
     <p>As you can see, things go smooth at first, but if you keeping
