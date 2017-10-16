@@ -200,7 +200,8 @@ function main() {
         );
     }
 
-    let a00 = document.getElementById("a00");
+    let a00 = document.getElementById("a00"),
+        a00value = document.getElementById("a00value");
     let animate = function () {
         gl.clearColor(0.5, 0.5, 0.5, 0.9);
         gl.clearDepth(1.0);
@@ -215,6 +216,7 @@ function main() {
         gl.drawElements(gl.TRIANGLES, cube.indices.length, gl.UNSIGNED_SHORT, 0);
 
         a00.innerHTML = 'a00 = ' + mo_matrix[0].toString();
+        a00value.innerHTML = 'a00.valueOf() = ' + mo_matrix[0].valueOf();
         window.requestAnimationFrame(animate);
     }
 
