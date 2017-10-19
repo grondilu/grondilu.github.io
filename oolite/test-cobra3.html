@@ -3,32 +3,6 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Spinning Cobra Mk. III</title>
-<!--
-    /*
-    * Copyright (C) 2009 Apple Inc. All Rights Reserved.
-    *
-    * Redistribution and use in source and binary forms, with or without
-    * modification, are permitted provided that the following conditions
-    * are met:
-    * 1. Redistributions of source code must retain the above copyright
-    *    notice, this list of conditions and the following disclaimer.
-    * 2. Redistributions in binary form must reproduce the above copyright
-    *    notice, this list of conditions and the following disclaimer in the
-    *    documentation and/or other materials provided with the distribution.
-    *
-    * THIS SOFTWARE IS PROVIDED BY APPLE INC. ``AS IS'' AND ANY
-    * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-    * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-    * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE INC. OR
-    * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-    * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-    * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-    * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-    * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-    * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-    * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-    */
--->
         <style>
 body, html {
     margin: 0px;
@@ -50,44 +24,42 @@ body, html {
 }
         </style>
         <script type="application/javascript" src="resources/webgl-utils.js"></script>
-        <script type="application/javascript" src="resources/webgl-debug.js"></script>
+        <script src="resources/gl-matrix-min.js"> </script>
         <script src="resources/J3DI.js"> </script>
         <script src="resources/J3DIMath.js" type="application/javascript"> </script>
         <script id="vshader" type="x-shader/x-vertex">
-uniform mat4 u_modelViewProjMatrix;
-    uniform mat4 u_normalMatrix;
-    uniform vec3 lightDir;
+        uniform mat4 u_modelViewProjMatrix;
+        uniform mat4 u_normalMatrix;
+        uniform vec3 lightDir;
 
-    attribute vec3 vNormal;
-    attribute vec4 vTexCoord;
-    attribute vec4 vPosition;
+        attribute vec3 vNormal;
+        attribute vec4 vTexCoord;
+        attribute vec4 vPosition;
 
-    varying float v_Dot;
-    varying vec2 v_texCoord;
+        varying float v_Dot;
+        varying vec2 v_texCoord;
 
-    void main()
-    {
-        gl_Position = u_modelViewProjMatrix * vPosition;
-        v_texCoord = vTexCoord.st;
-        vec4 transNormal = u_normalMatrix * vec4(vNormal, 1);
-        v_Dot = max(dot(transNormal.xyz, lightDir), 0.0);
-    }
+        void main()
+        {
+            gl_Position = u_modelViewProjMatrix * vPosition;
+            v_texCoord = vTexCoord.st;
+            vec4 transNormal = u_normalMatrix * vec4(vNormal, 1);
+            v_Dot = max(dot(transNormal.xyz, lightDir), 0.0);
+        }
         </script>
         <script id="fshader" type="x-shader/x-fragment">
-precision mediump float;
+        precision mediump float;
 
-uniform sampler2D sampler2d;
+        uniform sampler2D sampler2d;
 
-varying float v_Dot;
-varying vec2 v_texCoord;
+        varying float v_Dot;
+        varying vec2 v_texCoord;
 
-void main()
-{
-    vec2 texCoord = vec2(v_texCoord.s, v_texCoord.t);
-    vec4 color = texture2D(sampler2d, texCoord);
-    color += vec4(0.1, 0.1, 0.1, 1);
-    gl_FragColor = vec4(color.xyz * v_Dot, color.a);
-}
+        void main()
+        {
+            vec4 color = texture2D(sampler2d, v_texCoord);
+            gl_FragColor = vec4(1.5*color.aaa + color.rgb * v_Dot, 1);
+        }
         </script>
 
         <script src="test-cobra3.js"></script>
