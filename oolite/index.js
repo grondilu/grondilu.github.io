@@ -171,7 +171,9 @@ function start() {
                             gl.generateMipmap(gl.TEXTURE_2D)
                             gl.bindTexture(gl.TEXTURE_2D, null);
                         }
-                        primitive.image.src = "resources/textures/" +
+                        primitive.image.crossOrigin = "anonymous";
+                        primitive.image.src =
+                            "https://raw.githubusercontent.com/OoliteProject/oolite-binary-resources/master/Textures/" +
                             json.images[
                                 json.materials[primitive.material]
                                 .pbrMetallicRoughness
