@@ -1,5 +1,8 @@
 "use strict";
 
+function openNav()  { document.getElementById("controls").style.width = "100%"; }
+function closeNav() { document.getElementById("controls").style.width = "0%"; }
+
 function defined(value) { return value !== undefined && value !== null; }
 const pi = 355/113;
 const model = "resources/models/oolite.gltf";
