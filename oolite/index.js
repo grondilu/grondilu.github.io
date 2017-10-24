@@ -40,7 +40,7 @@ varying vec2  v_texCoord;
 void main()
 {
     vec4 color = texture2D(sampler2d, v_texCoord);
-    gl_FragColor = vec4(emissionFactor*color.aaa + color.rgb, 1);
+    gl_FragColor = vec4(emissionFactor*color.aaa + color.rgb * v_Dot, 1);
 }`
 }
 
@@ -113,7 +113,7 @@ function start() {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
         // Set some uniform variables for the shaders
-        gl.uniform3f(gl.getUniformLocation(program, "lightDir"), 0, 0, 1);
+        gl.uniform3f(gl.getUniformLocation(program, "lightDir"), 0, 1, 0);
         gl.uniform1i(gl.getUniformLocation(program, "sampler2d"), 0);
 
         // Enable all of the vertex attribute arrays.
@@ -184,6 +184,10 @@ function start() {
                                 .index
                             ].uri
                         ;
+                        primitive.emissiveFactor = primitive.image.src
+                            .includes("_diffuse") ?
+                            2.0 : 0.0
+
                     }
                 }
                 return primitives;
@@ -193,32 +197,46 @@ function start() {
             function (primitives) {
                 let mvMatrix = matrixStack
                     .reduce((a, b) => mat4.multiply(mat4.create(), a, b)),
+                    rotation = mat4.create(),
                     normalMatrix = mat4.create();
 
-
-                //g.normalMatrix.setUniform(gl, g.u_normalMatrixLoc, false);
-                
                 function drawPrimitives(angle) {
-                    gl.uniformMatrix4fv(gl.getUniformLocation(program, "u_modelViewProjMatrix"), false, 
+                    gl.uniformMatrix4fv(
+                        gl.getUniformLocation(program, "u_modelViewProjMatrix"),
+                        false, 
+                        mat4.multiply(
+                            mat4.create(),
+                            mvMatrix,
+                            mat4.rotate(
+                                mat4.create(),
+                                mat4.rotate(
+                                    mat4.create(),
+                                    mat4.rotate(mat4.create(), rotation, angle, [0, 0, 1]),
+                                    0.2*angle, [0, 1, 0]
+                                ),
+                                0.1*angle, [1, 0, 0]
+                            )
+                        )
+                    );
+                    gl.uniformMatrix4fv(
+                        gl.getUniformLocation(program, "u_normalMatrix"),
+                        false,
                         mat4.rotate(
                             mat4.create(),
                             mat4.rotate(
                                 mat4.create(),
-                                mat4.rotate(mat4.create(), mvMatrix, angle, [0, 0, 1]),
+                                mat4.rotate(mat4.create(), rotation, angle, [0, 0, 1]),
                                 0.2*angle, [0, 1, 0]
                             ),
                             0.1*angle, [1, 0, 0]
                         )
-
                     );
-                    gl.uniformMatrix4fv(gl.getUniformLocation(program, "u_normalMatrix"), false, normalMatrix);
 
                     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                     for (let primitive of primitives) {
                         gl.uniform1f(
                             gl.getUniformLocation(program, "emissionFactor"),
-                            primitive.image.src.includes("_diffuse") ?
-                            2.0 : 0.0
+                            primitive.emissiveFactor
                         );
                         // Set up all the vertex attributes for vertices, normals and texCoords
                         gl.bindBuffer(gl.ARRAY_BUFFER, primitive.vertexObject);
