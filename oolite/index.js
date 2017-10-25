@@ -54,7 +54,7 @@ function start() {
             fragment: gl.createShader(gl.FRAGMENT_SHADER)
         },
         program = gl.createProgram(),
-        gltf    = fetch(model).then(resp => resp.json()),
+        gltf    = fetch(model, {cache: "no-store"}).then(resp => resp.json()),
         matrixStack = [
             mat4.create(),
             mat4.perspective(
