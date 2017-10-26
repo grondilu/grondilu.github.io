@@ -329,9 +329,11 @@ function updatePrimitives(gl, json) {
                     .index
                 ].uri
             ;
-            primitive.emissionFactor = primitive.image.src
-                .includes("_diffuse") ?
+            primitive.emissionFactor = 
+                json.materials[primitive.material]
+                .emissiveTexture ?
                 1.0 : 0.0
+            ;
 
         }
     }
