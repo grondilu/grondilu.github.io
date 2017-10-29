@@ -117,7 +117,11 @@ function init() {
     gl.uniform1i(gl.getUniformLocation(program, "sampler2d"), 0);
 
     // Load an image to use. Returns a WebGLTexture object
-    cobra3Texture = loadImageTexture(gl, "resources/textures/cobra3/diffuse.png");
+    cobra3Texture = loadImageTexture(
+        gl, 
+        "https://raw.githubusercontent.com/OoliteProject/oolite-binary-resources/master/Textures/" +
+        "oolite_cobra3_diffuse.png"
+    );
 
     // Create some matrices to use later and save their locations in the
     // shaders
@@ -269,6 +273,7 @@ function loadScene(gl, gltf) {
 
                     primitive.texture = loadImageTexture(
                         gl,
+                        "https://raw.githubusercontent.com/OoliteProject/oolite-binary-resources/master/Textures/" +
                         gltf.images[
                             gltf.materials[primitive.material]
                             .pbrMetallicRoughness
@@ -313,5 +318,4 @@ function getAccessorData(gltf, accessorIndex) {
         )(slicedBuffer);
 
     return data;
-
 }
