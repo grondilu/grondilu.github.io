@@ -1,13 +1,10 @@
 class Trackball {
-    get matrix() { return this._matrix }
+    get matrix() { return this._matrix; }
+    get maxLength() { return Math.max(canvas.width, canvas.height); }
     constructor(canvas) {
         this.drag = false;
         this._matrix = mat4.create();
-        console.log(this.matrix);
         this._matrix.copy = mat4.create();
-        canvas.maxLength = Math.max(canvas.width, canvas.height);
-        this.x = canvas.width /2;
-        this.y = canvas.height/2;
         canvas.addEventListener("mousedown",
             e => {
                 mat4.copy(this.matrix.copy, this.matrix);
@@ -25,8 +22,8 @@ class Trackball {
                 mat4.multiply(
                     this.matrix,
                     this.turn(
-                        -(e.pageX-this.x)/canvas.maxLength,
-                        +(e.pageY-this.y)/canvas.maxLength
+                        -(e.pageX-this.x)/this.maxLength,
+                        +(e.pageY-this.y)/this.maxLength
                     ),
                     this.matrix.copy
                 );
