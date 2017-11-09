@@ -1,23 +1,8 @@
-function turn(X, Y) {
-    let X2 = X*X, Y2 = Y*Y,
-        q  = 1 + X2 + Y2,
-        s  = 1 - X2 - Y2,
-        r2 = 1/(q*q), s2 = s*s,
-        A  = (s2 + 4*(Y2 - X2))*r2, B = -8*X*Y*r2, C = 4*s*X*r2,
-        D  = (s2 + 4*(X2 - Y2))*r2, E = 4*s*Y*r2,
-        F  = (s2 - 4*(X2 + Y2))*r2;
-    return [
-        A, B, C, 0,
-        B, D, E, 0,
-        -C,-E, F, 0,
-        0, 0, 0, 1
-    ];
-}
-
 function main() {
-    let canvas   = document.getElementById('canvas'),
-        gl       = WebGLUtils.setupWebGL(canvas),
-        cube     = {
+    let canvas    = document.getElementById('canvas'),
+        trackball = new Trackball(canvas),
+        gl        = WebGLUtils.setupWebGL(canvas),
+        cube      = {
             vertices: [
                 -1, -1, -1, +1, -1, -1, +1, +1, -1, -1, +1, -1,
                 -1, -1, +1, +1, -1, +1, +1, +1, +1, -1, +1, +1,
@@ -112,45 +97,14 @@ function main() {
     }
 
     let proj_matrix = get_projection(40, canvas.width/canvas.height, 1, 100),
-        mo_matrix   = mat4.create(),
         view_matrix = mat4.create();
 
-    mo_matrix.copy = mat4.create();
     view_matrix[14] = view_matrix[14]-6;
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
     gl.viewport(0,0,canvas.width,canvas.height);
-    canvas.maxLength = Math.max(canvas.width, canvas.height);
 
-    {
-        // MOUSE MANAGEMENT
-        let drag = false, old_x, old_y;
-
-        canvas.addEventListener("mousedown",
-            function (e) {
-                mat4.copy(mo_matrix.copy, mo_matrix);
-                drag = true, old_x = e.pageX, old_y = e.pageY;
-                e.preventDefault();
-                return false;
-            }, false
-        );
-        document.addEventListener("mouseup", function (e) { drag = false; });
-        document.addEventListener("mousemove",
-            function(e) {
-                if (!drag) return false;
-                mat4.multiply(
-                    mo_matrix,
-                    turn(
-                        -(e.pageX-old_x)/canvas.maxLength,
-                        +(e.pageY-old_y)/canvas.maxLength
-                    ),
-                    mo_matrix.copy
-                );
-                e.preventDefault();
-            }, false
-        );
-    }
 
     let animate = function () {
         gl.clearColor(0.5, 0.5, 0.5, 0.9);
@@ -160,7 +114,7 @@ function main() {
 
         gl.uniformMatrix4fv(_Pmatrix, false, proj_matrix);
         gl.uniformMatrix4fv(_Vmatrix, false, view_matrix);
-        gl.uniformMatrix4fv(_Mmatrix, false, mo_matrix);
+        gl.uniformMatrix4fv(_Mmatrix, false, trackball.matrix);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
         gl.drawElements(gl.TRIANGLES, cube.indices.length, gl.UNSIGNED_SHORT, 0);
