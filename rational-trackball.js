@@ -1,5 +1,9 @@
 "use strict";
 
+const N = bigRat(1000000000);
+function valueOf(x) {
+    return +x.toDecimal(16);
+}
 let mo_matrix;
 function reset() {
     mo_matrix = [
@@ -210,14 +214,14 @@ function main() {
 
         gl.uniformMatrix4fv(_Pmatrix, false, proj_matrix);
         gl.uniformMatrix4fv(_Vmatrix, false, view_matrix);
-        gl.uniformMatrix4fv(_Mmatrix, false, mo_matrix);
+        gl.uniformMatrix4fv(_Mmatrix, false, mo_matrix.map(valueOf));
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer);
         gl.drawElements(gl.TRIANGLES, cube.indices.length, gl.UNSIGNED_SHORT, 0);
 
         let D = mo_matrix.map(x => x.denom.valueOf().toPrecision(6)),
             N = mo_matrix.map(x => x.num.valueOf().toPrecision(6)),
-            V = mo_matrix.map(x => x.valueOf().toPrecision(6));
+            V = mo_matrix.map(x => valueOf(x));
         matrices.innerHTML =
             `numerators &cong;
             <table>
