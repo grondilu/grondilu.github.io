@@ -120,6 +120,8 @@ function main() {
         gl.drawElements(gl.TRIANGLES, cube.indices.length, gl.UNSIGNED_SHORT, 0);
 
         window.requestAnimationFrame(animate);
+        document.getElementById("determinant").value =
+            mat4.determinant(trackball.matrix);
     }
 
     animate();
