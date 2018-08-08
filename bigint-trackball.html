@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang=en>
+    <head>
+        <meta charset=UTF-8>
+        <script type="text/javascript" async
+                src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script>
+        <script src="webgl-utils.js"></script>
+        <script src="gl-matrix-min.js"></script>
+        <script src="bigint-trackball.js"></script>
+        <script src="bigint-cube.js"></script>
+        <title>Rational trackball</title>
+    </head>
+
+    <body onload="main();">
+        <p>Some time ago I implemented a <a href=cube.html>trackball without trigonometry</a>,
+        and later I <a href=rational-trackball.html>modified it to also use rational numbers</a>.
+        </p>
+
+        <p>Lately javascript added native support for arbitrary large integers.
+        I wondered if I could use them to implement the trackball more efficiently.
+        </p>
+
+        <p>Here it is :</p>
+
+	<canvas id="canvas" width="800" height="600" style="border:1px solid black;">
+	    Apparently your browser does not support HTML5 canvas.
+	</canvas>
+
+	<p>The largest integer used is <output id=largest_number></output>
+    </p>
+
+    </body>
+
+
+</html>
