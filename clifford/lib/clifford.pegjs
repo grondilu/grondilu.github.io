@@ -1,4 +1,3 @@
-const parser = peg.generate(`
 start
     = AdditiveExpression
 
@@ -107,4 +106,3 @@ EuclideanBasisVector = "$" index:DecimalIntegerLiteral {
 AntiEuclideanBasisVector = "#" index:DecimalIntegerLiteral {
     return { type: "basis vector", args: [ -1, index ] }
 }
-`);

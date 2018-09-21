@@ -1,15 +1,10 @@
-
 <!doctype html>
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
     <title>Clifford.js</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
-    <script src=lib/peg-0.10.0.min.js></script>
-    <script src="lib/parsing.js"></script>
-    <script src="lib/rat.js"></script>
     <script src="lib/clifford.js"></script>
-    <script src="lib/translating.js"></script>
   </head>
   <body>
     <script>
@@ -77,16 +72,15 @@ let tests = [
   "(a+b/2)**3"
   ],
   html_table = document.getElementById("table"),
-  outputs = [ x => "\\(" + translate(x).toTeX() + "\\)" ];
+  outputs = [ x => "\\(" + new MultiVector(x).toTeX() + "\\)" ];
 for (let test of tests) {
   let row = document.createElement("tr"),
-    td = document.createElement("td"),
-    tree = parser.parse(test);
+    td = document.createElement("td");
   td.innerHTML = test;
   row.appendChild(td);
   for (let output of outputs) {
     let td = document.createElement("td");
-    td.innerHTML = output(tree);
+    td.innerHTML = output(test);
     row.appendChild(td);
   }
   html_table.appendChild(row);
