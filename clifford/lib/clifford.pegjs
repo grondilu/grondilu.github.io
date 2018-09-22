@@ -68,8 +68,8 @@ exponential
 
 primary
     = LiteralNumber
-    / Variable
     / BasisVector 
+    / Variable
     / "(" additive:AdditiveExpression ")" { return additive; }
 
 LiteralNumber
@@ -98,7 +98,10 @@ Variable = [a-z] { return { type: "variable", args: text() } }
 BasisVector
   = EuclideanBasisVector 
   / AntiEuclideanBasisVector
+  / NullBasisVector
 
+NullBasisVector
+  = "n" [io] { return { type: text(), args: [] }; }
 EuclideanBasisVector = "$" index:DecimalIntegerLiteral {
     return { type: "basis vector", args: [ +1, index ] }
 }
