@@ -8,7 +8,7 @@ AdditiveExpression
       tail:(__ AdditiveOperator __ MultiplicativeExpression)*
       {
           return tail.reduce(
-              (left, element) => ({ type: element[1], args: [left, element[3]]}),
+            (left, element) => ({ ...element[1], args: [left, element[3]] }),
               head
           );
       }
@@ -18,18 +18,18 @@ MultiplicativeExpression
     tail:(__ MultiplicativeOperator __ cdot)*
     {
           return tail.reduce(
-              (left, element) => ({ type: element[1], args: [left, element[3]]}),
+              (left, element) => ({ ...element[1], args: [left, element[3]] }),
               head
           );
     }
 
 AdditiveOperator
-  = "+" { return "addition"; }
-  / "-" { return "subtraction"; }
+  = "+" { return { op: (a,b) => a.add(b), type: "operator", name: "addition", symbol: "+" }; }
+  / "-" { return { op: (a,b) => a.subtract(b), type: "operator", name: "subtraction", symbol: "-" }; }
 
 MultiplicativeOperator
-  = "/" { return "division"; }
-  / "*" { return "multiplication"; }
+  = "/" { return { op: (a,b) => a.divide(b), type: "operator", name: "division", symbol: "/" }; }
+  / "*" { return { op: (a,b) => a.multiply(b), type: "operator", name: "multiplication", symbol: "*" }; }
 
 UnaryOperator
   = "+"
@@ -47,7 +47,8 @@ wedge
     = left:UnaryExpression '∧' right:wedge {
         return {
             type: "∧",
-            args: [ left, right ]
+            args: [ left, right ],
+TeX: left.TeX+"\\wedge"+right.TeX
         }
     } / UnaryExpression
 
@@ -59,10 +60,26 @@ UnaryExpression
 
 exponential
     =  left:primary '**' right:DecimalIntegerLiteral {
-        return { type: "exponentiation", args: [ left, parseInt(right) ] }
+      return {
+        type: "operator",
+        name: "exponentiation",
+        op: function exponentiate(b, n) {
+           if (n==0) return b.one;
+           if (n==1) return b;
+           return (x => n % 2 == 0 ? x : x.multiply(b))(
+               (x => x.multiply(x))(exponentiate(b, Math.floor(n/2)))
+               );
+           },
+        args: [left, parseInt(right)]
+      };
     }
     / left:primary '²' {
-      return { type: "exponentiation", args: [ left, 2 ] }
+        return {
+          type: "operator",
+          name: "square",
+          op: x => x.multiply(x),
+          args: [left]
+        }
     }
     / primary
 
@@ -73,12 +90,12 @@ primary
     / "(" additive:AdditiveExpression ")" { return additive; }
 
 LiteralNumber
-    = sign? DecimalIntegerLiteral { return { type: "number", args: [ text() ] } }
+    = sign? DecimalIntegerLiteral { return { type: "number", args: [ text() ], TeX: text() } }
 
 decimal_point = "."
 
 DecimalIntegerLiteral
-  = "0"
+  = "0" 
   / NonZeroDigit DecimalDigit*
 
 sign = minus / plus
@@ -93,7 +110,7 @@ DecimalDigit = [0-9]
 
 NonZeroDigit = [1-9]
 
-Variable = [a-z] { return { type: "variable", args: text() } }
+Variable = [a-z] { return { type: "variable", args: text(), TeX: text() } }
 
 BasisVector
   = EuclideanBasisVector 
@@ -101,11 +118,12 @@ BasisVector
   / NullBasisVector
 
 NullBasisVector
-  = "n" [io] { return { type: text(), args: [] }; }
+  = "n" letter:[io] { return { type: text(), args: [], TeX: "\\mathbf{n}_" + (letter == 'i' ? "\\infty" : "o") } }
+
 EuclideanBasisVector = "$" index:DecimalIntegerLiteral {
-    return { type: "basis vector", args: [ +1, index ] }
+    return { type: "basis vector", args: [ +1, index ], TeX: "\\mathbf{e}_" + parseInt(index) }
 }
 
 AntiEuclideanBasisVector = "#" index:DecimalIntegerLiteral {
-    return { type: "basis vector", args: [ -1, index ] }
+    return { type: "basis vector", args: [ -1, index ], TeX: "\\mathbf{\\overbar e}_" + parseInt(index) }
 }

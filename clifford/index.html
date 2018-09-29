@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>Clifford.js</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+    <script src="lib/peg-0.10.0.min.js"></script>
     <script src="lib/clifford.js"></script>
   </head>
   <body>
@@ -26,7 +27,7 @@ if (typeof(BigInt) !== 'undefined') {
 
     <h1>Tests</h1>
     <p>The table below tests various inputs.</p>
-    <table id=table width=100%>
+    <table id=tests_table width=100%>
       <tr>
         <th>input</th>
         <!--<th>.constructor.name</th>-->
@@ -36,54 +37,63 @@ if (typeof(BigInt) !== 'undefined') {
     </table>
     <script>
 "use strict";
-let tests = [
-  "1",
-  "$1",
-  "#2",
-  "1+2",
-  "2/3",
-  "(1/2)*(1/2)",
-  "3*2",
-  "1+2/3",
-  "1+2*3",
-  "a",
-  "a+b",
-  "a+b/2",
-  "a²",
-  "x/3",
-  "(a+b)*(a-b)",
-  "2*$1",
-  "(1+x)*$1",
-  "$1*$2+$2*$1",
-  "$1*$2+$1*$2",
-  "$1*$2-$1*$2",
-  "$0*$1",
-  "$1*$0",
-  "$1²",
-  "(1+$1)*$2",
-  "($0+$1)*($0+$1)",
-  "($0+$1)²",
-  "$1*$2*$3",
-  "$0*$1*$0",
-  "#1**3",
-  "(a+b/2)**1",
-  "(a+b/2)**2",
-  "(a+b/2)*(a+b/2)",
-  "(a+b/2)**3"
-  ],
-  html_table = document.getElementById("table"),
-  outputs = [ x => "\\(" + new MultiVector(x).toTeX() + "\\)" ];
-for (let test of tests) {
-  let row = document.createElement("tr"),
-    td = document.createElement("td");
-  td.innerHTML = test;
-  row.appendChild(td);
-  for (let output of outputs) {
-    let td = document.createElement("td");
-    td.innerHTML = output(test);
-    row.appendChild(td);
-  }
-  html_table.appendChild(row);
+
+fetch("lib/clifford.pegjs").
+then(r => r.text()).
+then(peg.generate).
+then(main);
+
+function main(parser) {
+  let tests = [
+    "1",
+    "$1",
+    "#2",
+    "1+2",
+    "2/3",
+    "(1/2)*(1/2)",
+    "3*2",
+    "1+2/3",
+    "1+2*3",
+    "a",
+    "a+b",
+    "a+b/2",
+    "a²",
+    "x/3",
+    "(a+b)*(a-b)",
+    "(a+b)**2",
+    "2*$1",
+    "(1+x)*$1",
+    "$1*$2+$2*$1",
+    "$1*$2+$1*$2",
+    "$1*$2-$1*$2",
+    "$0*$1",
+    "$1*$0",
+    "$1²",
+    "(1+$1)*$2",
+    "($0+$1)*($0+$1)",
+    "($0+$1)²",
+    "$1*$2*$3",
+    "$0*$1*$0",
+    "#1**3",
+    "(a+b/2)**1",
+    "(a+b/2)**2",
+    "(a+b/2)*(a+b/2)",
+    "(a+b/2)**3" ],
+    html_table = document.getElementById("tests_table"),
+    outputs = [ x => "\\(" + new MultiVector(parser.parse(x)).toTeX() + "\\)" ];
+
+    for (let test of tests) {
+      let row = document.createElement("tr"),
+        td = document.createElement("td");
+      td.innerHTML = test;
+      row.appendChild(td);
+      for (let output of outputs) {
+        let td = document.createElement("td");
+        td.innerHTML = output(test);
+        row.appendChild(td);
+      }
+      html_table.appendChild(row);
+    }
 }
 
     </script>
