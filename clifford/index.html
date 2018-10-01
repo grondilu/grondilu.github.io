@@ -38,12 +38,13 @@ if (typeof(BigInt) !== 'undefined') {
     <script>
 "use strict";
 
+var parser;
 fetch("lib/clifford.pegjs").
 then(r => r.text()).
 then(peg.generate).
-then(main);
+then(p => { parser = p; main(); });
 
-function main(parser) {
+function main() {
   let tests = [
     "1",
     "$1",
@@ -80,7 +81,7 @@ function main(parser) {
     "(a+b/2)*(a+b/2)",
     "(a+b/2)**3" ],
     html_table = document.getElementById("tests_table"),
-    outputs = [ x => "\\(" + new MultiVector(parser.parse(x)).toTeX() + "\\)" ];
+    outputs = [ x => "\\(" + new MultiVector(x).toTeX() + "\\)" ];
 
     for (let test of tests) {
       let row = document.createElement("tr"),

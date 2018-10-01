@@ -48,7 +48,6 @@ wedge
         return {
             type: "∧",
             args: [ left, right ],
-TeX: left.TeX+"\\wedge"+right.TeX
         }
     } / UnaryExpression
 
@@ -90,13 +89,13 @@ primary
     / "(" additive:AdditiveExpression ")" { return additive; }
 
 LiteralNumber
-    = sign? DecimalIntegerLiteral { return { type: "number", args: [ text() ], TeX: text() } }
+    = sign? DecimalIntegerLiteral { return { type: "number", args: [ text() ] } }
 
 decimal_point = "."
 
 DecimalIntegerLiteral
   = "0" 
-  / NonZeroDigit DecimalDigit*
+  / NonZeroDigit DecimalDigit* { return text(); }
 
 sign = minus / plus
 
@@ -110,7 +109,7 @@ DecimalDigit = [0-9]
 
 NonZeroDigit = [1-9]
 
-Variable = [a-z] { return { type: "variable", args: text(), TeX: text() } }
+Variable = [a-z] { return { type: "variable", args: [ text() ] } }
 
 BasisVector
   = EuclideanBasisVector 
@@ -118,12 +117,12 @@ BasisVector
   / NullBasisVector
 
 NullBasisVector
-  = "n" letter:[io] { return { type: text(), args: [], TeX: "\\mathbf{n}_" + (letter == 'i' ? "\\infty" : "o") } }
+  = "n" letter:[io] { return { type: "null basis vector", args: [ text() ] } }
 
 EuclideanBasisVector = "$" index:DecimalIntegerLiteral {
-    return { type: "basis vector", args: [ +1, index ], TeX: "\\mathbf{e}_" + parseInt(index) }
+    return { type: "euclidean basis vector", args: [ index ] }
 }
 
 AntiEuclideanBasisVector = "#" index:DecimalIntegerLiteral {
-    return { type: "basis vector", args: [ -1, index ], TeX: "\\mathbf{\\overbar e}_" + parseInt(index) }
+    return { type: "anti-euclidean basis vector", args: [ index ] }
 }

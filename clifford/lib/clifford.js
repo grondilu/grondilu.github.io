@@ -23,11 +23,6 @@
 "use strict";
 
 class Rat {
-  static fromNumber(number) {
-    const N = 6;
-    if (typeof(number) == 'number') return new Rat(Math.round(number*10**N), 10**N);
-    else throw new Error('argument must be a number');
-  }
   constructor(num, den = 1) {
     let numerator = BigInt(num),
       denominator = BigInt(den),
@@ -49,173 +44,136 @@ class Rat {
   static get zero() { return new Rat(0); }
   static get one() { return new Rat(1); }
 }
-function permutationSign(...p) {
-  // permutation sign for a list of integers
-  let n = p.length, sgn = 1;
-  for(let i=0; i<n; ++i)
-    for(let j=0; j<i; ++j) {
-      if(p[i] < p[j]) sgn *= -1
-      else if(p[i] === p[j]) return 0
-    }
-  return sgn
-}
+
 function grade(b) { let n = 0; while (b > 0) { if (b&1n) n++; b >>= 1n; } return n; }
 function sign(a, b) {
-  // sign of the product of two bit-Encoded blades
   let n = a >> 1n, sum = 0; while (n > 0) { sum += grade(n & b); n >>= 1n; }
   return sum & 1 ? -1 : 1;
 }
 
-class BasisVector {
-  constructor (index, square = 1) {
-    if (index === undefined) throw new Error("undefined index");
-    else if (!Number.isInteger(index)) throw new Error("index must be an integer");
-    else if (index < 0) throw new Error("negative index");
-    else if (square*square !== 1) throw new Error("non-unitary square");
-    else {
-      this.square = square;
-      this.index  = index;
-    }
-  }
-  bitEncoding()     { throw new Error("Virtual call"); }
-  toString() { return this.letter + this.index; }
-  toTeX() { return "\\mathbf{" + this.letter + "}_" + this.index; }
-  get letter() { return this.square === 1 ? 'e' : '\\bar e'; }
-  get order() { throw "virtual method call"; }
-  static fromOrder(order) {
-    return order >= 2 ?
-      new AntiEuclideanBasisVector(order - 2) :
-      new EuclideanBasisVector(Math.floor(1/(1 - order) - 2));
-  }
-}
-class EuclideanBasisVector extends BasisVector {
-  constructor (index) { super(index, 1); }
-  get bitEncoding() { return 1n << BigInt(2*this.index); }
-  get order() { return 1 - 1/(2 + this.index) }
-}
-class AntiEuclideanBasisVector extends BasisVector {
-  constructor (index) { super(index, -1); }
-  toString() { return 'ē' + this.index; }
-  get bitEncoding() { return 1n << BigInt(2*this.index + 1); }
-  get order() { return 2 + this.index; }
-}
-
 // Some constants related to the Minkowski plane
-const eplane   = 0b11;
-const eplus    = 0b01;
-const eminus   = 0b10;
+const eplane   = 0b11n;
+const eplus    = 0b01n;
+const eminus   = 0b10n;
 
-const oriinf   = 0b11;
-const origin   = 0b01;
-const infinity = 0b10;
+const oriinf   = 0b11n;
+const origin   = 0b01n;
+const infinity = 0b10n;
 
 class BasisBlade {
-  // has basisVectors;
-  // has Polynomial scale;
-  static get zero() { return new BasisBlade([], Polynomial.zero); }
-  static get one() { return new BasisBlade([], Polynomial.one); }
-  constructor(...args) {
-    if (args.every(x => x instanceof BasisVector)) {
-      this.basisVectors = args;
-      this.scale = new Polynomial(new Rat(permutationSign(...this.basisVectors.map(x => x.order))));
-    }
-    else if (args.length == 0) { this.basisVectors = []; this.scale = Polynomial.one; }
-    else if (args.length == 1) {
-      let arg = args[0];
-      if (arg instanceof Polynomial) {
-        this.basisVectors = []; this.scale = arg;
-      } else if (arg instanceof Array) {
-        if (arg.every(x => x instanceof BasisVector)) {
-          this.basisVectors = args;
-          this.scale = new Polynomial(new Rat(permutationSign(...this.basisVectors)));
-        } else throw new Error("an array of basis vectors was expected");
-      } else if (typeof(arg) == 'bigint') {
-        throw "NYI";
-      } else if (typeof(arg) == 'string') {
-        let re = /^[eē](0|[1-9][0-9]*)$/;
-        if (re.test(arg)) {
-          console.log(arg.match(re));
-        }
-        throw "NYI";
-      } else throw new Error("unsupported constructor argument of type " + arg.constructor.name);
-    }
-    else if (args.length == 2) {
-      let arg0 = args[0], arg1 = args[1];
-      if (arg0 instanceof Array && arg1 instanceof Polynomial) {
-        this.basisVectors = arg0;
-        this.scale = arg1;
-      } else throw new Error("invalid two-arguments");
-    } else throw new Error("could not parse arguments");
+  static get zero() { return new BasisBlade(0n, Polynomial.zero); }
+  static get one() { return new BasisBlade(0n, Polynomial.one); }
+  constructor(bitEncoding, weight = Polynomial.one) {
+    if (typeof(bitEncoding) !== 'bigint') throw new Error("bitEncoding must be a big integer");
+    if (!(weight instanceof Polynomial)) throw new Error("weight must be a multivariate polynomial");
+    this.bitEncoding = bitEncoding;
+    this.weight = weight;
   }
-  toString() {
-    if (this.grade == 0) return this.scale.toString();
-    return this.basisVectors.length === 0 ? '1' :
-      this.basisVectors
-    .sort((a,b) => a.order > b.order)
-    .map(x => x.toString())
-    .join('∧');
-  }
-  toTeX() {
-    if (this.basisVectors.length == 0) { return this.scale.toTeX(); }
-    else {
-      let scale = this.scale.toTeX();
-      return (
-        this.scale.degree > 0 ? `(${scale})` :
-          this.scale.isOne() ? '' :
-          this.scale.negate().isOne() ? '-' :
-          scale
-      ) +
-      this.basisVectors.
-        sort((a,b) => a.order > b.order).
-        map(x => x.toTeX()).
-        join('\\wedge ');
-    }
-  }
-  wedge(that) {
-    if (that instanceof BasisBlade) {
-      if (this.bitEncoding & that.bitEncoding) return BasisBlade.zero;
-      else return this.multiply(that);
-    } else throw new Error("unsupported argument type");
-  }
-  multiply(that) {
-    if (that instanceof BasisBlade) {
-      let basisVectors = [],
-        scale = this.scale.multiply(that.scale),
-        $sign = sign(this.bitEncoding, that.bitEncoding);
-      for (
-        let n = 1, bitEncoding = this.bitEncoding & that.bitEncoding;
-        bitEncoding > 0;
-        n *= -1, bitEncoding >>= 1n
-      ) { if (bitEncoding & 1n) $sign *= n; }
-      for (
-        let n = 0, bitEncoding = this.bitEncoding ^ that.bitEncoding;
-        bitEncoding > 0;
-        n++, bitEncoding >>= 1n
-      ) {
-        if (bitEncoding & 1n) 
-          basisVectors.push(
-            new (n % 2 ? AntiEuclideanBasisVector : EuclideanBasisVector)(
-              parseInt(n % 2 ? (n-1)/2 : n/2)
-            )
-          );
-      }
-      return new BasisBlade(basisVectors, scale.multiply(new Polynomial(new Rat($sign))));
-    } else if (that instanceof Rat) {
-      throw "NYI";
-    } else throw new Error("unsupported argument type");
-  }
+  // "scale" is an alias for "weight"
+  get scale() { return this.weight; }
   divide(that) {
     if (that instanceof Rat) {
-      return new BasisBlade(this.basisVectors, this.scale.divide(that));
+      return new BasisBlade(this.bitEncoding, this.weight.divide(that));
     } else throw new Error("only Rat division supported");
   }
-  negate() { return new BasisBlade(this.basisVectors, this.scale.negate()); }
-  get grade() { return this.basisVectors.length; }
-  isZero() { return this.scale.isZero(); }
-  get bitEncoding() {
-    return this.basisVectors.
-      map(x => x.bitEncoding).
-      reduce((a,b) => a|b, 0n);
+  negate() { return new BasisBlade(this.bitEncoding, this.weight.negate()); }
+  get grade() { return grade(this.bitEncoding); }
+  isZero() { return this.weight.isZero(); }
+  toString() {
+    if (this.grade == 0) return this.weight.toString();
+    else return (
+      this.weight.isOne() ? '' :
+      this.weight.negate().isOne() ? '-' :
+    this.weight.toString() + '*'
+    ) + [...(function*(b) {
+      let n = 0;
+      if (b & origin) yield 'no';
+      if (b & infinity) yield 'ni';
+      b >>= 2n;
+      while (b > 0) {
+        n++;
+        if (b & 1n) yield n % 2 ? `e${(n-1) / 2}` : `ē${n/2 - 1}`;
+        b >>= 1n;
+      }
+    })(this.bitEncoding)].join('∧');
+  }
+  toTeX() {
+    if (this.grade == 0) return this.weight.toTeX();
+    else return (
+      this.weight.isOne() ? '' :
+      this.weight.negate().isOne() ? '-' :
+    this.weight.toTeX()
+    ) + [...(function*(b) {
+      let n = 0;
+      if (b & origin) yield 'n_0';
+      if (b & infinity) yield 'n_{\\infty}';
+      b >>= 2n;
+      while (b > 0) {
+        n++;
+        if (b & 1n) yield n % 2 ? `e_${(n-1) / 2}` : `{\\bar e}_${n/2 - 1}`;
+        b >>= 1n;
+      }
+    })(this.bitEncoding)].join('\\wedge ');
+  }
+  toDiagonalBasis() {
+    if ([0b00n, oriinf].includes(this.bitEncoding & oriinf)) {
+      return [new BasisBlade(this.bitEncoding, this.weight)];
+    } else if (this.bitEncoding & origin) {
+      let b = this.bitEncoding ^ origin,
+        weight = this.weight.divide(new Rat(2));
+      return [
+        new BasisBlade(b ^ eplus, weight),
+        new BasisBlade(b ^ eminus, weight)
+      ];
+    } else if (this.bitEncoding & infinity) {
+      let b = this.bitEncoding ^ infinity;
+      return [
+        new BasisBlade(b ^ eplus, this.weight.negate()),
+        new BasisBlade(b ^ eminus, this.weight)
+      ];
+    } else throw new Error("unexpected case");
+  }
+  toConformalBasis() {
+    if ([0b00n, eplane].includes(this.bitEncoding & eplane)) {
+      return [new BasisBlade(this.bitEncoding, this.weight)];
+    } else if (this.bitEncoding & eplus) {
+      let b = this.bitEncoding ^ eplus;
+      return [
+        new BasisBlade(b ^ origin, this.weight),
+        new BasisBlade(b ^ infinity, this.weight.negate().divide(new Rat(2)))
+      ];
+    } else if (this.bitEncoding ^ eminus) {
+      let b = this.bitEncoding ^ eminus;
+      return [
+        new BasisBlade(b ^ origin, this.weight),
+        new BasisBlade(b ^ infinity, this.weight.divide(new Rat(2)))
+      ];
+    } else throw new Error("unexpected case");
+  }
+  wedge(that) {
+    if (that instanceof BasisBlade)
+      return this.bitEncoding & that.bitEncoding ? [ BasisBlade.zero ] : this.multiply(that);
+    else throw new Error("unsupported argument type");
+  }
+  multiply(that) {
+    if (!(that instanceof BasisBlade)) throw new Error("unsupported argument type");
+    else if (that instanceof Rat) 
+      return [new BasisBlade(this.bitEncoding, this.weight.multiply(that))];
+    else return [...(
+      function*(self) {
+        let weight = self.weight.multiply(that.weight),
+          $sign = sign(self.bitEncoding, that.bitEncoding);
+        for (
+          let n = 1, bitEncoding = self.bitEncoding & that.bitEncoding;
+        bitEncoding > 0;
+        n *= -1, bitEncoding >>= 1n
+        ) { if (bitEncoding & 1n) $sign *= n; }
+        yield new BasisBlade(
+          self.bitEncoding ^ that.bitEncoding,
+          weight.multiply(new Polynomial(new Rat($sign)))
+        );
+      }
+      )(this)].reduce((a,b) => a.concat(b), []);
   }
 }
 
@@ -236,7 +194,6 @@ class PoweredVariable {
     } else throw "unknown variable " + this.varname;
   }
 }
-
 class Monomial {
   constructor(...poweredVars) {
     if (!poweredVars.every(x => x instanceof PoweredVariable))
@@ -291,13 +248,16 @@ class ScaledMonomial {
     this.monomial = monomial;
   }
   toString() {
-    return (this.scale === +1 ? ''  :
-            this.scale === -1 ? '-' :
-            this.scale + '*') + this.monomial.toString();
+    if (this.degree == 0) return this.scale.toString();
+    else return (
+      this.scale.isOne() ? ''  :
+      this.scale.opposite.isOne() ? '-' :
+    this.scale.toString() + '*'
+    ) + this.monomial.toString();
   }
   toTeX() {
     if (this.degree == 0) return this.scale.toTeX();
-    return (this.scale.isOne() ? '' :
+    else return (this.scale.isOne() ? '' :
        this.scale.opposite.isOne() ? '-' : this.scale.toTeX()
       ) + this.monomial.toTeX();
   }
@@ -401,27 +361,21 @@ class Polynomial {
 }
 
 class MultiVector {
-  static get zero() { return new MultiVector(BasisBlade.zero); }
-  static get one() { return new MultiVector(BasisBlade.one); }
   static fromParseTree(node) {
-    if (Number.isInteger(node)) return node;
     if(typeof(node) !== "object") throw new Error("unexpected argument type");
     switch(node.type) {
       case "number":
-        return new MultiVector(
-          new BasisBlade(new Polynomial(new Rat(node.args[0])))
-      );
-      case "basis vector":
-        return (
-          (square, index) => new MultiVector(
-            new BasisBlade(
-              new (square > 0 ? EuclideanBasisVector : AntiEuclideanBasisVector)(index)
-            )
-          )
-      )(node.args[0], parseInt(node.args[1]));
+        return new MultiVector(new BasisBlade(0n, new Polynomial(new Rat(node.args[0]))));
+      case "euclidean basis vector":
+        return (index => new MultiVector(new BasisBlade(1n << (2n*index + 2n))))(BigInt(parseInt(node.args[0])));
+      case "anti-euclidean basis vector":
+        return (index => new MultiVector(new BasisBlade(1n << (2n*index + 3n))))(BigInt(parseInt(node.args[0])));
+      case "null basis vector":
+        return (index => new MultiVector(new BasisBlade(1n << index)))(node.args[0] == "no" ? 0n : 1n);
       case "variable":
         return new MultiVector(
           new BasisBlade(
+            0n,
             new Polynomial(
               new ScaledMonomial(
                 new Monomial(
@@ -432,59 +386,72 @@ class MultiVector {
           )
       );
       case "operator":
-        return node.op(...node.args.map(MultiVector.fromParseTree));
+        return node.op(...node.args.map(arg => typeof(arg) == 'object' ? MultiVector.fromParseTree(arg) : arg));
       default:
         throw new Error(node.type + " NYI");
     }
   }
   constructor(...args) {
-    if (args.every(x => x instanceof BasisBlade)) {
-      if (new Set(args.map(x => x.toString())).size !== args.length)
-        throw new Error("duplicated blade");
-      this.blades = args;
-    } else if (args.length === 1) {
-      let arg = args[0];
-      if (arg instanceof BasisBlade || arg instanceof Polynomial) {
-        this.blades = [ new BasisBlade(arg) ];
-      } else if (typeof(arg) == 'object') {
-        let mv = MultiVector.fromParseTree(arg);
-        this.blades = mv.blades;
-      } else throw new Error("unexpected constructor argument of type " + arg.constructor.name);
-    } else throw new Error("unexpected constructor call");
+    if (args.length == 1 && typeof(args[0]) == 'string') {
+      this.blades = MultiVector.fromParseTree(parser.parse(args[0])).blades;
+    } else if (args.every(x => x instanceof BasisBlade)) {
+        this.blades = args;
+    } else {
+      throw new Error("wrong constructor argument type");
+    }
   }
   toTeX() { return this.blades.map(x => x.toTeX()).join("+"); }
   toString() { return this.blades.map(x => x.toString()).join('+'); }
   get grade() { return Math.max(...this.blades.map(x => x.grade)); }
+  diagonalize() {
+    return this.blades.map(b => b.toDiagonalBasis()).
+      reduce((a,b) => a.concat(b), []);
+  }
+  conformalize() {
+    return this.blades.map(b => b.toConformalBasis()).
+      reduce((a,b) => a.concat(b), []);
+  }
   add(that) {
     if (that instanceof MultiVector) {
       let blades = {};
       for (let blade of this.blades.concat(that.blades)) {
         let key = blade.bitEncoding;
         if (blades[key] === undefined) {
-          blades[key] = new BasisBlade(blade.basisVectors, blade.scale);
+          blades[key] = new BasisBlade(blade.bitEncoding, blade.weight);
         } else {
-          blades[key].scale = blades[key].scale.add(blade.scale);
+          blades[key].weight = blades[key].weight.add(blade.weight);
         }
       }
-      blades = Object.values(blades).filter(x => !x.scale.isZero());
-      if (blades.length == 0) return MultiVector.zero;
+      blades = Object.values(blades).filter(x => !x.weight.isZero());
+      if (blades.length == 0) return new MultiVector(BasisBlade.zero);
       else return new MultiVector(...blades);
     } else throw new Error("unexpected argument of type " + that.constructor.name);
   }
   multiply(that) {
     if (that instanceof MultiVector) {
-      return [...(function* (blades) { for (let i of blades) for (let j of that.blades) {
-        yield new MultiVector(i.multiply(j));
-      }
-      })(this.blades)].reduce((a,b) => a.add(b), MultiVector.zero)
+      let these = this.diagonalize(), those = that.diagonalize(),
+        blades = [
+          ...(
+            function* () {
+              for (let i of these) for (let j of those) for (let ij of i.multiply(j)) {
+                yield new MultiVector(ij);
+              }
+            }
+          )()
+        ].
+          reduce((a,b) => a.add(b), new MultiVector(BasisBlade.zero)).
+          conformalize()
+        ;
+      return new MultiVector(...blades);
     } else throw new Error("unsupported argument type");
   }
   divide(that) {
     if (that instanceof MultiVector) {
       if (that.grade == 0) {
-        let polynomial = that.blades[0].scale;
+        let polynomial = that.blades[0].weight;
         if (polynomial.degree == 0) {
           let rat = polynomial.monomials[0].scale;
+          console.log(this.blades.map(b => b));
           return new MultiVector(
             ...this.blades.map(b => b.divide(rat))
           );
