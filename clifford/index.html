@@ -19,6 +19,14 @@ if (typeof(BigInt) !== 'undefined') {
   document.body.appendChild(paragraph);
 }
     </script>
+    <h1>Disclaimer</h1>
+    <p>This is a work in progress.  So far, only the geometric product seems to work and it has not been tested much.  There is no inner nor outer product yet,
+    but once the geometric product works reliably, the inner and outer products implementation should
+    be straightforward.</p>
+
+    <p>Also, this will probably only work on Google chrome, as the code relies on the recent inclusion
+    on big natural integers in javascript.</p>
+
     <h1>Introduction</h1>
     <p><em>Clifford.js</em> is a javascript library that performs computations on the
     <a href="https://en.wikipedia.org/wiki/Universal_geometric_algebra">Universal geometric algebra</a>
@@ -67,7 +75,7 @@ var parser;
 fetch("lib/clifford.pegjs").
 then(r => r.text()).
 then(peg.generate).
-then(p => { parser = p });
+then(p => { parser = p; main(); });
 
 let input = document.getElementById("input"),
     output = document.getElementById("output");
