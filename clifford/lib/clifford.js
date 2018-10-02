@@ -373,6 +373,7 @@ class Polynomial {
 
 class MultiVector {
   static get zero() { return new MultiVector(BasisBlade.zero); }
+  isZero() { return this.blades.length == 0 || (this.grade == 0 && this.blades[0].isZero()); }
   static fromParseTree(node) {
     if(typeof(node) !== "object") throw new Error("unexpected argument type");
     switch(node.type) {
@@ -412,7 +413,7 @@ class MultiVector {
       throw new Error("wrong constructor argument type");
     }
   }
-  toTeX() { return this.blades.map(x => x.toTeX()).join("+"); }
+  toTeX() { return this.isZero() ? '0' : this.blades.map(x => x.toTeX()).join("+"); }
   toString() { return this.blades.map(x => x.toString()).join('+'); }
   get grade() { return Math.max(...this.blades.map(x => x.grade)); }
   diagonalize() {
