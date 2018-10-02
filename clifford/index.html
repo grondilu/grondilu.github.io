@@ -33,7 +33,9 @@ if (typeof(BigInt) !== 'undefined') {
     with <a href="http://mathworld.wolfram.com/MultivariatePolynomial.html">multivariate polynomial</a> coefficients.  Thus, it allows computations on expressions such as :
     $$ 1 + (1+x+x²)\mathbf{e}_1 + xyz\,\mathbf{e}_2\wedge\mathbf{e}_3 $$</p>
 
-    <p>The main user interface is a <tt>MultiVector</tt> class.  The constructor takes an algebraic expression as a string argument.  An algebraic expression may contain
+    <p>The main user interface is a <tt>MultiVector</tt> class.  So for instance the above expression could have been entered with (input notation is described further) :</p>
+    <tt>new MultiVector("1 + (1+x+x**2)*$1 + x*y*z*$2*$3")</tt>
+    <p>The constructor takes an algebraic expression as a string argument.  An algebraic expression may contain
     any of the usual agebraic operators (addition, subtraction, multiplication, division and exponentiation) acting
     on three different kinds of entities described below.</p>
 
