@@ -105,7 +105,7 @@ class BasisBlade {
     this.weight.toTeX()
     ) + [...(function*(b) {
       let n = 0;
-      if (b & origin) yield 'n_0';
+      if (b & origin) yield 'n_o';
       if (b & infinity) yield 'n_{\\infty}';
       b >>= 2n;
       while (b > 0) {
@@ -174,6 +174,17 @@ class BasisBlade {
         );
       }
       )(this)].reduce((a,b) => a.concat(b), []);
+  }
+  static consolidate(...blades) {
+    let dict = {}
+    for (let blade of blades) {
+      let key = blade.bitEncoding.toString();
+      if (dict[key] == undefined)
+        dict[key] = new BasisBlade(blade.bitEncoding, blade.weight);
+      else
+        dict[key].weight = dict[key].weight.add(blade.weight);
+    }
+    return Object.values(dict).filter(x => !x.weight.isZero());
   }
 }
 
@@ -361,6 +372,7 @@ class Polynomial {
 }
 
 class MultiVector {
+  static get zero() { return new MultiVector(BasisBlade.zero); }
   static fromParseTree(node) {
     if(typeof(node) !== "object") throw new Error("unexpected argument type");
     switch(node.type) {
@@ -412,20 +424,7 @@ class MultiVector {
       reduce((a,b) => a.concat(b), []);
   }
   add(that) {
-    if (that instanceof MultiVector) {
-      let blades = {};
-      for (let blade of this.blades.concat(that.blades)) {
-        let key = blade.bitEncoding;
-        if (blades[key] === undefined) {
-          blades[key] = new BasisBlade(blade.bitEncoding, blade.weight);
-        } else {
-          blades[key].weight = blades[key].weight.add(blade.weight);
-        }
-      }
-      blades = Object.values(blades).filter(x => !x.weight.isZero());
-      if (blades.length == 0) return new MultiVector(BasisBlade.zero);
-      else return new MultiVector(...blades);
-    } else throw new Error("unexpected argument of type " + that.constructor.name);
+    return new MultiVector(...BasisBlade.consolidate(...this.blades.concat(that.blades)));
   }
   multiply(that) {
     if (that instanceof MultiVector) {
@@ -442,7 +441,7 @@ class MultiVector {
           reduce((a,b) => a.add(b), new MultiVector(BasisBlade.zero)).
           conformalize()
         ;
-      return new MultiVector(...blades);
+      return new MultiVector(...BasisBlade.consolidate(...blades));
     } else throw new Error("unsupported argument type");
   }
   divide(that) {
@@ -451,7 +450,6 @@ class MultiVector {
         let polynomial = that.blades[0].weight;
         if (polynomial.degree == 0) {
           let rat = polynomial.monomials[0].scale;
-          console.log(this.blades.map(b => b));
           return new MultiVector(
             ...this.blades.map(b => b.divide(rat))
           );
