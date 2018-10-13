@@ -123,6 +123,6 @@ EuclideanBasisVector = "$" index:DecimalIntegerLiteral {
     return { type: "euclidean basis vector", args: [ index ] }
 }
 
-AntiEuclideanBasisVector = "#" index:DecimalIntegerLiteral {
+AntiEuclideanBasisVector = "_" index:DecimalIntegerLiteral {
     return { type: "anti-euclidean basis vector", args: [ index ] }
 }

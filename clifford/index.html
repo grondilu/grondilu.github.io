@@ -3,16 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <title>Clifford.js</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script src="lib/peg-0.10.0.min.js"></script>
     <script src="lib/clifford.js"></script>
   </head>
   <body>
     <script>
-if (typeof(BigInt) !== 'undefined') {
-  document.createElement("script").src = "lib/rat.js";
-  document.createElement("script").src = "lib/clifford.js";
-} else {
+if (typeof(BigInt) == 'undefined') {
   let paragraph = document.createElement("p");
   paragraph.style = "color:red;";
   paragraph.innerHTML = '<p style="color:red;">This page requires support for <a href="https://developers.google.com/web/updates/2018/05/bigint">javascript\'s native bigint</a>.  Try using <a href=http://www.google.com/chrome>Google chrome</a>.</p>';
@@ -59,7 +56,7 @@ if (typeof(BigInt) !== 'undefined') {
         To enter those basis vectors, a "$" notation is used : <tt>$0, $1, ...</tt>
       </li>
       <li>An anti-Euclidean Space is spanned by a basis \(\mathbf{\bar e}_0,\mathbf{\bar e}_1,\ldots\)
-        To enter those basis vectors, a "#" notation is used : <tt>#0, #1, ...</tt>
+        To enter those basis vectors, a "_" notation is used : <tt>_0, _1, ...</tt>
       </li>
       <li>A Minkowskii space is spanned by a null basis \(n_o, n_\infty\).
         To enter those basis vectors, the words <tt>no</tt> and <tt>ni</tt> are used respectively.
@@ -77,15 +74,47 @@ var parser;
 fetch("lib/clifford.pegjs").
 then(r => r.text()).
 then(peg.generate).
-then(p => { parser = p; main(); });
+then(p => { parser = p;
+  main();
+});
 
+function multiVectorFromParseTree(node) {
+  if(typeof(node) !== "object") throw new Error("unexpected argument type");
+  switch(node.type) {
+    case "number":
+      return new MultiVector(new BasisBlade(0n, new Polynomial(new Rat(node.args[0]))));
+    case "euclidean basis vector":
+      return (index => new MultiVector(new BasisBlade(1n << (2n*index + 2n))))(BigInt(parseInt(node.args[0])));
+    case "anti-euclidean basis vector":
+      return (index => new MultiVector(new BasisBlade(1n << (2n*index + 3n))))(BigInt(parseInt(node.args[0])));
+    case "null basis vector":
+      return (index => new MultiVector(new BasisBlade(1n << index)))(node.args[0] == "no" ? 0n : 1n);
+    case "variable":
+      return new MultiVector(
+          new BasisBlade(
+            0n,
+            new Polynomial(
+              new ScaledMonomial(
+                new Monomial(
+                  new PoweredVariable(node.args[0])
+                  )
+                )
+              )
+            )
+          );
+    case "operator":
+      return node.op(...node.args.map(arg => typeof(arg) == 'object' ? multiVectorFromParseTree(arg) : arg));
+    default:
+      throw new Error(node.type + " NYI");
+  }
+}
 let input = document.getElementById("input"),
     output = document.getElementById("output");
 function update_output() {
   try {
-    output.innerHTML = "\\(" + new MultiVector(input.value).toTeX() + "\\)";
+    output.innerHTML = "\\(" + multiVectorFromParseTree(input.value).toTeX() + "\\)";
   } catch(err) { console.log(err); }
-MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+  MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 }
     </script>
 
@@ -100,10 +129,10 @@ MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
     </table>
     <script>
 function main() {
-  let tests = [
+  const tests = [
     "1",
     "$1",
-    "#2",
+    "_2",
     "no",
     "ni",
     "1+2",
@@ -135,13 +164,13 @@ function main() {
     "($0+$1)²",
     "$1*$2*$3",
     "$0*$1*$0",
-    "#1**3",
+    "_1**3",
     "(a+b/2)**1",
     "(a+b/2)**2",
     "(a+b/2)*(a+b/2)",
     "(a+b/2)**3" ],
     html_table = document.getElementById("tests_table"),
-    outputs = [ x => "\\(" + new MultiVector(x).toTeX() + "\\)" ];
+    outputs = [ x => "\\(" + multiVectorFromParseTree(parser.parse(x)).toTeX() + "\\)" ];
 
     for (let test of tests) {
       let row = document.createElement("tr"),

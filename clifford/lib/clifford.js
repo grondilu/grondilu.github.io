@@ -374,39 +374,14 @@ class Polynomial {
 class MultiVector {
   static get zero() { return new MultiVector(BasisBlade.zero); }
   isZero() { return this.blades.length == 0 || (this.grade == 0 && this.blades[0].isZero()); }
-  static fromParseTree(node) {
-    if(typeof(node) !== "object") throw new Error("unexpected argument type");
-    switch(node.type) {
-      case "number":
-        return new MultiVector(new BasisBlade(0n, new Polynomial(new Rat(node.args[0]))));
-      case "euclidean basis vector":
-        return (index => new MultiVector(new BasisBlade(1n << (2n*index + 2n))))(BigInt(parseInt(node.args[0])));
-      case "anti-euclidean basis vector":
-        return (index => new MultiVector(new BasisBlade(1n << (2n*index + 3n))))(BigInt(parseInt(node.args[0])));
-      case "null basis vector":
-        return (index => new MultiVector(new BasisBlade(1n << index)))(node.args[0] == "no" ? 0n : 1n);
-      case "variable":
-        return new MultiVector(
-          new BasisBlade(
-            0n,
-            new Polynomial(
-              new ScaledMonomial(
-                new Monomial(
-                  new PoweredVariable(node.args[0])
-                )
-              )
-            )
-          )
-      );
-      case "operator":
-        return node.op(...node.args.map(arg => typeof(arg) == 'object' ? MultiVector.fromParseTree(arg) : arg));
-      default:
-        throw new Error(node.type + " NYI");
-    }
+  equals(that) {
+    if (that instanceof MultiVector) {
+      return this.subtract(that).isZero();
+    } else throw Error("non-multivector argument");
   }
   constructor(...args) {
     if (args.length == 1 && typeof(args[0]) == 'string') {
-      this.blades = MultiVector.fromParseTree(parser.parse(args[0])).blades;
+      throw new Error("direct expression parsing not implemented");
     } else if (args.every(x => x instanceof BasisBlade)) {
         this.blades = args;
     } else {
@@ -461,4 +436,3 @@ class MultiVector {
   negate() { return new MultiVector(...this.blades.map(m => m.negate())); }
   subtract(that) { return this.add(that.negate()); }
 }
-
