@@ -1,5 +1,5 @@
 class Trackball {
-  matrix() { return mat4.multiply(mat4.create(), this.translation, this.rotation); }
+  get matrix() { return mat4.multiply(mat4.create(), this.translation, this.rotation); }
   get maxLength() { return Math.max(this.canvas.width, this.canvas.height); }
   constructor(canvas, distance = 10) {
     this.canvas = canvas;
