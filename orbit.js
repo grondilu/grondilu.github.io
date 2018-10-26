@@ -72,7 +72,7 @@ async function conicDrawer(gl) {
     gl.uniform1f(uniformLocation["e"], eccentricity);
     gl.uniform1f(uniformLocation["theta"], theta);
     gl.uniformMatrix4fv(uniformLocation["PMatrix"], false, matrices.proj);
-    gl.uniformMatrix4fv(uniformLocation["VMatrix"], false, gl.trackball.matrix());
+    gl.uniformMatrix4fv(uniformLocation["VMatrix"], false, gl.trackball.matrix);
     gl.uniformMatrix4fv(uniformLocation["MMatrix"], false, matrices.model);
 
     gl.drawArrays(gl.LINE_STRIP, 0, N);
@@ -212,7 +212,9 @@ void main() {
     colorLocation = gl.getUniformLocation(program, "u_color"),
     reverseLightDirectionLocation = gl.getUniformLocation(program, "u_reverseLightDirection");
 
+  console.log("fetching asteroid.gltf");
   let gltf = await fetch("asteroid.gltf").then(r => r.json());
+  console.log("fetching binary data");
   await loadBuffers(gltf);
 
   for (let node of gltf.nodes) {
@@ -268,7 +270,7 @@ void main() {
           gl.bindVertexArray(vao);
 
           gl.uniformMatrix4fv(pMatrixLocation, false, matrices.proj);
-          gl.uniformMatrix4fv(vMatrixLocation, false, gl.trackball.matrix());
+          gl.uniformMatrix4fv(vMatrixLocation, false, gl.trackball.matrix);
           gl.uniformMatrix4fv(mMatrixLocation, false, matrices.model);
           gl.uniform4fv(colorLocation, [1.0, 1.0, 1.0, 1.0]);
 
