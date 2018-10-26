@@ -2,10 +2,10 @@
     "accessors" : [
         {
             "bufferView" : 0, 
-            "componentType" : 5125, 
-            "count" : 1474560, 
+            "componentType" : 5123, 
+            "count" : 47616, 
             "max" : [
-                983039
+                31743
             ], 
             "min" : [
                 0
@@ -15,32 +15,32 @@
         {
             "bufferView" : 1, 
             "componentType" : 5126, 
-            "count" : 983040, 
+            "count" : 31744, 
             "max" : [
-                0.9201000928878784, 
-                0.9426277875900269, 
-                0.9378341436386108
+                1.0419353246688843, 
+                1.1370141506195068, 
+                1.0692100524902344
             ], 
             "min" : [
-                -0.9265395998954773, 
-                -0.9289342761039734, 
-                -0.9376459717750549
+                -1.1284526586532593, 
+                -1.060044288635254, 
+                -1.0524696111679077
             ], 
             "type" : "VEC3"
         }, 
         {
             "bufferView" : 2, 
             "componentType" : 5126, 
-            "count" : 983040, 
+            "count" : 31744, 
             "max" : [
-                0.9999954104423523, 
-                0.9999845027923584, 
-                0.9998930096626282
+                0.9996443390846252, 
+                0.99997478723526, 
+                0.9995813965797424
             ], 
             "min" : [
-                -0.9999890327453613, 
-                -0.999991774559021, 
-                -0.9999624490737915
+                -0.9997333288192749, 
+                -0.9992616772651672, 
+                -0.9997341632843018
             ], 
             "type" : "VEC3"
         }
@@ -52,32 +52,32 @@
     "bufferViews" : [
         {
             "buffer" : 0, 
-            "byteLength" : 5898240, 
+            "byteLength" : 95232, 
             "byteOffset" : 0, 
             "target" : 34963
         }, 
         {
             "buffer" : 0, 
-            "byteLength" : 11796480, 
-            "byteOffset" : 5898240, 
+            "byteLength" : 380928, 
+            "byteOffset" : 95232, 
             "target" : 34962
         }, 
         {
             "buffer" : 0, 
-            "byteLength" : 11796480, 
-            "byteOffset" : 17694720, 
+            "byteLength" : 380928, 
+            "byteOffset" : 476160, 
             "target" : 34962
         }
     ], 
     "buffers" : [
         {
-            "byteLength" : 29491200, 
+            "byteLength" : 857088, 
             "uri" : "asteroid.bin"
         }
     ], 
     "meshes" : [
         {
-            "name" : "Icosphere", 
+            "name" : "Sphere", 
             "primitives" : [
                 {
                     "attributes" : {
@@ -92,7 +92,7 @@
     "nodes" : [
         {
             "mesh" : 0, 
-            "name" : "Asteroid"
+            "name" : "Sphere"
         }
     ], 
     "scene" : 0, 

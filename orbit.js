@@ -1,10 +1,5 @@
 "use strict";
 
-const shaderSourcesURIs = [
-  "conics-vertex.glsl",
-  "conics-fragment.glsl",
-];
-
 function get_projection(angle, a, zMin, zMax) {
   let ang = Math.tan((angle*.5)*Math.PI/180);//angle*.5
   return mat4.fromValues(
@@ -14,8 +9,6 @@ function get_projection(angle, a, zMin, zMax) {
     0, 0, (-2*zMax*zMin)/(zMax-zMin), 0 
   );
 }
-
-async function getShaderSources() { return Promise.all(shaderSourcesURIs.map(uri => fetch(uri).then(resp => resp.text()))); }
 
 function createShader(gl, type, source) {
   let shader = gl.createShader(type);
@@ -27,12 +20,9 @@ function createShader(gl, type, source) {
   throw err;
 }
 
-function solveKepler(e, M) {
-  const N = 20;
+function solveKepler(e, M, N = 20) {
   let E = M;
-  for(let i = 0; i<N; i++) {
-    E = M + e*Math.sin(E);
-  }
+  for(let i = 0; i<N; i++) E = M + e*Math.sin(E);
   return E;
 }
 
@@ -42,10 +32,47 @@ function drawScene(gl, ...drawers) {
   for (let drawer of drawers) drawer();
 }
 
-async function conicDrawer(gl) {
-  let shaderSources = await getShaderSources(),
-    vertexShader = createShader(gl, gl.VERTEX_SHADER, shaderSources[0]),
-    fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, shaderSources[1]),
+function conicDrawer(gl) {
+  const vertexShaderSource = `#version 300 es
+
+const float tau = 6.283185307179586;
+
+uniform int N;
+uniform float a;
+uniform float e;
+uniform float theta;
+
+uniform mat4 PMatrix;
+uniform mat4 VMatrix;
+uniform mat4 MMatrix;
+
+out float intensity;
+
+void main() {
+
+   intensity = float(gl_VertexID)/float(N);
+   float p = a*(1.0-e*e);
+   float phi = theta + tau*intensity;
+   gl_Position = PMatrix*VMatrix*MMatrix*vec4( p*cos(phi), p*sin(phi), 0.0, 1.0 + e*cos(phi) );
+
+}`;
+  const fragmentShaderSource = `#version 300 es
+ 
+// fragment shaders don't have a default precision so we need
+// to pick one. mediump is a good default. It means "medium precision"
+precision mediump float;
+ 
+// we need to declare an output for the fragment shader
+out vec4 outColor;
+
+in float intensity;
+ 
+void main() {
+  outColor = vec4(intensity, intensity, intensity, 1);
+}`;
+
+  let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource),
+    fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource),
     program = gl.createProgram();
 
   gl.attachShader(program, vertexShader);
@@ -100,34 +127,33 @@ async function loadBuffers(gltf) {
 }
 
 function getAccessorData(gltf, accessor) {
-    let bufferView   = gltf.bufferViews[accessor.bufferView],
-        buffer       = gltf.buffers[bufferView.buffer],
-        result       = buffer.reader.result,
-        start        = bufferView.byteOffset ? bufferView.byteOffset : 0,
-        end          = start + bufferView.byteLength,
-        slicedBuffer = result.slice(start, end),
-        data         = new (
-            function (componentType) {
-                switch (componentType) {
-                    case 5120:
-                        return Int8Array;
-                    case 5121:
-                        return Uint8Array;
-                    case 5122:
-                        return Int16Array;
-                    case 5123:
-                        return Uint16Array;
-                    case 5125:
-                        return Uint32Array;
-                    case 5126:
-                        return Float32Array;
-                    default:
-                        throw new Error("unknown component type " + componentType);
-                }
-            }(accessor.componentType)
-        )(slicedBuffer);
-
-    return data;
+  let bufferView   = gltf.bufferViews[accessor.bufferView],
+    buffer       = gltf.buffers[bufferView.buffer],
+    result       = buffer.reader.result,
+    start        = bufferView.byteOffset ? bufferView.byteOffset : 0,
+    end          = start + bufferView.byteLength,
+    slicedBuffer = result.slice(start, end),
+    data         = new (
+      function (componentType) {
+        switch (componentType) {
+          case 5120:
+            return Int8Array;
+          case 5121:
+            return Uint8Array;
+          case 5122:
+            return Int16Array;
+          case 5123:
+            return Uint16Array;
+          case 5125:
+            return Uint32Array;
+          case 5126:
+            return Float32Array;
+          default:
+            throw new Error("unknown component type " + componentType);
+        }
+      }(accessor.componentType)
+  )(slicedBuffer);
+  return data;
 }
 
 async function asteroidDrawer(gl, matrices) {
@@ -213,7 +239,7 @@ void main() {
     reverseLightDirectionLocation = gl.getUniformLocation(program, "u_reverseLightDirection");
 
   console.log("fetching asteroid.gltf");
-  let gltf = await fetch("asteroid.gltf").then(r => r.json());
+  let gltf = await fetch("asteroid.gltf", {cache: "no-store"}).then(r => r.json());
   console.log("fetching binary data");
   await loadBuffers(gltf);
 
@@ -293,11 +319,11 @@ void main() {
 async function main() {
   let canvas = document.createElement("canvas"),
     gl = canvas.getContext("webgl2"),
-    conic = await conicDrawer(gl, 0.2);
+    conic = conicDrawer(gl, 0.2);
 
   gl.trackball = new Trackball(canvas),
   canvas.width = 800;
-  canvas.height = 600;
+  canvas.height = 640;
   document.body.appendChild(canvas);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -310,30 +336,14 @@ async function main() {
     view: gl.trackball.matrix,
   }, 
   asteroids = await asteroidDrawer(gl, matrices),
-    table = document.createElement("table"),
     orbitalElements = {
     eccentricity: 0.8,
-    semiMajorAxis: 5,
+    semiMajorAxis: 6,
   };
-
-  for (let element in orbitalElements) {
-    let tr = document.createElement("tr");
-    table.appendChild(tr);
-    let name = document.createElement("td"),
-      value = document.createElement("td"),
-      output = document.createElement("output");
-    name.innerHTML = element;
-    output.value = orbitalElements[element];
-    value.appendChild(output);
-    tr.appendChild(name);
-    tr.appendChild(value);
-  }
-
-  document.body.appendChild(table);
 
   (function animate() {
     let e = orbitalElements.eccentricity,
-      a = 5,
+      a = orbitalElements.semiMajorAxis,
       w = 0.3,
       t = Date.now()/1000,
       M = (w*t) % (2*Math.PI) - Math.PI,
@@ -349,6 +359,4 @@ async function main() {
   })();
 
 }
-
-main();
 
