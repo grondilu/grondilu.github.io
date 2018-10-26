@@ -1,15 +1,92 @@
 <!doctype html>
 <html>
   <head>
-    <title>sandbox</title>
+    <title>Kepler Orbit in WebGL</title>
     <meta charset=utf8 />
     <link rel="icon" href="data:;base64,=">
     <script src="gl-matrix-min.js"></script>
     <script src="trackball.js"></script>
-  </head>
-  <body>
     <script src=orbit.js></script>
+  </head>
+  <body onload="main();">
 
+    <p>So, recently I've made this:</p>
+    <canvas id=asteroid></canvas>
+    <p>Normally, you should see an asteroid-looking ball and an elliptic orbit around it.
+    If you don't see anything, it can be either that the mesh for the ball is still loading,
+    or that your browser doesn't support <a href=https://get.webgl.org/webgl2/>WebGL2</a>.</p>
+
+    <p>If you see the asteroid and the orbit, go ahead and use your mouse to rotate the view,
+    as well as the mouse wheel to zoom out and in.</p>
+
+    <p>My goal with this was to learn how to display astrometric data in 3D with WebGL,
+    with the dream of doing something similar to what is done in
+    <a href=https://en.wikipedia.org/wiki/Kerbal_Space_Program>Kerbal Space Program</a>.
+    I'm far from reaching that dream, but this is a start.</p>
+
+    <p>I've made the asteroid model with <a href=http://www.blender.org>blender</a>.  Starting from an UV-sphere, I just added a displacement
+    modifier controlled by a "clouds" noise texture.  I then exported the mesh into <a href=https://www.khronos.org/gltf/>glTF</a> using
+    the <a href=https://github.com/KhronosGroup/glTF-Blender-Exporter>Khronos Group glTF-Blender-Exporter</a>.  Importing the mesh 
+    from javascript was quite a hassle, but it was interesting and a good learning experience imho.
+    </p>
+
+    <p>One neat trick I've learnt while drawing the orbit is that I don't actually need to feed the shader with any vertices buffer.
+    I could just use the special variable <tt>gl_VertexID</tt>.  The vertex shader looks like this :
+
+    <pre>#version 300 es
+
+const float tau = 6.283185307179586;
+
+uniform int N;
+uniform float a;
+uniform float e;
+uniform float theta;
+
+uniform mat4 PMatrix;
+uniform mat4 VMatrix;
+uniform mat4 MMatrix;
+
+out float intensity;
+
+void main() {
+
+   intensity = float(gl_VertexID)/float(N);
+   float p = a*(1.0-e*e);
+   float phi = theta + tau*intensity;
+   gl_Position = PMatrix*VMatrix*MMatrix*vec4( p*cos(phi), p*sin(phi), 0.0, 1.0 + e*cos(phi) );
+
+}</pre>
+
+    As you can see, there is no "in" variable.  All input data is given via uniforms : the only variable
+    that changes along the curve is <tt>gl_VertexID</tt>.
+    </p>
+
+
+    <p>The ellipse shows a nice intensity gradient, indicating the position of the orbiting body with time.
+    The speed is visibly higher at perigee, and lower at apogee, as expected from basic orbital mechanics.
+    I've tried to made this scientifically accurate, and to do that I had to convert the mean anomaly (which evolves
+    linearly with time) into the true anomaly.  After reading the corresponding wikipedia articles,
+    I've learnt that this can be done first by calculating the eccentric anomaly, which is done by solving 
+    <a href=https://en.wikipedia.org/wiki/Kepler%27s_equation>Kepler's equation</a>.  I did it in javascript,
+    by searching the fixed point :
+    <pre>function solveKepler(e, M, N = 20) {
+  let E = M;
+  for(let i = 0; i< N; i++) E = M + e*Math.sin(E);
+  return E;
+}</pre>
+    I picked 20 as the default value for the number of iterations for no reason in particular.</p>
+
+    <p>I'm happy with this little project, but obviously a lot more must be done to make it useful or fun:
+    <ul>
+      <li>use realistic astronomical parameters, such as the size and mass of the asteroid, and the corresponding
+        orbital parameters</li>
+      <li>dynamically change the orbital parameters when the orbiting body is submitted to an intrinsic acceleration (engine firing).</li>
+      <li>import a model for a spacecraft</li>
+      <li>do things like manoeuver nodes in KSP</li>
+    </ul>
+    </p>
+
+    <p>I you feel like helping, feel free to contact me on github or Hackernews (I'm grondilu in both).</p>
   </body>
 </html>
 

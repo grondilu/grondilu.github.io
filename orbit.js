@@ -317,14 +317,13 @@ void main() {
 }
 
 async function main() {
-  let canvas = document.createElement("canvas"),
+  let canvas = document.getElementById("asteroid"),
     gl = canvas.getContext("webgl2"),
     conic = conicDrawer(gl, 0.2);
 
   gl.trackball = new Trackball(canvas),
   canvas.width = 800;
   canvas.height = 640;
-  document.body.appendChild(canvas);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clearColor(0, 0, 0, 1);
