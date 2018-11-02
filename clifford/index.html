@@ -2,6 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
+    <link rel="icon" href="data:;base64,=">
     <title>Clifford.js</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script src="lib/peg-0.10.0.min.js"></script>
@@ -28,14 +29,14 @@ if (typeof(BigInt) == 'undefined') {
     <p><em>Clifford.js</em> is a javascript library that performs computations on the
     <a href="https://en.wikipedia.org/wiki/Universal_geometric_algebra">Universal geometric algebra</a>
     with <a href="http://mathworld.wolfram.com/MultivariatePolynomial.html">multivariate polynomial</a> coefficients.  Thus, it allows computations on expressions such as :
-    $$ 1 + (1+x+x²)\mathbf{e}_1 + xyz\,\mathbf{e}_2\wedge\mathbf{e}_3 $$</p>
+    $$ 1 + (1+x+x^2)\mathbf{e}_1 + xyz\,\mathbf{e}_2\wedge\mathbf{e}_3 $$</p>
 
     <!-- The API is not decided yet
-    <p>The main user interface is a <tt>MultiVector</tt> class.  So for instance the above expression could have been entered with (input notation is described further) :</p>
-    <tt>new MultiVector("1 + (1+x+x**2)*$1 + x*y*z*$2*$3")</tt>
-    <p>The constructor takes an algebraic expression as a string argument.  An algebraic expression may contain
-    any of the usual agebraic operators (addition, subtraction, multiplication, division and exponentiation) acting
-    on three different kinds of entities described below.</p>
+      <p>The main user interface is a <tt>MultiVector</tt> class.  So for instance the above expression could have been entered with (input notation is described further) :</p>
+      <tt>new MultiVector("1 + (1+x+x**2)*$1 + x*y*z*$2*$3")</tt>
+      <p>The constructor takes an algebraic expression as a string argument.  An algebraic expression may contain
+      any of the usual agebraic operators (addition, subtraction, multiplication, division and exponentiation) acting
+      on three different kinds of entities described below.</p>
     -->
 
     <h2>Numbers</h2>
@@ -129,6 +130,11 @@ function update_output() {
         <th>.toTeX()</th>
       </tr>
     </table>
+
+    <p>
+    <div id=axiom_tests></div>
+    </p>
+
     <script>
 function main() {
   const tests = [
@@ -161,6 +167,7 @@ function main() {
     "no²",
     "ni²",
     "no*ni",
+    "no∧ni",
     "(1+$1)*$2",
     "($0+$1)*($0+$1)",
     "($0+$1)²",
@@ -170,7 +177,9 @@ function main() {
     "(a+b/2)**1",
     "(a+b/2)**2",
     "(a+b/2)*(a+b/2)",
-    "(a+b/2)**3" ],
+    "(a+b/2)**3",
+    "(a+b)*$0",
+    ],
     html_table = document.getElementById("tests_table"),
     outputs = [ x => "\\(" + multiVectorFromParseTree(parser.parse(x)).toTeX() + "\\)" ];
 
@@ -189,13 +198,46 @@ function main() {
     MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 }
 
+function test() {
+  let [a, b, c] = [1,2,3].map(MultiVector.random);
+
+  let div = document.getElementById("axiom_tests");
+
+  div.innerHTML = '$$\\begin{eqnarray}';
+
+  div.innerHTML += "a & = & " + a.toTeX() + "\\\\";
+  div.innerHTML += "b & = & " + b.toTeX() + "\\\\";
+  div.innerHTML += "c & = & " + c.toTeX();
+
+  div.innerHTML += '\\end{eqnarray}$$';
+  MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+
+  // associativity
+  // (a*b)*c = a*(b*c)
+
+  if (!a.multiply(b).multiply(c).equals(a.multiply(b.multiply(c))))
+    console.log("associativity failed for triplet", [a, b, c]);
+  // left distributivity
+  // a*(b+c) = a*b + a*c
+  if (!a.multiply(b.add(c)).equals(a.multiply(b).add(a.multiply(c))))
+    console.log("left distributivity failed for triplet", [a, b, c]);
+  // right distributivity
+  // (a+b)*c = a*c + b*c
+  if (!a.add(b).multiply(c).equals(a.multiply(c).add(b.multiply(c))))
+    console.log("right distributivity failed for triplet", [a, b, c]);
+  // contraction
+  // v**2 is real
+  let v = MultiVector.randomVector();
+  if (v.multiply(v).grade !== 0)
+    console.log("vector contraction failed for vector", v);
+}
     </script>
-  <h2>Dependencies</h2>
-  <ul>
-    <li><a href=http://pegjs.org>PEG.js</a>, for parsing an expression.</li>
-    <li><a href=http://www.mathjax.org>MathJax</a>, for rendering \(\TeX\)</li>
-    <li>The code makes extensive use of <a href=https://www.w3schools.com/js/js_es6.asp>ECMASCRIPT 6</a>'s features.</li>
-  </ul>
+    <h2>Dependencies</h2>
+    <ul>
+      <li><a href=http://pegjs.org>PEG.js</a>, for parsing an expression.</li>
+      <li><a href=http://www.mathjax.org>MathJax</a>, for rendering \(\TeX\)</li>
+      <li>The code makes extensive use of <a href=https://www.w3schools.com/js/js_es6.asp>ECMASCRIPT 6</a>'s features.</li>
+    </ul>
 
   </body>
 </html>

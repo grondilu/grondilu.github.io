@@ -46,8 +46,11 @@ cdot
 wedge
     = left:UnaryExpression '∧' right:wedge {
         return {
-            type: "∧",
+            type: "operator",
+            name: "outer product",
+            symbol: "∧",
             args: [ left, right ],
+            op: (a,b) => a.wedge(b)
         }
     } / UnaryExpression
 

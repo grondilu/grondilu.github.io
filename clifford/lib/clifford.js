@@ -21,6 +21,7 @@
  *
  */
 "use strict";
+const alphabet = ["x","y","z","t"];
 
 class Rat {
   constructor(num, den = 1) {
@@ -43,6 +44,10 @@ class Rat {
   get opposite() { return new Rat(-this.numerator, this.denominator); }
   static get zero() { return new Rat(0); }
   static get one() { return new Rat(1); }
+  static random() {
+    const N = 60;
+    return new Rat(Math.floor(N*(2*Math.random() - 1)), N);
+  }
 }
 
 function grade(b) { let n = 0; while (b > 0) { if (b&1n) n++; b >>= 1n; } return n; }
@@ -102,7 +107,8 @@ class BasisBlade {
     else return (
       this.weight.isOne() ? '' :
       this.weight.negate().isOne() ? '-' :
-    this.weight.toTeX()
+      this.weight.monomials.length > 1 ? "(" + this.weight.toTeX() + ")" :
+      this.weight.toTeX()
     ) + [...(function*(b) {
       let n = 0;
       if (b & origin) yield 'n_o';
@@ -142,13 +148,16 @@ class BasisBlade {
         new BasisBlade(b ^ origin, this.weight),
         new BasisBlade(b ^ infinity, this.weight.negate().divide(new Rat(2)))
       ];
-    } else if (this.bitEncoding ^ eminus) {
+    } else if (this.bitEncoding & eminus) {
       let b = this.bitEncoding ^ eminus;
       return [
         new BasisBlade(b ^ origin, this.weight),
         new BasisBlade(b ^ infinity, this.weight.divide(new Rat(2)))
       ];
-    } else throw new Error("unexpected case");
+    } else {
+      console.log(this);
+      throw new Error("unexpected case");
+    }
   }
   wedge(that) {
     if (that instanceof BasisBlade)
@@ -197,6 +206,12 @@ class PoweredVariable {
     this.varname = varname;
     this.power = power;
   }
+  static random() {
+    return new PoweredVariable(
+      alphabet[Math.floor(Math.random()*alphabet.length)],
+      Math.floor(3*Math.random()) + 1
+    );
+  }
   toString() { return this.varname + (this.power === 1 ? '' : '^'+this.power); }
   toTeX() { return this.toString(); }
   eval(dict) {
@@ -209,9 +224,28 @@ class Monomial {
   constructor(...poweredVars) {
     if (!poweredVars.every(x => x instanceof PoweredVariable))
       throw new Error("constructor accepts only powers of variables");
-    if (new Set(poweredVars.map(x => x.varname)).size !== poweredVars.length)
+    if (new Set(poweredVars.map(x => x.varname)).size !== poweredVars.length) {
+      console.log(poweredVars);
       throw new Error("duplicated variable");
+    }
     this.poweredVars = poweredVars;
+  }
+  static random() {
+    let dict = {}
+    return new Monomial(
+      ...(function*() {
+        for (let n = 0; n < 4; n++) {
+          if (Math.random() < 0.5) {
+            let variable = PoweredVariable.random(),
+              key = variable.varname;
+            if (!dict[key]) {
+              yield variable;
+              dict[key] = true;
+            }
+          }
+        }
+      })()
+    );
   }
   toString() {
     return this.poweredVars.
@@ -221,7 +255,7 @@ class Monomial {
   }
   toTeX() {
     return this.poweredVars.
-    sort((a, b) => a.varname > b.varname).
+      sort((a, b) => a.varname > b.varname).
       map(x => x.toTeX()).
       join('');
   }
@@ -258,6 +292,7 @@ class ScaledMonomial {
     this.scale = scale;
     this.monomial = monomial;
   }
+  static random() { return new ScaledMonomial(Monomial.random(), Rat.random()); }
   toString() {
     if (this.degree == 0) return this.scale.toString();
     else return (
@@ -289,8 +324,23 @@ class ScaledMonomial {
 class Polynomial {
   static get zero() { return new Polynomial(Rat.zero); }
   static get one() { return new Polynomial(Rat.one); }
+  static random() {
+    return new Polynomial(
+      ...(function*() {
+        for (let dict = {}; Math.random() < 0.5; ) {
+          let scaledMonomial = ScaledMonomial.random(),
+            key = scaledMonomial.monomial.toString();
+          if (!dict[key]) {
+            dict[key] = true;
+            yield scaledMonomial;
+          }
+        }
+      }())
+    );
+  }
   constructor(...args) {
-    if (args.length === 1) {
+    if (args.length === 0) return Polynomial.one;
+    else if (args.length === 1) {
       let arg = args[0];
       if (typeof(arg) == 'bigint') { return new Polynomial(new Rat(arg)); }
       else if (arg instanceof Rat) {
@@ -373,6 +423,7 @@ class Polynomial {
 
 class MultiVector {
   static get zero() { return new MultiVector(BasisBlade.zero); }
+  static get one() { return new MultiVector(BasisBlade.one); }
   isZero() { return this.blades.length == 0 || (this.grade == 0 && this.blades[0].isZero()); }
   equals(that) {
     if (that instanceof MultiVector) {
@@ -390,7 +441,7 @@ class MultiVector {
   }
   toTeX() { return this.isZero() ? '0' : this.blades.map(x => x.toTeX()).join("+"); }
   toString() { return this.blades.map(x => x.toString()).join('+'); }
-  get grade() { return Math.max(...this.blades.map(x => x.grade)); }
+  get grade() { return Math.max(0, ...this.blades.map(x => x.grade)); }
   diagonalize() {
     return this.blades.map(b => b.toDiagonalBasis()).
       reduce((a,b) => a.concat(b), []);
@@ -399,9 +450,7 @@ class MultiVector {
     return this.blades.map(b => b.toConformalBasis()).
       reduce((a,b) => a.concat(b), []);
   }
-  add(that) {
-    return new MultiVector(...BasisBlade.consolidate(...this.blades.concat(that.blades)));
-  }
+  add(that) { return new MultiVector(...BasisBlade.consolidate(...this.blades.concat(that.blades))); }
   multiply(that) {
     if (that instanceof MultiVector) {
       let these = this.diagonalize(), those = that.diagonalize(),
@@ -420,6 +469,19 @@ class MultiVector {
       return new MultiVector(...BasisBlade.consolidate(...blades));
     } else throw new Error("unsupported argument type");
   }
+  wedge(that) {
+    if (that instanceof MultiVector) {
+      return [
+        ...(
+          function* (these) {
+            for (let i of these) for (let j of that.blades) {
+              yield new MultiVector(...i.wedge(j));
+            }
+          }
+        )(this.blades)
+      ].reduce((a,b) => a.add(b), new MultiVector(BasisBlade.zero));
+    } else throw new Error("unsupported argument type");
+  }
   divide(that) {
     if (that instanceof MultiVector) {
       if (that.grade == 0) {
@@ -435,4 +497,24 @@ class MultiVector {
   }
   negate() { return new MultiVector(...this.blades.map(m => m.negate())); }
   subtract(that) { return this.add(that.negate()); }
+  static random() {
+    return new MultiVector(
+      ...(function* () {
+        for (let n = 0n; n < 32n; n++) {
+          if (Math.random() < 0.04) yield new BasisBlade(n, Polynomial.random());
+        }
+      }())
+    );
+  }
+  static randomVector() {
+    return new MultiVector(
+      ...(function* () {
+        for (let n = 0n; n < 32n; n++) {
+          if (Math.random() < 0.04) yield new BasisBlade(1n << n, Polynomial.random());
+        }
+      }())
+    );
+  }
 }
+
+
