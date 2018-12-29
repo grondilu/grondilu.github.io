@@ -151,51 +151,6 @@ function drawing3D(gl) {
 
 }
 
-function drawing2D(context) {
-
-  let canvas = context.canvas;
-  canvas.width = canvas.height = 500;
-  canvas.style = "border: solid 1px;";
-
-  const N = 50,
-    halfN = N/2, thirdN  = N/3,
-    θ = Math.PI/3,
-    Ncosθ = N*Math.cos(θ),
-    Nsinθ = N*Math.sin(θ);
-
-  function drawCell(c) {
-
-    c.save();
-    c.beginPath();
-
-    c.moveTo(thirdN - Ncosθ/2, halfN - Nsinθ/2);
-    c.lineTo(thirdN, halfN);
-    c.lineTo(thirdN+N, halfN);
-    c.lineTo(thirdN+N + Ncosθ/2, halfN - Nsinθ/2);
-    c.moveTo(thirdN - Ncosθ/2, halfN + Nsinθ/2);
-    c.lineTo(thirdN, halfN);
-    c.moveTo(thirdN+N + Ncosθ/2, halfN + Nsinθ/2);
-    c.lineTo(thirdN+N, halfN);
-
-    c.stroke();
-    c.restore();
-
-  }
-
-  let e1 = [N + Ncosθ,  -Nsinθ],
-      e2 = [        0, 2*Nsinθ];
-  const n = 3;
-  context.translate(50, 50);
-  for (let i = 0; i<n; i++)
-  for (let j = 0; j<n; j++) {
-    context.save();
-    context.translate(i*e1[0] + j*e2[0], i*e1[1] + j*e2[1]);
-    drawCell(context);
-    context.restore();
-  }
- 
-}
-
 function get_projection(angle, a, zMin, zMax) {
   let ang = Math.tan((angle*.5)*Math.PI/180);//angle*.5
   return mat4.fromValues(
