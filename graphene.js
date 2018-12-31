@@ -55,8 +55,8 @@ function drawing3D(gl) {
       int n = gl_VertexID / 10;
       int i = n % W;
       int j = n / W;
-      float i_float = float(i);
-      float j_float = float(j);
+      float i_float = float(i - W / 2 );
+      float j_float = float(j - H / 2 );
 
       vec2 xy;
 
