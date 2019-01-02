@@ -51,8 +51,10 @@ function drawing3D(gl) {
     const vec2 a = vec2(1.0 + c, -s);
     const vec2 b = vec2(0.0, 2.0*s);
 
+    out float intensity;
+
     void main() {
-      int n = gl_VertexID / 10;
+      int n = gl_VertexID / 12;
       int i = n % W;
       int j = n / W;
       float i_float = float(i - W / 2 );
@@ -60,28 +62,33 @@ function drawing3D(gl) {
 
       vec2 xy;
 
+      intensity = 1.0;
+
       //
-      //   0           7
-      //    \         /
-      //     124 - 568
-      //    /         \
-      //   3           9
+      //   0              9
+      //    \            /
+      //     124 - 56 - 7810
+      //    /            \
+      //   3              11
       //
-      switch(gl_VertexID % 10) {
-        case 0: xy = vec2(third - c/2.0,     .5 + s/2.0); break;
+      switch(gl_VertexID % 12) {
+        case 0: xy = vec2(third - c/2.0,     .5 + s/2.0); intensity = 0.0; break;
         case 1: xy = vec2(third        ,     .5        ); break;
 
         case 2: xy = vec2(third, .5)                    ; break;
-        case 3: xy = vec2(third - c/2.0, .5 - s/2.0)    ; break;
+        case 3: xy = vec2(third - c/2.0, .5 - s/2.0)    ; intensity = 0.0; break;
 
         case 4: xy = vec2(third, .5)                    ; break;
-        case 5: xy = vec2(third+1.0, .5)                ; break;
+        case 5: xy = vec2(third+0.5, .5)                ; intensity = 0.0; break;
 
-        case 6: xy = vec2(third+1.0, .5)                ; break;
-        case 7: xy = vec2(third+1.0 + c/2.0, .5 + s/2.0); break;
+        case 6: xy = vec2(third+0.5, .5)                ; intensity = 0.0; break;
+        case 7: xy = vec2(third+1.0, .5); break;
 
         case 8: xy = vec2(third+1.0, .5)                ; break;
-        case 9: xy = vec2(third+1.0 + c/2.0, .5 - s/2.0); break;
+        case 9: xy = vec2(third+1.0 + c/2.0, .5 + s/2.0); intensity = 0.0; break;
+
+        case 10: xy = vec2(third+1.0, .5)                ; break;
+        case 11: xy = vec2(third+1.0 + c/2.0, .5 - s/2.0); intensity = 0.0; break;
         default:
           ;
       }
@@ -96,10 +103,11 @@ function drawing3D(gl) {
 
     precision mediump float;
 
+    in float intensity;
     out vec4 color;
 
     void main() {
-      color = vec4(1.0, 1.0, 1.0, 1.0);
+      color = vec4(intensity, intensity, intensity, 1.0);
     }`
   };
 
@@ -146,7 +154,7 @@ function drawing3D(gl) {
     gl.uniformMatrix4fv(uniformLocation["VMatrix"], false, view);
     gl.uniformMatrix4fv(uniformLocation["MMatrix"], false, model);
 
-    gl.drawArrays(gl.LINES, 0, 10*N);
+    gl.drawArrays(gl.LINES, 0, 12*N);
   }
 
 }
