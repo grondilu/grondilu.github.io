@@ -12,9 +12,9 @@ function createShader(gl, type, source) {
 }
 function main() {
 
-  let canvas = document.getElementById("3dcanvas"),
+  let canvas = document.querySelector("canvas"),
     gl = canvas.getContext("webgl2"),
-    drawer = drawing3D(gl),
+    $drawer = drawer(gl),
     projection = get_projection(40, canvas.width/canvas.height, .001, 10000),
     model = mat4.create(),
     trackball = new Trackball(canvas)
@@ -22,12 +22,12 @@ function main() {
 
   (function animate() {
     let [W, H] = ['W', 'H'].map(l => parseInt(document.getElementById(l).value));
-    drawer(W, H, projection, trackball.matrix, model);
-    window.requestAnimationFrame(animate);
+    $drawer(W, H, projection, trackball.matrix, model);
+    requestAnimationFrame(animate);
   })();
 }
 
-function drawing3D(gl) {
+function drawer(gl) {
 
   const glsl = {
     vertex: `#version 300 es
@@ -93,7 +93,8 @@ function drawing3D(gl) {
           ;
       }
 
-      gl_Position = PMatrix * VMatrix * MMatrix * vec4(
+      gl_Position = PMatrix * VMatrix * MMatrix *
+      vec4(
         i_float*a + j_float*b +
           xy
         , 0.0, 1.0 );
@@ -115,9 +116,6 @@ function drawing3D(gl) {
     fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, glsl.fragment),
     vertexShader = createShader(gl, gl.VERTEX_SHADER, glsl.vertex),
     program = gl.createProgram();
-
-  canvas.width = canvas.height = 500;
-  canvas.style = "border: solid 1px;";
 
   for (let shader of [ vertexShader, fragmentShader ])
     gl.attachShader(program, shader);
