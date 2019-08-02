@@ -10,9 +10,8 @@
     </head>
     <body onload="start();">
         <audio autoplay>
-            <source src="https://raw.githubusercontent.com/OoliteProject/oolite-binary-resources/master/Music/OoliteTheme.ogg" type=audio/ogg >
+            <source src="https://raw.githubusercontent.com/OoliteProject/oolite-binary-resources/master/Music/OoliteTheme.ogg" type="audio/ogg">
                 Could not play audio
-            </source>
         </audio>
         <div id=error></div>
         <h1>Oolite</h1>
@@ -34,8 +33,8 @@
         <br><a href=http://oolite.org>Credits</a>
 
         <div id=controls class=overlay>
+            <a href="javascript:void(0)" class=closebtn onclick="closeNav();">&times;</a>
             <table class=overlay-content>
-                <a href="javascript:void(0)" class=closebtn onclick="closeNav();">&times;</a>
                 <tr> <td>roll left <td><td>&larr;</td> <td>roll right<td><td>&rarr;</td> </tr>
                 <tr> <td>pitch down<td><td>&darr;</td> <td>pitch up  <td><td>&uarr;</td> </tr>
                 <tr> <td>accelerate<td><td>w</td> <td>decelerate<td><td>s</td> </tr>
