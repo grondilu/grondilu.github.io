@@ -1,268 +1,268 @@
 <html>
-    <head>
-		<meta charset="utf-8">
-        <title>Geometric Algebra for Javascript</title>
-        <link rel="stylesheet" href="css/reveal.css">
-        <link rel="stylesheet" href="css/theme/black.css">
-        <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
-    </head>
-    <body>
-        <div class="reveal">
-            <div class="slides">
-                <section><h1>Clifford.JS</h1>
-                    <h3>A Javascript library for geometric algebra</h3>
-                    <h4>Work In Progress</h4>
-                    <p>
-                    <small><a href="https://github.com/grondilu/clifford.js">github</a></small>
-                    </p>
-                </section>
+  <head>
+    <meta charset="utf-8">
+    <title>Geometric Algebra for Javascript</title>
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css">
+    <script type="text/javascript" src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section><h1>Clifford.JS</h1>
+          <h3>A Javascript library for geometric algebra</h3>
+          <h4>Work In Progress</h4>
+          <p>
+            <small><a href="https://github.com/grondilu/clifford.js">github</a></small>
+          </p>
+        </section>
 
-                <section>
-                    <h2>The Problem</h2>
-                    <p>
-                    Geometric Algebra (GA) is a fascinating concept, but :
-                    <ul>
-                        <li>It's tough to implement efficiently</li>
-                        <li>The existing JS library (
-                            <a href="http://versor.mat.ucsb.edu/">versor</a>
-                            ) is cumbersome</li>
-                    </ul>
-                    </p>
-                </section>
+        <section>
+          <h2>The Problem</h2>
+          <p>
+            Geometric Algebra (GA) is a fascinating concept, but :
+            <ul>
+              <li>It's tough to implement efficiently</li>
+              <li>The existing JS library (
+                <a href="http://versor.mat.ucsb.edu/">versor</a>
+                ) is cumbersome</li>
+            </ul>
+          </p>
+        </section>
 
-                <section>
-                    <h2>The Goal</h2>
-                    <p>
-                    <ul>
-                        <li>Hide the complicated typing system from the main API
-                            (unlike with versor)</li>
-                        <li>Parse 
-                            <b><code>"x + pi/2*e0 - e1**2"</code></b>
-                            to mean \( x + \frac{\pi}{2}\mathbf{e_0} - \mathbf{e_1}^2 \)
-                        </li>
-                        <li>Be ultra-generic : infinite dimensions, conformal...</li>
-                        <li>Use a sophisticated cache system for optimization</li>
-                        <li>Do a bit of formal calculus for real parameters</li>
-                    </ul>
-                    </p>
-                </section>
+        <section>
+          <h2>The Goal</h2>
+          <p>
+            <ul>
+              <li>Hide the complicated typing system from the main API
+                (unlike with versor)</li>
+              <li>Parse 
+                <b><code>"x + pi/2*e0 - e1**2"</code></b>
+                to mean \( x + \frac{\pi}{2}\mathbf{e_0} - \mathbf{e_1}^2 \)
+              </li>
+              <li>Be ultra-generic : infinite dimensions, conformal...</li>
+              <li>Use a sophisticated cache system for optimization</li>
+              <li>Do a bit of formal calculus for real parameters</li>
+            </ul>
+          </p>
+        </section>
 
-                <section>
-                    <section>
-                        <h2>Quick Primer on Geometric Algebra</h2>
+        <section>
+          <section>
+            <h2>Quick Primer on Geometric Algebra</h2>
 
-						<a href="#" class="navigate-down">
-							<img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-						</a>
-                    </section>
-                    <section>
-                        <p>A geometric algebra is an associative algebra with a twist :</p>
-                        <blockquote>
-                            There exists a vectorial subspace for which all elements
-                            have a real square</blockquote>
-                    </section>
-                    <section>
-                        <p>In other words :
-                        $$\forall \mathbf{v}\in\mathcal{V},\;
-                        \mathbf{v}^2\in\mathbb{R}$$
-                        </p>
-                    </section>
+            <a href="#" class="navigate-down">
+              <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
+            </a>
+          </section>
+          <section>
+            <p>A geometric algebra is an associative algebra with a twist :</p>
+            <blockquote>
+              There exists a vectorial subspace for which all elements
+              have a real square</blockquote>
+          </section>
+          <section>
+            <p>In other words :
+              $$\forall \mathbf{v}\in\mathcal{V},\;
+              \mathbf{v}^2\in\mathbb{R}$$
+            </p>
+          </section>
 
-                    <!-- looks wrong:  1 + v is not a vector!
-                    <section>
-                        <p>That means that all vectorial spaces are geometric algebras,
-                        albeit trivial ones : their "vectorial subspace" is the real
-                        space.</p>
-                        <p>Non-trivial geometric algebras are those for which the dimension
-                        of the vectorial subspace is more than one, and different 
-                        from the dimension of the algebra.</p>
-                    </section>
-                    -->
+          <!-- looks wrong:  1 + v is not a vector!
+            <section>
+            <p>That means that all vectorial spaces are geometric algebras,
+            albeit trivial ones : their "vectorial subspace" is the real
+            space.</p>
+            <p>Non-trivial geometric algebras are those for which the dimension
+            of the vectorial subspace is more than one, and different 
+            from the dimension of the algebra.</p>
+            </section>
+          -->
 
-                    <section>
-                        <p>Although all associative algebras have a natural vectorial
-                        space structure, we reserve the word <em>vector</em>
-                        to the elements of the <em>vectorial subspace</em>.
-                        </p>
-                        <p>We usually denote vectors with a lowercase,
-                        bold roman letter.</p>
-                        <p>A generic element of the algebra is called a
-                        <em>multivector</em>.</p>
-                    </section>
-                    <section>
-                        <p>Multiplication is called the <em>geometric product</em>.</p>
+          <section>
+            <p>Although all associative algebras have a natural vectorial
+              space structure, we reserve the word <em>vector</em>
+              to the elements of the <em>vectorial subspace</em>.
+            </p>
+            <p>We usually denote vectors with a lowercase,
+              bold roman letter.</p>
+            <p>A generic element of the algebra is called a
+              <em>multivector</em>.</p>
+          </section>
+          <section>
+            <p>Multiplication is called the <em>geometric product</em>.</p>
 
-                        <p>It is noted just like the usual multiplication,
-                        with the multiplication sign `*`.<p>
-                    </section>
-                    <section>
-                        <p>For vectors (and for vectors only !),
-                        the geometric product is decomposed into
-                        a symetric and an anti-symetric part :</p>
+            <p>It is noted just like the usual multiplication,
+              with the multiplication sign `*`.<p>
+          </section>
+          <section>
+            <p>For vectors (and for vectors only !),
+              the geometric product is decomposed into
+              a symetric and an anti-symetric part :</p>
 
-                        $$\mathbf{uv} =
-                        \mathbf{u}\cdot\mathbf{v}
-                        +\mathbf{u}\wedge\mathbf{v}$$
+            $$\mathbf{uv} =
+            \mathbf{u}\cdot\mathbf{v}
+            +\mathbf{u}\wedge\mathbf{v}$$
 
-                        <p>They are called the <em>inner product</em>
-                        and the <em>outer product</em>.</p>
-                    </section>
-                    <section>
-                        <ul>
-                            <li>The inner product defines a <em>scalar product</em>
-                                in the usual sense of the expression.</li>
-                            <li>Only the outer product is easily generalized
-                                to any element of the algebra. It is fully
-                                associative and anti-symetric.</li>
-                            <li>Along with the geometric product, those two operations are the main tools of GA</li>
-                    </section>
+            <p>They are called the <em>inner product</em>
+              and the <em>outer product</em>.</p>
+          </section>
+          <section>
+            <ul>
+              <li>The inner product defines a <em>scalar product</em>
+                in the usual sense of the expression.</li>
+              <li>Only the outer product is easily generalized
+                to any element of the algebra. It is fully
+                associative and anti-symetric.</li>
+              <li>Along with the geometric product, those two operations are the main tools of GA</li>
+          </section>
 
-                    <section>
-                        <p>One can build a very generic geometric algebra
-                        by taking a vectorial space of infinite (though countable)
-                        dimension, with both positive-squared vectors
-                        <nobr>(\(\mathbf{v}^2 \gt 0\))</nobr>
-                        and negative-squared ones
-                        <nobr>(\(\mathbf{v}^2 \lt 0\))</nobr>
-                        </p>
-                        <p>Such algebra is called
-                        the <b>Universal Algebra</b>
-                        </p>
-                        <p>This is what we want to implement</p>
-                    </section>
-                    <section>
-                        <p>The vector space of the universal algebra
-                        has a basis which is made of euclidean vectors
-                        $$(\mathbf{e_0},\mathbf{e_1},\ldots)$$
-                        and anti-euclidean ones
-                        $$(\mathbf{\bar{e}_0},\mathbf{\bar{e}_1},\ldots)$$
-                        such that
-                        $$\mathbf{e_i}\cdot\mathbf{e_j} = \delta_{ij}$$
-                        $$\mathbf{\bar{e}_i}\cdot\mathbf{\bar{e}_j} = -\delta_{ij}$$
-                        $$\mathbf{\bar{e}_i}\cdot\mathbf{e_j} =
-                        \mathbf{e_i}\cdot\mathbf{\bar{e}_j} = 0
-                        $$
-                        </p>
-                    </section>
-                    <section>
-                        <p>The linear combination of an euclidean vector
-                        with an anti-euclidean one can have a null square.
-                        Such vector is called a <em>null vector</em>.</p>
-                        <p>Two particular null vectors are important for the
-                        so-called <em>conformal model</em>, which will be
-                        discussed later.  For now, you can just remember the
-                        names and notations for those two : they are called
-                        <em>origin</em> and <em>infinity</em> and noted \(o\)
-                        and \(\infty\).  In the JS code we'll note them `no`
-                        and `ni`.
-                        </p>
-                    </section>
+          <section>
+            <p>One can build a very generic geometric algebra
+              by taking a vectorial space of infinite (though countable)
+              dimension, with both positive-squared vectors
+              <nobr>(\(\mathbf{v}^2 \gt 0\))</nobr>
+              and negative-squared ones
+              <nobr>(\(\mathbf{v}^2 \lt 0\))</nobr>
+            </p>
+            <p>Such algebra is called
+              the <b>Universal Algebra</b>
+            </p>
+            <p>This is what we want to implement</p>
+          </section>
+          <section>
+            <p>The vector space of the universal algebra
+              has a basis which is made of euclidean vectors
+              $$(\mathbf{e_0},\mathbf{e_1},\ldots)$$
+              and anti-euclidean ones
+              $$(\mathbf{\bar{e}_0},\mathbf{\bar{e}_1},\ldots)$$
+              such that
+              $$\mathbf{e_i}\cdot\mathbf{e_j} = \delta_{ij}$$
+              $$\mathbf{\bar{e}_i}\cdot\mathbf{\bar{e}_j} = -\delta_{ij}$$
+              $$\mathbf{\bar{e}_i}\cdot\mathbf{e_j} =
+              \mathbf{e_i}\cdot\mathbf{\bar{e}_j} = 0
+              $$
+            </p>
+          </section>
+          <section>
+            <p>The linear combination of an euclidean vector
+              with an anti-euclidean one can have a null square.
+              Such vector is called a <em>null vector</em>.</p>
+            <p>Two particular null vectors are important for the
+              so-called <em>conformal model</em>, which will be
+              discussed later.  For now, you can just remember the
+              names and notations for those two : they are called
+              <em>origin</em> and <em>infinity</em> and noted \(o\)
+              and \(\infty\).  In the JS code we'll note them `no`
+              and `ni`.
+            </p>
+          </section>
 
-                    <section>
-                        <p>The geometric product of several distinct base
-                        vectors is equal to its outer product :
-                        $$
-                        \mathbf{b_{i_1}}\mathbf{b_{i_2}}\ldots\mathbf{b_{i_n}}
-                        =
-                        \mathbf{b_{i_1}}\wedge\mathbf{b_{i_2}}\wedge\ldots\wedge\mathbf{b_{i_n}}
-                        $$
-                        where \(\mathbf{b}\) is a placeholder for either
-                        \(\mathbf{e}\), \(\mathbf{\bar{e}}\), \(o\)
-                        or \(\infty\).</p>
+          <section>
+            <p>The geometric product of several distinct base
+              vectors is equal to its outer product :
+              $$
+              \mathbf{b_{i_1}}\mathbf{b_{i_2}}\ldots\mathbf{b_{i_n}}
+              =
+              \mathbf{b_{i_1}}\wedge\mathbf{b_{i_2}}\wedge\ldots\wedge\mathbf{b_{i_n}}
+              $$
+              where \(\mathbf{b}\) is a placeholder for either
+              \(\mathbf{e}\), \(\mathbf{\bar{e}}\), \(o\)
+              or \(\infty\).</p>
 
-                        <p>Such product forms an <em>irreducible</em>
-                        multivector.  It is called a <em>basis blade</em>.</p>
+            <p>Such product forms an <em>irreducible</em>
+              multivector.  It is called a <em>basis blade</em>.</p>
 
-                        <p>All basis blades form a base of the algebra in the
-                        vectorial sense.  Our goal is to be able to write any
-                        multivector in that base.</p>
-                    </section>
+            <p>All basis blades form a base of the algebra in the
+              vectorial sense.  Our goal is to be able to write any
+              multivector in that base.</p>
+          </section>
 
-                    <section>
-                        <p>This was the bare minimum you need
-                        to know in order to understand the rest
-                        of this slideshow.</p>
+          <section>
+            <p>This was the bare minimum you need
+              to know in order to understand the rest
+              of this slideshow.</p>
 
-                        <p>A good entry point to learn more about geometric
-                        algebra is the <a href=https://en.wikipedia.org/wiki/Geometric_algebra>Wikipedia article</a>.
-                        
-                        <p>Notable authors on the subject are for instance
-                        David Hestenes and Chris Doran.  Pablo Colapinto is
-                        also notable for having written <em>Versor</em>, a
-                        highly efficient library in C++, that was then
-                        translated to javascript.</p>
-                        
-                    </section>
-                </section>
+            <p>A good entry point to learn more about geometric
+              algebra is the <a href=https://en.wikipedia.org/wiki/Geometric_algebra>Wikipedia article</a>.
 
-                <section>
-                    <h2>Strategy</h2>
-                    <ul>
-                        <li>Write an Object-Oriented Model reflecting
-                            most characteristics of the Universal Algebra</li>
-                        <li>Write a grammar to parse expressions such as :
-                            <pre>M = pi/2 * e0∧e1 - a·b + 2.1*no∧ni∧ē3</pre>
-                            This will produce an AST.
-                        </li>
-                        <li>Translate this AST into a structure in the
-                            object model.</li>
-                        <li>Process this object structure to perform symbolic
-                            calculus</li>
-                    </ul>
-                </section>
+              <p>Notable authors on the subject are for instance
+                David Hestenes and Chris Doran.  Pablo Colapinto is
+                also notable for having written <em>Versor</em>, a
+                highly efficient library in C++, that was then
+                translated to javascript.</p>
 
-                <section>
-                    <section>
-                        <h2>The Object Model</h2>
-                        <a href="#" class="navigate-down">
-                            <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-                        </a>
-                    </section>
-                    <section>
-                        <p>This subsection is yet to be written</p>
-                        <p>For now, you can look at <a href=https://github.com/grondilu/clifford.js/blob/master/src/algebra-model.js>the code</a></p>
-                    </section>
-                </section>
+          </section>
+        </section>
 
-                <section>
-                    <h2>The Grammar</h2>
-                    <p>That part is actually easy,
-                    thanks to the excellent <a href=http://pegjs.org>PEG.js</a>
-                    library.</p>
-                    <p>To write <a href=http://github.com/grondilu/clifford.js/src/algebra.pegjs>the grammar</a>,
-                    I took inspiration from the <a href=https://github.com/pegjs/pegjs/blob/master/examples/javascript.pegjs>javascript example</a>.
-                    </p>
-                </section>
+        <section>
+          <h2>Strategy</h2>
+          <ul>
+            <li>Write an Object-Oriented Model reflecting
+              most characteristics of the Universal Algebra</li>
+            <li>Write a grammar to parse expressions such as :
+              <pre>M = pi/2 * e0∧e1 - a·b + 2.1*no∧ni∧ē3</pre>
+              This will produce an AST.
+            </li>
+            <li>Translate this AST into a structure in the
+              object model.</li>
+            <li>Process this object structure to perform symbolic
+              calculus</li>
+          </ul>
+        </section>
 
-                <section>
-                    <h2>What works now</h2>
-                    <ul>
-                        <li>the parser works fine (see test.js file)</li>
-                        <li>the object model is rich enough to perform
-                            basic arithmetics and simplifications
-                            on basis blades, which is encouraging
-                            for the feasability of the whole concept
-                        </li>
-                    </ul>
-                </section>
+        <section>
+          <section>
+            <h2>The Object Model</h2>
+            <a href="#" class="navigate-down">
+              <img width="178" height="238" data-src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
+            </a>
+          </section>
+          <section>
+            <p>This subsection is yet to be written</p>
+            <p>For now, you can look at <a href=https://github.com/grondilu/clifford.js/blob/master/src/algebra-model.js>the code</a></p>
+          </section>
+        </section>
 
-                <section>
-                    <h2>TODO</h2>
-                    <ul>
-                        <li>Improve the object model : complete classes for involution,
-                            scaled multivectors, better `simplify()` methods...
-                        </li>
-                        <li>Design an efficient caching system, for we don't
-                            want to compute the same kind of operations
-                            twice!</li>
-                    </ul>
-                </section>
+        <section>
+          <h2>The Grammar</h2>
+          <p>That part is actually easy,
+            thanks to the excellent <a href=http://pegjs.org>PEG.js</a>
+            library.</p>
+          <p>To write <a href=http://github.com/grondilu/clifford.js/src/algebra.pegjs>the grammar</a>,
+            I took inspiration from the <a href=https://github.com/pegjs/pegjs/blob/master/examples/javascript.pegjs>javascript example</a>.
+          </p>
+        </section>
 
-            </div>
-        </div>
-        <script src="js/reveal.js"></script>
-        <script>
-Reveal.initialize();
-        </script>
-    </body>
+        <section>
+          <h2>What works now</h2>
+          <ul>
+            <li>the parser works fine (see test.js file)</li>
+            <li>the object model is rich enough to perform
+              basic arithmetics and simplifications
+              on basis blades, which is encouraging
+              for the feasability of the whole concept
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>TODO</h2>
+          <ul>
+            <li>Improve the object model : complete classes for involution,
+              scaled multivectors, better `simplify()` methods...
+            </li>
+            <li>Design an efficient caching system, for we don't
+              want to compute the same kind of operations
+              twice!</li>
+          </ul>
+        </section>
+
+      </div>
+    </div>
+    <script src="js/reveal.js"></script>
+    <script>
+      Reveal.initialize();
+    </script>
+  </body>
 </html>
