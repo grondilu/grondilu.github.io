@@ -112,7 +112,7 @@ DecimalDigit = [0-9]
 
 NonZeroDigit = [1-9]
 
-Variable = [a-z] { return { type: "variable", args: [ text() ] } }
+Variable = [a-zẋẏż] { return { type: "variable", args: [ text() ] } }
 
 BasisVector
   = EuclideanBasisVector 
@@ -126,6 +126,6 @@ EuclideanBasisVector = "$" index:DecimalIntegerLiteral {
     return { type: "euclidean basis vector", args: [ index ] }
 }
 
-AntiEuclideanBasisVector = "_" index:DecimalIntegerLiteral {
+AntiEuclideanBasisVector = "%" index:DecimalIntegerLiteral {
     return { type: "anti-euclidean basis vector", args: [ index ] }
 }

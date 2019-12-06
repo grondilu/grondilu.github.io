@@ -21,7 +21,22 @@
  *
  */
 "use strict";
-const alphabet = ["x","y","z","t"];
+const alphabet = ['x','y','z','t','ẋ','ẏ','ż'];
+
+function grade(b) { let n = 0; while (b > 0) { if (b&1n) n++; b >>= 1n; } return n; }
+function sign(a, b) {
+  let n = a >> 1n, sum = 0; while (n > 0) { sum += grade(n & b); n >>= 1n; }
+  return sum & 1 ? -1 : 1;
+}
+
+// Some constants related to the Minkowski plane
+const eplane   = 0b11n;
+const eplus    = 0b01n;
+const eminus   = 0b10n;
+
+const oriinf   = 0b11n;
+const origin   = 0b01n;
+const infinity = 0b10n;
 
 class Rat {
   constructor(num, den = 1) {
@@ -49,22 +64,6 @@ class Rat {
     return new Rat(Math.floor(N*(2*Math.random() - 1)), N);
   }
 }
-
-function grade(b) { let n = 0; while (b > 0) { if (b&1n) n++; b >>= 1n; } return n; }
-function sign(a, b) {
-  let n = a >> 1n, sum = 0; while (n > 0) { sum += grade(n & b); n >>= 1n; }
-  return sum & 1 ? -1 : 1;
-}
-
-// Some constants related to the Minkowski plane
-const eplane   = 0b11n;
-const eplus    = 0b01n;
-const eminus   = 0b10n;
-
-const oriinf   = 0b11n;
-const origin   = 0b01n;
-const infinity = 0b10n;
-
 class BasisBlade {
   static get zero() { return new BasisBlade(0n, Polynomial.zero); }
   static get one() { return new BasisBlade(0n, Polynomial.one); }
@@ -89,7 +88,7 @@ class BasisBlade {
     else return (
       this.weight.isOne() ? '' :
       this.weight.negate().isOne() ? '-' :
-    this.weight.toString() + '*'
+      this.weight.toString() + '*'
     ) + [...(function*(b) {
       let n = 0;
       if (b & origin) yield 'no';
@@ -188,7 +187,7 @@ class BasisBlade {
     let dict = {}
     for (let blade of blades) {
       let key = blade.bitEncoding.toString();
-      if (dict[key] == undefined)
+      if (dict[key] === undefined)
         dict[key] = new BasisBlade(blade.bitEncoding, blade.weight);
       else
         dict[key].weight = dict[key].weight.add(blade.weight);
@@ -196,11 +195,10 @@ class BasisBlade {
     return Object.values(dict).filter(x => !x.weight.isZero());
   }
 }
-
 class PoweredVariable {
   constructor(varname, power = 1) {
-    if (!/^\w$/.test(varname))
-      throw new Error("incorrect variable name " + variable);
+    if (!varname.match(/[a-zẋẏż]/))
+      throw new Error("incorrect variable name " + varname);
     if (power < 1 || Math.floor(power) !== power)
       throw new Error("incorrect exponent " + power);
     this.varname = varname;
@@ -247,18 +245,9 @@ class Monomial {
       })()
     );
   }
-  toString() {
-    return this.poweredVars.
-      sort((a, b) => a.varname > b.varname).
-      map(x => x.toString()).
-      join('*');
-  }
-  toTeX() {
-    return this.poweredVars.
-      sort((a, b) => a.varname > b.varname).
-      map(x => x.toTeX()).
-      join('');
-  }
+  get key() { return this.poweredVars.map(x => x.varname).sort().join(); }
+  toString() { return this.poweredVars.map(x => x.toString()).join('*'); }
+  toTeX() { return this.poweredVars.map(x => x.toTeX()).join(''); }
   eval(dict) {
     return this.poweredVars.
       map(x => x.eval(dict)).
@@ -361,18 +350,14 @@ class Polynomial {
       this.monomials = args;
     } else throw new Error("constructor only accepts second class monomial arguments");
   }
-  eval(dict = {}) {
-    return this.monomials.map(x => x.eval(dict)).reduce(
-      (a,b) => a+b, 0
-    );
-  }
+  eval(dict = {}) { return this.monomials.map(x => x.eval(dict)).reduce((a,b) => a+b, 0); }
   subtract(that) { return this.add(that.negate); }
   add(that) {
     let scales = {}
     for (let scaledMonomial of this.monomials.concat(that.monomials)) {
       let monomial = scaledMonomial.monomial,
         scale = scaledMonomial.scale,
-        key = monomial.toString();
+        key = monomial.key;
       if (scales[key] === undefined) {
         scales[key] = { monomial, scale };
       } else {
@@ -420,7 +405,6 @@ class Polynomial {
   isZero() { return this.degree == 0 && this.monomials[0].isZero(); }
   isOne () { return this.degree == 0 && this.monomials[0].isOne(); }
 }
-
 class MultiVector {
   static get zero() { return new MultiVector(BasisBlade.zero); }
   static get one() { return new MultiVector(BasisBlade.one); }
