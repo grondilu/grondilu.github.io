@@ -9,27 +9,25 @@
     <script src="lib/clifford.js"></script>
   </head>
   <body>
-    <script>
-if (typeof(BigInt) == 'undefined') {
-  let paragraph = document.createElement("p");
-  paragraph.style = "color:red;";
-  paragraph.innerHTML = '<p style="color:red;">This page requires support for <a href="https://developers.google.com/web/updates/2018/05/bigint">javascript\'s native bigint</a>.  Try using <a href=http://www.google.com/chrome>Google chrome</a>.</p>';
-  document.body.appendChild(paragraph);
-}
-    </script>
     <h1>Disclaimer</h1>
-    <p>This is a work in progress.  So far, only the geometric product seems to work and it has not been tested much.  There is no inner nor outer product yet,
-    but once the geometric product works reliably, the inner and outer products implementation should
-    be straightforward.</p>
+    <p>This is a work in progress.  So far, only the geometric product seems to
+      work and it has not been tested much.  There is no inner nor outer
+      product yet, but once the geometric product works reliably, the inner and
+      outer products implementation should be straightforward.</p>
 
-    <p>Also, this will probably only work on Google chrome, as the code relies on the recent inclusion
-    on big natural integers in javascript.</p>
+    <p>Also, this will probably only work on Google chrome, as the code relies
+      on the recent inclusion on big natural integers in javascript.</p>
 
     <h1>Introduction</h1>
     <p><em>Clifford.js</em> is a javascript library that performs computations on the
-    <a href="https://en.wikipedia.org/wiki/Universal_geometric_algebra">Universal geometric algebra</a>
-    with <a href="http://mathworld.wolfram.com/MultivariatePolynomial.html">multivariate polynomial</a> coefficients.  Thus, it allows computations on expressions such as :
-    $$ 1 + (1+x+x^2)\mathbf{e}_1 + xyz\,\mathbf{e}_2\wedge\mathbf{e}_3 $$</p>
+      <a href="https://en.wikipedia.org/wiki/Universal_geometric_algebra">Universal geometric algebra</a>
+      with <a href="http://mathworld.wolfram.com/MultivariatePolynomial.html">multivariate polynomial</a> coefficients.
+      Thus, it allows computations on expressions such as :
+      $$ 1 + (1+x+x^2)\mathbf{e}_1 + xyz\,\mathbf{e}_2\wedge\mathbf{e}_3 $$
+      That particular example can not be simplified, though.
+      An other example would be an expression such as \(\mathbf{e}_1\wedge\mathbf{e}_2\wedge\mathbf{e}_1\),
+      which should be simplified as 0.
+    </p>
 
     <!-- The API is not decided yet
       <p>The main user interface is a <tt>MultiVector</tt> class.  So for instance the above expression could have been entered with (input notation is described further) :</p>
@@ -41,25 +39,25 @@ if (typeof(BigInt) == 'undefined') {
 
     <h2>Numbers</h2>
     <p>Literal numbers are integers of arbitrary size.  Dividing two of them may return a rational number.
-    There is no support for decimal or floating-point numbers.  Neither is there any support for scientific notation such as <tt>1e6</tt>.
+      There is no support for decimal or floating-point numbers.  Neither is there any support for scientific notation such as <tt>1e6</tt>.
     </p>
     <p>Only rational numbers can be used as a divisor.
     </p>
 
     <h2>Variables</h2>
     <p>Right now, only twenty-six variables are possible, each named after a letter of the alphabet.
-    Variables are assumed to represent an undetermined <em>real</em> scalar value.  Algebraic operations
-    on variables spans the algebra of multivariate polynomials.
+      Variables are assumed to represent an undetermined <em>real</em> scalar value.  Algebraic operations
+      on variables spans the algebra of multivariate polynomials.
     </p>
 
     <h2>Basis vectors</h2>
     <p>The universal geometric algebra contains three orthogonal spaces.</p>
     <ol>
       <li>An Euclidean Space is spanned by an orthonormal basis \(\mathbf{e}_0,\mathbf{e}_1,\ldots\).
-        To enter those basis vectors, a "$" notation is used : <tt>$0, $1, ...</tt>
+        To enter those basis vectors, a "$" prefix is used : <tt>$0, $1, ...</tt>
       </li>
       <li>An anti-Euclidean Space is spanned by a basis \(\mathbf{\bar e}_0,\mathbf{\bar e}_1,\ldots\)
-        To enter those basis vectors, a "_" notation is used : <tt>_0, _1, ...</tt>
+        To enter those basis vectors, a "%" prefix is used : <tt>%0, %1, ...</tt>
       </li>
       <li>A Minkowskii space is spanned by a null basis \(n_o, n_\infty\).
         To enter those basis vectors, the words <tt>no</tt> and <tt>ni</tt> are used respectively.
@@ -71,54 +69,44 @@ if (typeof(BigInt) == 'undefined') {
     <p>Enter an algebraic expression below</p>
     <input id=input onchange=update_output();></input> &rarr; <output id=output for=input></output>
     <script>
-"use strict";
+      "use strict";
 
-var parser;
-fetch("lib/clifford.pegjs").
-then(r => r.text()).
-then(peg.generate).
-then(p => { parser = p;
-  main();
-});
+      var parser;
+      fetch("lib/clifford.pegjs").
+        then(r => r.text()).
+        then(peg.generate).
+        then(p => { parser = p;
+          main();
+        });
 
-function multiVectorFromParseTree(node) {
-  if(typeof(node) !== "object") throw new Error("unexpected argument type");
-  switch(node.type) {
-    case "number":
-      return new MultiVector(new BasisBlade(0n, new Polynomial(new Rat(node.args[0]))));
-    case "euclidean basis vector":
-      return (index => new MultiVector(new BasisBlade(1n << (2n*index + 2n))))(BigInt(parseInt(node.args[0])));
-    case "anti-euclidean basis vector":
-      return (index => new MultiVector(new BasisBlade(1n << (2n*index + 3n))))(BigInt(parseInt(node.args[0])));
-    case "null basis vector":
-      return (index => new MultiVector(new BasisBlade(1n << index)))(node.args[0] == "no" ? 0n : 1n);
-    case "variable":
-      return new MultiVector(
-          new BasisBlade(
-            0n,
-            new Polynomial(
-              new ScaledMonomial(
-                new Monomial(
-                  new PoweredVariable(node.args[0])
-                  )
-                )
-              )
-            )
-          );
-    case "operator":
-      return node.op(...node.args.map(arg => typeof(arg) == 'object' ? multiVectorFromParseTree(arg) : arg));
-    default:
-      throw new Error(node.type + " NYI");
-  }
-}
-let input = document.getElementById("input"),
-    output = document.getElementById("output");
-function update_output() {
-  try {
-    output.innerHTML = "\\(" + multiVectorFromParseTree(input.value).toTeX() + "\\)";
-  } catch(err) { console.log(err); }
-  MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-}
+      function multiVectorFromParseTree(node) {
+        if(typeof(node) == "object") {
+          switch(node.type) {
+            case "number":
+              return new MultiVector(new BasisBlade(0n, new Polynomial(new Rat(node.args[0]))));
+            case "euclidean basis vector":
+              return (index => new MultiVector(new BasisBlade(1n << (2n*index + 2n))))(BigInt(parseInt(node.args[0])));
+            case "anti-euclidean basis vector":
+              return (index => new MultiVector(new BasisBlade(1n << (2n*index + 3n))))(BigInt(parseInt(node.args[0])));
+            case "null basis vector":
+              return (index => new MultiVector(new BasisBlade(1n << index)))(node.args[0] == "no" ? 0n : 1n);
+            case "variable":
+              return new MultiVector(new BasisBlade(0n, new Polynomial(new ScaledMonomial(new Monomial(new PoweredVariable(node.args[0]))))));
+            case "operator":
+              return node.op(...node.args.map(arg => typeof(arg) == 'object' ? multiVectorFromParseTree(arg) : arg));
+            default:
+              throw new Error(node.type + " NYI");
+          }
+        } else throw new Error("unexpected argument type");
+      }
+      let input = document.getElementById("input"),
+        output = document.getElementById("output");
+      function update_output() {
+        try {
+          output.innerHTML = "\\(" + multiVectorFromParseTree(parser.parse(input.value)).toTeX() + "\\)";
+        } catch(err) { console.log(err); }
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+      }
     </script>
 
     <p>The table below tests various inputs.</p>
@@ -132,105 +120,107 @@ function update_output() {
     </table>
 
     <p>
-    <div id=axiom_tests></div>
+      <div id=axiom_tests></div>
     </p>
 
     <script>
-function main() {
-  const tests = [
-    "1",
-    "$1",
-    "_2",
-    "no",
-    "ni",
-    "1+2",
-    "2/3",
-    "(1/2)*(1/2)",
-    "3*2",
-    "1+2/3",
-    "1+2*3",
-    "a",
-    "a+b",
-    "a+b/2",
-    "a²",
-    "x/3",
-    "(a+b)*(a-b)",
-    "(a+b)**2",
-    "2*$1",
-    "(1+x)*$1",
-    "$1*$2+$2*$1",
-    "$1*$2+$1*$2",
-    "$1*$2-$1*$2",
-    "$0*$1",
-    "$1*$0",
-    "$1²",
-    "no²",
-    "ni²",
-    "no*ni",
-    "no∧ni",
-    "(1+$1)*$2",
-    "($0+$1)*($0+$1)",
-    "($0+$1)²",
-    "$1*$2*$3",
-    "$0*$1*$0",
-    "_1**3",
-    "(a+b/2)**1",
-    "(a+b/2)**2",
-    "(a+b/2)*(a+b/2)",
-    "(a+b/2)**3",
-    "(a+b)*$0",
-    ],
-    html_table = document.getElementById("tests_table"),
-    outputs = [ x => "\\(" + multiVectorFromParseTree(parser.parse(x)).toTeX() + "\\)" ];
+      function main() {
+        const tests = [
+          "1",
+          "$1",
+          "%2",
+          "no",
+          "ni",
+          "1+2",
+          "2/3",
+          "(1/2)*(1/2)",
+          "3*2",
+          "1+2/3",
+          "1+2*3",
+          "a",
+          "a+b",
+          "a+b/2",
+          "a²",
+          "x/3",
+          "(a+b)*(a-b)",
+          "(a+b)**2",
+          "2*$1",
+          "(1+x)*$1",
+          "$1*$2+$2*$1",
+          "$1*$2+$1*$2",
+          "$1*$2-$1*$2",
+          "$0*$1",
+          "$1*$0",
+          "$1²",
+          "no²",
+          "ni²",
+          "no*ni",
+          "no∧ni",
+          "(1+$1)*$2",
+          "($0+$1)*($0+$1)",
+          "($0+$1)²",
+          "$1*$2*$3",
+          "$0*$1*$0",
+          "%1**3",
+          "(a+b/2)**1",
+          "(a+b/2)**2",
+          "(a+b/2)*(a+b/2)",
+          "(a+b/2)**3",
+          "(a+b)*$0",
+          "(x*$0+y*$1+z*$2)∧(ẋ*$0+ẏ*$1+ż*$2)",
+          "((x*$0+y*$1+z*$2)∧(ẋ*$0+ẏ*$1+ż*$2))*(ẋ*$0+ẏ*$1+ż*$2)",
+        ],
+          html_table = document.getElementById("tests_table"),
+          outputs = [ x => "\\(" + multiVectorFromParseTree(parser.parse(x)).toTeX() + "\\)" ];
 
-    for (let test of tests) {
-      let row = document.createElement("tr"),
-        td = document.createElement("td");
-      td.innerHTML = test;
-      row.appendChild(td);
-      for (let output of outputs) {
-        let td = document.createElement("td");
-        td.innerHTML = output(test);
-        row.appendChild(td);
+        for (let test of tests) {
+          let row = document.createElement("tr"),
+            td = document.createElement("td");
+          td.innerHTML = test;
+          row.appendChild(td);
+          for (let output of outputs) {
+            let td = document.createElement("td");
+            td.innerHTML = output(test);
+            row.appendChild(td);
+          }
+          html_table.appendChild(row);
+        }
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
       }
-      html_table.appendChild(row);
-    }
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-}
 
-function test() {
-  let [a, b, c] = [1,2,3].map(MultiVector.random);
+      function test() {
+        let [a, b, c] = [1,2,3].map(MultiVector.random);
 
-  let div = document.getElementById("axiom_tests");
+        let div = document.getElementById("axiom_tests");
 
-  div.innerHTML = '$$\\begin{eqnarray}';
+        div.innerHTML = '$$\\begin{eqnarray}';
 
-  div.innerHTML += "a & = & " + a.toTeX() + "\\\\";
-  div.innerHTML += "b & = & " + b.toTeX() + "\\\\";
-  div.innerHTML += "c & = & " + c.toTeX();
+        div.innerHTML += "a & = & " + a.toTeX() + "\\\\";
+        div.innerHTML += "b & = & " + b.toTeX() + "\\\\";
+        div.innerHTML += "c & = & " + c.toTeX();
 
-  div.innerHTML += '\\end{eqnarray}$$';
-  MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+        div.innerHTML += '\\end{eqnarray}$$';
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
 
-  // associativity
-  // (a*b)*c = a*(b*c)
+        // associativity
+        // (a*b)*c = a*(b*c)
 
-  if (!a.multiply(b).multiply(c).equals(a.multiply(b.multiply(c))))
-    console.log("associativity failed for triplet", [a, b, c]);
-  // left distributivity
-  // a*(b+c) = a*b + a*c
-  if (!a.multiply(b.add(c)).equals(a.multiply(b).add(a.multiply(c))))
-    console.log("left distributivity failed for triplet", [a, b, c]);
-  // right distributivity
-  // (a+b)*c = a*c + b*c
-  if (!a.add(b).multiply(c).equals(a.multiply(c).add(b.multiply(c))))
-    console.log("right distributivity failed for triplet", [a, b, c]);
-  // contraction
-  // v**2 is real
-  let v = MultiVector.randomVector();
-  if (v.multiply(v).grade !== 0)
-    console.log("vector contraction failed for vector", v);
-}
+        if (!a.multiply(b).multiply(c).equals(a.multiply(b.multiply(c))))
+          console.log("associativity failed for triplet", [a, b, c]);
+        // left distributivity
+        // a*(b+c) = a*b + a*c
+        if (!a.multiply(b.add(c)).equals(a.multiply(b).add(a.multiply(c))))
+          console.log("left distributivity failed for triplet", [a, b, c]);
+        // right distributivity
+        // (a+b)*c = a*c + b*c
+        if (!a.add(b).multiply(c).equals(a.multiply(c).add(b.multiply(c))))
+          console.log("right distributivity failed for triplet", [a, b, c]);
+        // contraction
+        // v**2 is real
+        let v = MultiVector.randomVector();
+        if (v.multiply(v).grade !== 0)
+          console.log("vector contraction failed for vector", v);
+      }
     </script>
     <h2>Dependencies</h2>
     <ul>
