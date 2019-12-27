@@ -1,23 +1,24 @@
 "use strict";
 
+var $ = x => document.getElementById(x);
+
 function createShader(gl, type, source) {
   let shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
-  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-    return shader;
+  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
   let infoLog = gl.getShaderInfoLog(shader);
   gl.deleteShader(shader);
   throw new Error(infoLog);
 }
 function main() {
 
-  let canvas = document.querySelector("canvas"),
-    gl = canvas.getContext("webgl2"),
+  let 
+    gl = $("cv").getContext("webgl2"),
     $drawer = drawer(gl),
-    projection = get_projection(40, canvas.width/canvas.height, .001, 10000),
+    projection = get_projection(40, gl.canvas.width/gl.canvas.height, .001, 10000),
     model = mat4.create(),
-    trackball = new Trackball(canvas)
+    trackball = new Trackball(gl.canvas)
   ;
 
   (function animate() {
@@ -36,6 +37,8 @@ function drawer(gl) {
 
     uniform int W;
     uniform int H;
+
+    uniform float u_wt;
 
     // A matrix to transform the positions by
     uniform mat4 PMatrix;
@@ -93,11 +96,9 @@ function drawer(gl) {
           ;
       }
 
+      xy += i_float*a + j_float*b;
       gl_Position = PMatrix * VMatrix * MMatrix *
-      vec4(
-        i_float*a + j_float*b +
-          xy
-        , 0.0, 1.0 );
+      vec4(xy, sin(0.1*xy.x + u_wt), 1.0 );
 
     }`,
     fragment: `#version 300 es
@@ -112,7 +113,7 @@ function drawer(gl) {
     }`
   };
 
-  let canvas = gl.canvas,
+  let 
     fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, glsl.fragment),
     vertexShader = createShader(gl, gl.VERTEX_SHADER, glsl.vertex),
     program = gl.createProgram();
@@ -135,7 +136,7 @@ function drawer(gl) {
   gl.useProgram(program);
 
   let uniformLocation = {}
-  for (let name of ["W", "H", "PMatrix", "VMatrix", "MMatrix"]) {
+  for (let name of ["W", "H", "PMatrix", "VMatrix", "MMatrix", "u_wt"]) {
     uniformLocation[name] = gl.getUniformLocation(program, name);
   }
 
@@ -147,6 +148,8 @@ function drawer(gl) {
 
     gl.uniform1i(uniformLocation['W'], W);
     gl.uniform1i(uniformLocation['H'], H);
+
+    gl.uniform1f(uniformLocation['u_wt'], Date.now()*0.001 % (2*Math.PI));
     
     gl.uniformMatrix4fv(uniformLocation["PMatrix"], false, projection);
     gl.uniformMatrix4fv(uniformLocation["VMatrix"], false, view);
