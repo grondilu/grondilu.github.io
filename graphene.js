@@ -16,14 +16,18 @@ function main() {
   let 
     gl = $("cv").getContext("webgl2"),
     $drawer = drawer(gl),
-    projection = get_projection(40, gl.canvas.width/gl.canvas.height, .001, 10000),
     model = mat4.create(),
     trackball = new Trackball(gl.canvas)
   ;
 
   (function animate() {
     let [W, H] = ['W', 'H'].map(l => parseInt(document.getElementById(l).value));
-    $drawer(W, H, projection, trackball.matrix, model);
+    $drawer(
+      W, H,
+      get_projection(45*trackball.zoom, gl.canvas.width/gl.canvas.height, .001, 10000),
+      trackball.matrix,
+      model
+    );
     requestAnimationFrame(animate);
   })();
 }
