@@ -97,16 +97,16 @@ function main(json) {
   $add.addEventListener(
     "click",
     function () {
-      let key = board.orientation(":") + move_history.join(',');
+      let key = JSON.stringify({ orientation: board.orientation(), moves: move_history });
       if (sessionStorage[key]) {
         let json = JSON.parse(sessionStorage[key]);
         console.log("This opening was already added on " + new Date(json.last_learned));
       } else {
-        say(new Game({}, ...move_history).opening);
+        $log.value = new Game({}, ...move_history).opening;
         sessionStorage[key] = JSON.stringify(
           { last_learned: Date.now(), successes: 0 }
         );
-        console.log(sessionStorage[key]);
+        console.log(key, sessionStorage[key]);
       }
     }
   );
