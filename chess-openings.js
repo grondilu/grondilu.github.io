@@ -18,10 +18,6 @@ const SECOND = 1,
 
   LANG = 'en-US';
 
-fetch("chess/repertoire.json")
-  .then(response => response.json())
-  .then(main);
-
 function $(x) { return document.getElementById(x); }
 function addElement(tag, innerHTML) {
   let element = document.createElement(tag);
@@ -30,7 +26,7 @@ function addElement(tag, innerHTML) {
   return element;
 }
 
-function main(json) {
+function main() {
 
   if (typeof sessionStorage === "undefined") {
     let p = addElement('p');
@@ -39,7 +35,6 @@ function main(json) {
   }
   
   let position = new Position(),
-    repertoire = json,
     move_history = [],
     sounds = {
       move:    document.getElementById("movesound"),
