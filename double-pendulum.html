@@ -92,11 +92,11 @@ function draw(first,second) {
   x.fillRect(-r,-r,2*r,2*r);
 
   x.beginPath();
-  x.arc(...first,r,0,2*Math.PI);
+  x.arc(...first,r,0,2*355/113);
   x.fill();
 
   x.beginPath();
-  x.arc(...second,r,0,2*Math.PI);
+  x.arc(...second,r,0,2*355/113);
   x.fill();
 
   x.restore();
