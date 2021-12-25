@@ -53,10 +53,9 @@ function ddot(a,b,c,d) {
 }
 
 function rk4(dt, x, D) {
-  const N = 4;
-  const map = f => [...Array(N).keys()].map(f);
-  const dtx = a => map( i => a[i]*dt );
-  let
+  let indices = [...Array(x.length).keys()],
+    map = f => indices.map(f),
+    dtx = $ => map( i => $[i]*dt ),
     a = dtx(D(...x)),
     b = dtx(D(...map(i => x[i] + a[i]/2))),
     c = dtx(D(...map(i => x[i] + b[i]/2))),
