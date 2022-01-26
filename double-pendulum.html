@@ -61,7 +61,7 @@ function rk4(dt, x, D) {
     a = dtx(D(...x)),
     b = dtx(D(...map(i => x[i] + a[i]/2))),
     c = dtx(D(...map(i => x[i] + b[i]/2))),
-    d = dtx(D(...map(i => x[i] + a[i])));
+    d = dtx(D(...map(i => x[i] + c[i])));
   return map(i => (a[i] + 2*b[i] + 2*c[i] + d[i])/6);
 }
 
