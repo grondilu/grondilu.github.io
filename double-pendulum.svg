@@ -32,7 +32,7 @@ function setPendulumsPos(a,b,c,d) {
 }
 
 var abcd = [0,1,0,1],
-    q    = [0,0,0,.00001];
+    q    = [0.01,0,0,0];
 
 setPendulumsPos(...abcd);
 
