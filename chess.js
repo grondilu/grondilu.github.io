@@ -301,7 +301,7 @@ class Position {
     this.pieces.forEach(
       (piece, s) => {
         let square = new Square(s);
-        piece.draw(ctx, square.x, square.y);
+        piece.draw(ctx, flip(square.x), flip(square.y));
       }
     );
   }
@@ -489,13 +489,14 @@ var animationFrameHandles = {
   movingPiece: null
 };
 var moves = [];
+var scores = new Map();
 var flipped = false;
 function flip(x) { return flipped ? 7 - x : x }
 
 var operatingMode = EDITING;
 
 var emptySquareDrag = null;
-var expectedMove;
+var expectedMove, line;
 
 function draw() {
   clearBoard(ctx);
@@ -520,6 +521,13 @@ function animate() {
   animationFrameHandles.movingPiece = requestAnimationFrame(animate);
 }
 
+function save() {
+  let json = {
+    scores: JSON.stringify(scores)
+  }
+  STORAGE.setItem("scores", json.scores);
+}
+
 { // Event listeners
   //
   addEventListener(
@@ -528,18 +536,23 @@ function animate() {
       switch (operatingMode) {
         case EDITING:
           if (e.key == 't') {
-            operatingMode = TRAINING;
-            document.getElementById('temperature').style.visibility = 'visible';
+            //document.getElementById('temperature').style.visibility = 'visible';
             document.getElementById('pgn').innerHTML = '';
+            document.getElementById('messages').innerHTML = 'TRAINING MODE';
             console.log("start training");
-            train("e2e4", "e7e5", "g1f3", "b8c6", "f1b5", "a7a6");
+            train();
           }
           break;
         case TRAINING:
           if (e.key == 'e') {
+            flipped = false;
             operatingMode = EDITING;
+            document.getElementById('messages').innerHTML = 'EDITING MODE';
             document.getElementById('temperature').style.visibility = 'hidden';
             console.log("start editing");
+            position = new Position();
+            expectedMove = null;
+            draw();
           }
           break;
       }
@@ -604,11 +617,18 @@ function animate() {
             position = move.make();
             switch (operatingMode) {
               case TRAINING:
+                if (!scores.has(line)) scores.set(line, 0);
                 if (expectedMove && expectedMove.la == move.la) {
                   console.log("good move!");
+                  scores.set(line, scores.get(line)+1);
                   expectedMove = null;
+                  setTimeout(train, 1000);
                 }
-                else console.log(`${expectedMove.a} was expected`);
+                else {
+                  console.log(`${expectedMove.a} was expected`);
+                  scores.set(line, scores.get(line)-1);
+                  setTimeout(train, 5000);
+                }
                 break;
               case EDITING:
                 moves.push(move);
@@ -626,13 +646,15 @@ function animate() {
         );
       } else if (emptySquareDrag && emptySquareDrag[1]) {
         if (Math.floor(emptySquareDrag[1].x) - Math.floor(emptySquareDrag[0].x) > BOARD_SIZE/8) {
-          let line = 
-            moves.map(m => m.la).join(' ');
-          console.log(line);
-          position = new Position();
-          moves = [];
-          draw();
-          document.getElementById('pgn').innerHTML = '';
+          if (moves.length > 0) {
+            let line = moves.map(m => m.la).join(' ');
+            console.log(line);
+            if (operatingMode == EDITING) scores.set(line, 0);
+            moves = [];
+            position = new Position();
+            draw();
+            document.getElementById('pgn').innerHTML = '';
+          }
         }
         else if (Math.floor(emptySquareDrag[0].x) - Math.floor(emptySquareDrag[1].x) > BOARD_SIZE/8) {
           console.log("empty square was dragged to the left");
@@ -648,18 +670,26 @@ function animate() {
   );
 }
     
-function train(...moves) {
-  let position = new Position(), timeout = 0;
-  position.draw();
-  let lastMove = moves.pop();
-  for (let move of moves) {
-    let [from, to] = [0, 2].map(i => new Square(move.substr(i, 2)));
-    position = new Move(position, from, to).make();
-    let pos = new Position(position.FEN);
-    setTimeout(() => { pos.draw(); sounds.move.play() }, 400*timeout++);
+function train() {
+  operatingMode = TRAINING;
+  let lines = Array.from(scores.keys());
+  if (lines.length > 0) {
+    line = lines[Math.floor(Math.random()*lines.length)];
+    let moves    = line.split(' '),
+        position = new Position(),
+        timeout  = 0;
+    flipped = moves.length % 2 ? false : true;
+    position.draw();
+    let lastMove = moves.pop();
+    for (let move of moves) {
+      let [from, to] = [0, 2].map(i => new Square(move.substr(i, 2)));
+      position = new Move(position, from, to).make();
+      let pos = new Position(position.FEN);
+      setTimeout(() => { pos.draw(); sounds.move.play() }, 400*timeout++);
+    }
+    expectedMove = new Move(position, ...[0, 2].map(i => new Square(lastMove.substr(i, 2))));
+    window.position = position;
   }
-  expectedMove = new Move(position, ...[0, 2].map(i => new Square(lastMove.substr(i, 2))));
-  window.position = position;
 }
 
 function main() {
