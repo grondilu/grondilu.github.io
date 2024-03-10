@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head><script type="text/javascript" src="https://web-static.archive.org/_static/js/bundle-playback.js?v=t1Bf4PY_" charset="utf-8"></script>
-<script type="text/javascript" src="https://web-static.archive.org/_static/js/wombat.js?v=txqj7nKC" charset="utf-8"></script>
-<script>window.RufflePlayer=window.RufflePlayer||{};window.RufflePlayer.config={"autoplay":"on","unmuteOverlay":"hidden"};</script>
-<script type="text/javascript" src="https://web-static.archive.org/_static/js/ruffle/ruffle.js"></script>
-<script type="text/javascript">
-  __wm.init("https://web.archive.org/web");
-  __wm.wombat("http://memchess.com:80/","20200220221814","https://web.archive.org/","web","https://web-static.archive.org/_static/",
-	      "1582237094");
-</script>
+<head>
 <link rel="stylesheet" type="text/css" href="https://web-static.archive.org/_static/css/banner-styles.css?v=S1zqJCYt" />
 <link rel="stylesheet" type="text/css" href="https://web-static.archive.org/_static/css/iconochive.css?v=qtvMKcIJ" />
 <!-- End Wayback Rewrite JS Include -->
@@ -21,13 +13,11 @@
 	<meta name="description" content="Learn chess openings and variations online by repeating the most popular chess Master moves"/>
 	<meta name="Keywords" content="chess, learn, openings, learn chess openings, online">
 
-	<link rel="icon" type="image/png" href="/web/20200220221814im_/http://memchess.com/favicon.png">
-	<link rel="stylesheet" type="text/css" href="/web/20200220221814cs_/http://memchess.com/css/memchess.css">
-	<link href="//web.archive.org/web/20200220221814cs_/http://fonts.googleapis.com/css?family=Stalemate|ABeeZee&amp;subset=latin" rel="stylesheet" type="text/css">
+	<link rel="icon" type="image/png" href="img/favicon.png">
+	<link rel="stylesheet" type="text/css" href="css/memchess.css">
+	<link href="fonts/ABeeZee.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-	<script src="/web/20200220221814js_/http://memchess.com/js/googleanalytics.js"></script>
-	
 	<div style="display: none" id="hideAll">&nbsp;</div>
 	<script type="text/javascript">
 		document.getElementById("hideAll").style.display = "block";
@@ -38,6 +28,7 @@
 			Sorry, you'll need to enable Javascript to use this site
 		</noscript>
 		<div id="header">
+                  <div style="display:none">
 			<nav>
 				<ul>
 					<span id="username"></span>
@@ -73,6 +64,7 @@
 					</li>
 				</ul>
 			</nav>
+                  </div>
 			<div id="headingHeader">
 				<h1>MemChess</h1>
 			</div>
@@ -85,7 +77,7 @@
 			
 			<div class="underBoard">
 				<span id="opening">&nbsp;</span>
-				<img id="helpbtn" src="/web/20200220221814im_/http://memchess.com/img/help.png" height="18" width="18">
+				<img id="helpbtn" src="img/help.png" height="18" width="18">
 			</div>
 			<div class="underBoard" id="warning">
 			</div>
@@ -101,9 +93,9 @@
 	
 	<div class="ui-layout-east">
 		<div id="tabNavigator">
-			<img id="tabOpeningButton" src="/web/20200220221814im_/http://memchess.com/img/openings_btn.png">
-			<img id="tabGamesButton" src="/web/20200220221814im_/http://memchess.com/img/games_btn.png">
-			<img id="tabCommentsButton" src="/web/20200220221814im_/http://memchess.com/img/comments_btn.png">
+			<img id="tabOpeningButton" src="img/openings_btn.png">
+			<img id="tabGamesButton" src="img/games_btn.png" style="display:none">
+			<img id="tabCommentsButton" src="img/comments_btn.png" style="display:none">
 		</div>
 		<div id="tab">
 			<h3 id="tabHeader">Opening Chooser</h3>
@@ -113,13 +105,13 @@
 					<div class="openingLine"><span class="expander">+</span><span id="QueenPawnOpeningGeneral" class="openingLineName">Queen Pawn Opening, General</span></div>
 					<div class="openingLine"><span class="expander">+</span><span id="ZukertortOpeningGeneral" class="openingLineName">Zukertort Opening, General</span></div>
 					<div class="openingLine"><span class="expander">+</span><span id="EnglishOpeningGeneral" class="openingLineName">English Opening, General</span></div>
-					<div class="openingLine"><span class="expander">+</span><span id="HungarianOpeningGeneral" class="openingLineName">Hungarian Opening, General</span></div>
+                                        <!--<div class="openingLine"><span class="expander">+</span><span id="HungarianOpeningGeneral" class="openingLineName">Hungarian Opening, General</span></div>-->
 					<!--<div class="openingLine"><span class="expander">&nbsp;</span><span id="BirdOpeningGeneral" class="openingLineName">Bird Opening, General</span></div>-->
 					<!--<div class="openingLine"><span class="expander">&nbsp;</span><span id="VanGeetOpeningGeneral" class="openingLineName">Van Geet Opening, General</span></div>-->
 					<!--<div class="openingLine"><span class="expander">&nbsp;</span><span id="GrobsAttackTraps" class="openingLineName">Grob's Attack (Traps)</span></div>-->
 				</div>
 
-				<div id="gameExplorer">
+				<div id="gameExplorer" style="display:none">
 					<button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" id="btnGetGames" role="button"><span class="ui-button-text">Get Games</span></button>
 					<div id="gamesBox">
 					</div>
@@ -175,25 +167,25 @@
 		<div><h6 style="text-align: center;">This is an opening, but not one selected in the Opening Chooser. Select it now?</h6></div>
 	</div>
 	
-	<audio id="soundMove" src="/web/20200220221814im_/http://memchess.com/sounds/move.wav" type="audio/wav"></audio>
-	<audio id="soundTake" src="/web/20200220221814im_/http://memchess.com/sounds/take.wav" type="audio/wav"></audio>
-	<audio id="soundCheck" src="/web/20200220221814im_/http://memchess.com/sounds/check.wav" type="audio/wav"></audio>
-	<audio id="soundSuccess" src="/web/20200220221814im_/http://memchess.com/sounds/success.wav" type="audio/wav"></audio>
+	<audio id="soundMove"    src="sounds/move.wav" type="audio/wav"></audio>
+	<audio id="soundTake"    src="sounds/take.wav" type="audio/wav"></audio>
+	<audio id="soundCheck"   src="sounds/check.wav" type="audio/wav"></audio>
+	<audio id="soundSuccess" src="sounds/success.wav" type="audio/wav"></audio>
 
-	<script src="/web/20200220221814js_/http://memchess.com/js/chess.js"></script>
-	<script src="https://web.archive.org/web/20200220221814js_/https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<link rel="stylesheet" href="https://web.archive.org/web/20200220221814cs_/https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-	<link rel="stylesheet" href="/web/20200220221814cs_/http://memchess.com/css/chessy.css">
-	<script src="https://web.archive.org/web/20200220221814js_/https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/chessboard-0.3.0.min.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/chessy.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/opening_names.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/books.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/lines.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/jquery.layout-latest.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/jquery.ui.touch-punch.min.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/bwbads.js"></script>
-	<script src="/web/20200220221814js_/http://memchess.com/js/memchess.js"></script>
+	<script src="js/chess.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<link rel="stylesheet" href="css/jquery-ui.css">
+	<link rel="stylesheet" href="css/chessy.css">
+	<script src="js/jquery-ui.min.js"></script>
+	<script src="js/chessboard-0.3.0.min.js"></script>
+	<script src="js/chessy.js"></script>
+	<script src="js/opening_names.js"></script>
+	<script src="js/books.js"></script>
+	<script src="js/lines.js"></script>
+	<script src="js/jquery.layout-latest.js"></script>
+	<script src="js/jquery.ui.touch-punch.min.js"></script>
+	<script src="js/bwbads.js"></script>
+	<script src="js/memchess.js"></script>
 </body>
 </html>
 <!--
