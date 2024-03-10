@@ -1,0 +1,513 @@
+h1 { 
+	font-family: 'Stalemate', sans-serif; 
+	font-size: 50px; 
+	font-weight: bold;
+	color: #fff; 
+	margin: 0;
+}
+
+body { 
+	text-align: center; 
+	font-family: Verdana,Arial,sans-serif; 
+	background-color: #eee; 
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+p {	font-size: 18px; }
+a { outline: 0; }
+
+#header { 
+	background-color: #1caff6; 
+	height: 60px;
+	width: 101%;
+}
+#main { margin-top: 30px; }
+
+.ui-layout-center { background: #eee; }
+.ui-layout-east { background: linear-gradient(#BEFFBA, #5DFF53); border: 1px solid #2A2; }
+.ui-layout-pane { }
+.ui-layout-resizer { width: 5px !important;}
+.ui-layout-toggler { }
+
+
+#hideAll {
+	position: fixed;
+	left: 0px; 
+	right: 0px; 
+	top: 0px; 
+	bottom: 0px; 
+	background-color: white;
+	z-index: 99; /* Higher than anything else in the document */
+}
+
+#introOverlay {
+	background: rgba(255,255,255,1.0);
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow-y: scroll;
+	text-align: center;
+	display: none;
+}
+
+#introOverlayContent {
+	width: 40%;
+	margin: 0 auto;
+}
+
+.squareByWidth { width: 400px; width: 65vw; height: 65vw; }
+.squareByHeight { width: 400px; width: 65vh; height: 65vh; }
+.rectangleByWidth { width: 400px; width: 65vw; }
+.rectangleByHeight { width: 400px; width: 65vh; }
+
+.no-close .ui-dialog-titlebar-close { display: none; }
+.ui-widget { font-size: 16px; border: 1px solid #525252; }
+.ui-widget-header { background: #3AFF44 !important; }
+.ui-dialog { border: 1px solid #000000 !important; }
+.ui-dialog .ui-dialog-title { width: 100% !important; }
+.ui-button:focus { outline: none; }
+.ui-button-text:hover { text-decoration: underline; }
+.ui-button-text:active {
+	background: -webkit-linear-gradient(#2ba6cb, #35BDE5);
+	background: -o-linear-gradient(#2ba6cb, #35BDE5);
+	background: -moz-linear-gradient(#2ba6cb, #35BDE5);
+	background: linear-gradient(#2ba6cb, #35BDE5);
+}
+.ui-button-text {
+	margin-left: 5px;
+	margin-right: 5px; 
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+
+	border: 1px solid #1e728c;
+	color: #fff;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0;
+	padding: 0.5vh 1vw 0.5vh;
+	text-align: center;
+	
+	-webkit-box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset;
+	-moz-box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset;
+	box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset;
+	
+	background: -webkit-linear-gradient(#35BDE5, #2ba6cb);
+	background: -o-linear-gradient(#35BDE5, #2ba6cb);
+	background: -moz-linear-gradient(#35BDE5, #2ba6cb);
+	background: linear-gradient(#35BDE5, #2ba6cb);
+	
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-ms-border-radius: 3px;
+	-o-border-radius: 3px;
+	border-radius: 3px;
+}
+.inProgressBtn:hover { cursor: wait !important; }
+.disabledBtn:hover { cursor: default !important; }
+.disabledBtn { visibility: hidden !important; }
+.headerbtn { float: right; margin: 0 10px; }
+
+#tab {
+	overflow-y: auto;
+	white-space: nowrap;
+	height: 100%;
+}
+#tabNavigator {
+	z-index: 9999;
+	position: relative;
+	right: 30px;
+	margin-right: -30px;
+	height: 100%;
+	width: 30px;
+	float: left;
+}
+#gameExplorer {
+	display: none;
+}
+#gamesBox {
+	background: #fff;
+	margin-top: 50px;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+	border: 1px solid #CCC;
+}
+#commentsSection {
+	display: none;
+	margin-top: 70px;
+}
+.commentsBox {
+}
+.commentMove {
+	text-align: left;
+	font-weight: bold;
+	color: #fff;
+	text-shadow: #000 0px 0px 1px, #000 0px 0px 1px, #000 0px 0px 1px;
+	-webkit-font-smoothing: antialiased;
+}
+.commentText {
+	margin: 2px 5px;
+}
+.commentOwner {
+	float: right;
+	margin: 0 10px 2px 0;
+	color: #13006f;
+}
+.commentFooter {
+	padding-bottom: 2px;
+}
+.comment {
+	background: #fff;
+	margin: 7px 0;
+	text-align: left;
+	white-space: normal;
+	word-wrap: break-word;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+	border: 1px solid #CCC;
+}
+.commentAddbtn {
+	float: right; 
+	margin-right: 5px;
+	margin-top: 3px;
+	font-size: 12px;
+}
+.commentAddbtn:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+.commentDelete {
+	color: #ff0000;
+}
+.commentDelete:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+.newComment {
+	display: block;
+	padding: 10px;
+	font-family: Verdana,Arial,sans-serif !important;
+	font-size: 16px;
+	width: 92%;
+	background: #fff;
+	margin-top: 15px;
+	text-align: left;
+	white-space: normal;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+	border: 1px solid #CCC;
+}
+.bookLink {
+}
+#tabCommentsButton {
+	border-top-left-radius: 15px;
+	border-bottom-left-radius: 15px;
+	cursor: pointer;
+	position: absolute;
+	top: 50%;
+	height: 100px;
+	margin-top: 50px;
+	left: 0;
+}
+#tabOpeningButton {
+	border-top-left-radius: 15px;
+	border-bottom-left-radius: 15px;
+	cursor: pointer;
+	position: absolute;
+	top: 50%;
+	height: 100px;
+	margin-top: -150px;
+	left: 0;
+}
+#tabGamesButton {
+	border-top-left-radius: 15px;
+	border-bottom-left-radius: 15px;
+	cursor: pointer;
+	position: absolute;
+	top: 50%;
+	height: 100px;
+	margin-top: -50px;
+	left: 0;
+}
+.gameLine {
+	font-family: 'ABeeZee', sans-serif;
+	font-size: 14px;
+	cursor: pointer;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: block;
+	overflow: hidden;
+	border: 2px solid #fff;
+}
+.gameLineName {		
+	border-radius: 10px 0 0 10px;
+	padding-left: 4px;
+}
+#gamesLoadingIcon {
+	width: 100%;
+}
+/* end layout pane */
+
+#controls { }
+.tooltipHint { text-align: left; }
+#welcomedlg { display: none; }
+#finishdlg, #finishdlgnonedue { display: none; }
+#openingneededdlg { display: none; }
+#otheropeningdlg { display: none; }
+.underBoard { margin: 1px auto 0 auto; height: 18px}
+#boardWrap {
+	padding: 20px;
+	border-radius: 20px;
+	background-color: #fff;
+}
+#opening { 
+	float: left; 
+	font-family: 'ABeeZee', sans-serif; 
+	font-size: 14px; 
+	width: 92%;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-webkit-touch-callout: text;
+	-webkit-user-select: text;
+	-khtml-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
+}
+#helpbtn { cursor: pointer; float:right; }
+#attribution { font-size: 10px; position: relative; top: 30px; padding: 0.5em 1em; }
+.overlay { position: absolute; top: 0; left: 0; background-color: #D2D2D2; }
+#warning {
+	color: #E43232;
+	font-size: 14px;
+	font-family: 'ABeeZee', sans-serif;
+	text-align: left;
+	clear:both;
+	overflow: auto;
+}
+#openingBox {
+	background: #fff;
+	margin-top: 50px;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+	border-radius: 5px;
+	border: 1px solid #CCC;
+}
+h3 { font-family: 'ABeeZee', sans-serif; }
+.openingLine {
+	font-family: 'ABeeZee', sans-serif;
+	font-size: 14px;
+	cursor: pointer;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: block;
+	overflow: hidden;
+	border: 2px solid #fff;
+}
+.openingLine.selected {
+	border: 2px solid #444;
+	border-radius: 5px;
+}
+.openingLine > .openingLine {
+	padding-left: 6px;
+}
+.openingLineName {		
+	border-radius: 10px 0 0 10px;
+	padding-left: 4px;
+}
+.expander {
+	width: 10px;
+	display: inline-block;
+	padding: 0 6px;
+	border-radius: 25px;
+	background-color: #eee;
+	border: 1px solid #666;
+}
+
+#headingHeader { width:33%; }
+#headingHeader:hover { cursor: default; }
+
+
+/* login/signup nav */
+nav ul {
+	margin: 10px 0 0 0;
+	padding: 0;
+	list-style: none;
+	position: relative;
+	float: right;
+}
+
+nav ul:hover { cursor: default; }
+
+nav li {
+	float: left;          
+}
+
+nav #login-trigger,
+nav #signup #signup-trigger {
+	display: inline-block;
+	*display: inline;
+	margin: 0 10px;
+	cursor: pointer;
+	height: 25px;
+	line-height: 25px;
+	padding: 0 8px;
+	text-decoration: none;
+	color: #fff;
+}
+
+nav #username,
+nav #logout {
+	margin: 7px 10px;
+	height: 25px;
+	line-height: 25px;
+	padding: 0 8px;
+	text-decoration: none;
+	color: #fff;
+}
+nav #logout { cursor: pointer; }
+
+nav #login-trigger:hover,
+nav #login .active,
+nav #signup-trigger:hover,
+nav #signup .active,
+nav #logout:hover {
+	background: #1493d1;
+}
+
+nav #login-content,
+nav #signup-content {
+	display: none;
+	position: absolute;
+	text-align: left;
+	right: 0;
+	z-index: 999;    
+	background: #fff;
+	background-image: linear-gradient(top, #fff, #eee);  
+	padding: 15px;
+	box-shadow: 0 2px 2px -1px rgba(0,0,0,.9);
+	border-radius: 3px 0 3px 3px;
+}
+
+nav li #login-content,
+nav li #signup-content {
+	right: 0;
+	width: 250px;  
+}
+
+/*--------------------*/
+
+.userbox form input {
+	background: #f1f1f1;
+	padding: 6px 5px;
+	margin: 0 0 5px 0;
+	width: 238px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	box-shadow: 0 1px 1px #ccc inset;
+}
+
+.userbox form input:focus {
+	background-color: #fff;
+	border-color: #e8c291;
+	outline: none;
+	box-shadow: 0 0 0 1px #e8c291 inset;
+}
+
+/*--------------------*/
+
+#login,
+#signup {
+	margin: 7px 0 0 0;
+}
+
+#login label,
+#signup label {
+	float: left;
+}
+
+#btnloginsubmit,
+#btnsignupsubmit {
+	display: block;
+	width: 100%;
+	margin-top: 10px;
+}
+
+#btnloginsubmit .ui-button-text, 
+#btnsignupsubmit .ui-button-text {
+	background: linear-gradient(#FF9797, #FF6F6F);
+	font-weight: normal;
+}
+
+#login label {
+	line-height: 30px;
+}
+
+#login label input {
+	position: relative;
+	top: 2px;
+	right: 2px;
+}
+
+.errorwarning {
+	color: #E43232;
+	font-size: 14px;
+	font-family: 'ABeeZee', sans-serif;
+	text-align: left;
+	clear:both;
+	overflow: auto;
+}
+
+#username,
+#logout {
+	display: none;
+}
+		
+/* end login/signup nav */
+
+/*
+     FILE ARCHIVED ON 02:07:20 Jan 22, 2019 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 06:14:29 Mar 10, 2024.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  exclusion.robots: 0.065
+  exclusion.robots.policy: 0.055
+  cdx.remote: 0.101
+  esindex: 0.011
+  LoadShardBlock: 100.926 (6)
+  PetaboxLoader3.datanode: 160.854 (8)
+  load_resource: 230.647 (2)
+  PetaboxLoader3.resolve: 133.565 (2)
+*/
