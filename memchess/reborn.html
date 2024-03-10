@@ -1,15 +1,7 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head><script type="text/javascript" src="https://web-static.archive.org/_static/js/bundle-playback.js?v=t1Bf4PY_" charset="utf-8"></script>
-<script type="text/javascript" src="https://web-static.archive.org/_static/js/wombat.js?v=txqj7nKC" charset="utf-8"></script>
-<script>window.RufflePlayer=window.RufflePlayer||{};window.RufflePlayer.config={"autoplay":"on","unmuteOverlay":"hidden"};</script>
-<script type="text/javascript" src="https://web-static.archive.org/_static/js/ruffle/ruffle.js"></script>
-<script type="text/javascript">
-  __wm.init("https://web.archive.org/web");
-  __wm.wombat("http://memchess.com:80/","20200220221814","https://web.archive.org/","web","https://web-static.archive.org/_static/",
-	      "1582237094");
-</script>
+<head>
 <link rel="stylesheet" type="text/css" href="https://web-static.archive.org/_static/css/banner-styles.css?v=S1zqJCYt" />
 <link rel="stylesheet" type="text/css" href="https://web-static.archive.org/_static/css/iconochive.css?v=qtvMKcIJ" />
 <!-- End Wayback Rewrite JS Include -->
@@ -102,8 +94,8 @@
 	<div class="ui-layout-east">
 		<div id="tabNavigator">
 			<img id="tabOpeningButton" src="img/openings_btn.png">
-			<img id="tabGamesButton" src="img/games_btn.png">
-			<img id="tabCommentsButton" src="img/comments_btn.png">
+			<img id="tabGamesButton" src="img/games_btn.png" style="display:none">
+			<img id="tabCommentsButton" src="img/comments_btn.png" style="display:none">
 		</div>
 		<div id="tab">
 			<h3 id="tabHeader">Opening Chooser</h3>
@@ -113,13 +105,13 @@
 					<div class="openingLine"><span class="expander">+</span><span id="QueenPawnOpeningGeneral" class="openingLineName">Queen Pawn Opening, General</span></div>
 					<div class="openingLine"><span class="expander">+</span><span id="ZukertortOpeningGeneral" class="openingLineName">Zukertort Opening, General</span></div>
 					<div class="openingLine"><span class="expander">+</span><span id="EnglishOpeningGeneral" class="openingLineName">English Opening, General</span></div>
-					<div class="openingLine"><span class="expander">+</span><span id="HungarianOpeningGeneral" class="openingLineName">Hungarian Opening, General</span></div>
+                                        <!--<div class="openingLine"><span class="expander">+</span><span id="HungarianOpeningGeneral" class="openingLineName">Hungarian Opening, General</span></div>-->
 					<!--<div class="openingLine"><span class="expander">&nbsp;</span><span id="BirdOpeningGeneral" class="openingLineName">Bird Opening, General</span></div>-->
 					<!--<div class="openingLine"><span class="expander">&nbsp;</span><span id="VanGeetOpeningGeneral" class="openingLineName">Van Geet Opening, General</span></div>-->
 					<!--<div class="openingLine"><span class="expander">&nbsp;</span><span id="GrobsAttackTraps" class="openingLineName">Grob's Attack (Traps)</span></div>-->
 				</div>
 
-				<div id="gameExplorer">
+				<div id="gameExplorer" style="display:none">
 					<button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" id="btnGetGames" role="button"><span class="ui-button-text">Get Games</span></button>
 					<div id="gamesBox">
 					</div>
