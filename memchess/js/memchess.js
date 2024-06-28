@@ -18,7 +18,7 @@ if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; re
   }
 
   var selectedOpeningBook = [];
-  var cfg = {
+  const cfg = {
     showNotation: false,
     draggable: true,
     position: 'start',
@@ -47,8 +47,7 @@ if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; re
   var comments;
 
   function retrieveData(srs) {
-    let whiteLines = [],
-      blackLines = [];
+    let whiteLines = [], blackLines = [];
     for (let line of srs.whiteSRSLines) {
       let item = localStorage.getItem(line.moves + '/white');
       if (item) {
@@ -56,8 +55,16 @@ if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; re
         whiteLines.push([line.moves, new Date(data.timeDue), new Number(data.nextBox)]);
       }
     }
+    for (let line of srs.blackSRSLines) {
+      let item = localStorage.getItem(line.moves + '/black');
+      if (item) {
+        let data = JSON.parse(item);
+        blackLines.push([line.moves, new Date(data.timeDue), new Number(data.nextBox)]);
+      }
+    }
     return [whiteLines, blackLines];
   }
+
   // SRS
   function Line(moves, timeDue, nextBox) {
     this.moves = moves;
@@ -298,7 +305,7 @@ if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; re
       candidateOpeningLine += lineArray[i];
       if (candidateOpeningLine in opening_book) {
         if (chessy.orientation() == 'white') {
-          if (!($.inArray(candidateOpeningLine, this.whiteLinesReverse[line]) > -1)) continue;
+          if (!this.whiteLinesReverse[line].includes(candidateOpeningLine)) continue;
           if (wasKnownBefore && !wasPerfect) opening_book[candidateOpeningLine][3] -= 1
           if (!wasKnownBefore && wasPerfect) opening_book[candidateOpeningLine][3] += 1
           // also remove 1 due line if it was due
@@ -1126,6 +1133,7 @@ $("body").on("click", ".gameLineName", function(e) {
 function newGame() {
   $("#warning").text("");
   $("#opening").html('&nbsp;');
+  $("#pgn").html('&nbsp;');
   if ($("#finishdlg").hasClass('ui-dialog-content'))
     $("#finishdlg").dialog("close");
   if ($("#finishdlgnonedue").hasClass('ui-dialog-content'))
@@ -1555,13 +1563,20 @@ function makeOpponentMove() {
 }
 
 function updateOpeningText() {
-  if (chessy.history().join('') in opening_book) {
-    currentOpening = opening_book[chessy.history().join('')][0];
+  let history = chessy.history().join('');
+  if (history in opening_book) {
+    currentOpening = opening_book[history][0];
     $('#opening').text(currentOpening);
-  } else if (chessy.history().join('') == '') {
+  } else if (history == '') {
     currentOpening = '';
     $('#opening').text('');
   }
+  if (history !== '')
+    $('#pgn').html(
+      '<a href="https://lichess.org/analysis/pgn/' +
+      chessy.history().join('_') +
+      '">lichess analysis</a>'
+    )
 }
 
 function updateSelectedOpeningBook() {
@@ -1684,7 +1699,7 @@ function showBookAd() {
 }
 
 function millisecondsToString(ms) {
-  var ret = '';
+  let ret = '';
   if (ms < 1000) {
     ret = ms + " millisecond";
     if (ms > 1) ret += "s";
