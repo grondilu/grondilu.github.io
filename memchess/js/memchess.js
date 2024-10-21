@@ -12,6 +12,8 @@ if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; re
 
   const DEBUG = true;
 
+  const halfMoveRegex = /(?:O-O(?:-O)?|[KQBNR](?:[a-h]|[1-8]|[a-h][1-8])??x?[a-h][1-8]|(?:[a-h]x)?[a-h][1-8](?:=[QBNR])?)\+?!?/g;
+
   if (typeof localStorage == 'undefined') {
     alert("web storage is not supported");
     throw "no web storage";
@@ -63,6 +65,29 @@ if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; re
       }
     }
     return [whiteLines, blackLines];
+  }
+
+  function exportCandidateLines(srs) {
+    let result = {}
+    for (let line of srs.candidateLines) {
+      let key = line + '/' + chessy.orientation(),
+	value = localStorage.getItem(key);
+      if (value)
+	result[key] = value;
+    }
+    return JSON.stringify(result);
+  }
+
+  function importCandidateLines(url) {
+    fetch(url)
+      .then(t => t.json())
+      .then(json => {
+	  for (let key in json) {
+	    localStorage.setItem(key, json[key]);
+	  }
+	  console.log(Object.keys(json).length + ' candidate lines imported');
+	}
+      )
   }
 
   // SRS
@@ -1134,6 +1159,7 @@ function newGame() {
   $("#warning").text("");
   $("#opening").html('&nbsp;');
   $("#pgn").html('&nbsp;');
+  $("#link").html('&nbsp;');
   if ($("#finishdlg").hasClass('ui-dialog-content'))
     $("#finishdlg").dialog("close");
   if ($("#finishdlgnonedue").hasClass('ui-dialog-content'))
@@ -1244,7 +1270,7 @@ function onDragStart(source, piece) {
   });
 
   if (moves.length === 0) return false;
-  if (chessy.isGameOver()) return false;
+  //if (chessy.isGameOver()) return false;
   if (!chessy.isPlayersTurn()) return false;
 
   chessy.greySquare(source);
@@ -1572,9 +1598,11 @@ function updateOpeningText() {
     $('#opening').text('');
   }
   if (history !== '')
-    $('#pgn').html(
+    $('#link').html(
       '<a href="https://lichess.org/analysis/pgn/' +
-      chessy.history().join('_') +
+      // chessy.history()
+      currentLine.match(halfMoveRegex)
+	.join('_') +
       '">lichess analysis</a>'
     )
 }
