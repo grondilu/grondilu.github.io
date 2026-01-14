@@ -535,103 +535,6 @@ if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; re
     $(".ui-dialog-buttonpane").append('<span id="attribution">site by jay bulgin, sounds <a href="https://web.archive.org/web/20190130125125/https://creativecommons.org/licenses/by/3.0/">CC</a> by <a href="https://web.archive.org/web/20190130125125/http://www.freesound.org/people/SuGu14/packs/5082/">SuGu14</a> and <a href="https://web.archive.org/web/20190130125125/http://www.freesound.org/people/rhodesmas/sounds/322896/">rhodesmas</a></span>');
   }
 
-  function signup(e) {
-    if (e.preventDefault) e.preventDefault();
-
-    $("#signuperror").html('&nbsp;');
-
-    var username = $("#signupusername").val();
-    var password = $("#signuppassword").val();
-    var password2 = $("#signuppassword2").val();
-    var knownLines = srs.getAllDoneLines();
-    var email = $("#signupemail").val();
-
-    // Validations
-    if (username.length < 3) {
-      $("#signuperror").text('Username needs to be at least 3 characters');
-      return false;
-    }
-    if (/\W/.test(username)) {
-      $("#signuperror").text('Username can only contain letters, numbers and underscores');
-      return false;
-    }
-    if (password.length < 6) {
-      $("#signuperror").text('Password needs to be at least 6 characters');
-      return false;
-    }
-    if (password != password2) {
-      $("#signuperror").text('Passwords do not match');
-      return false;
-    }
-
-    $.post( "api.php", { action: 'signup', username: username, password: password, email: email, whitelines: knownLines[0], blacklines: knownLines[1] }, function( data ) {
-      if (data != 'success') {
-        $("#signuperror").text(data);
-      } else {
-        doLogin(username, password);
-        $('#signup-content').slideToggle();
-        $('#signup-trigger').toggleClass('active');
-      }
-    }).fail(function() {
-      $("#signuperror").text("Problem contacting server");
-    });
-
-    return false;
-  }
-  var form = document.getElementById('signupform');
-  if (form.attachEvent) {
-    form.attachEvent("submit", signup);
-  } else {
-    form.addEventListener("submit", signup);
-  }
-
-  function login(e) {
-    if (e.preventDefault) e.preventDefault();
-
-    $("#loginerror").html('&nbsp;');
-
-    var username = $("#loginusername").val();
-    var password = $("#loginpassword").val();
-
-    doLogin(username, password);
-  }
-  function doLogin(_username, _password) {
-    $.post( "api.php", { action: 'login', username: _username, password: _password }, function( data ) {
-      if (data.substring(0, 7) != 'success') {
-        $("#loginerror").text(data);
-      } else {
-        loggedin = true;
-        username = data.substring(7);
-        password = _password;
-        $("#loginerror").html('&nbsp;');
-        $("#username").text(username);
-        $("#loginpassword").val('');
-        $("#logout").css('display', 'inline-block');
-        $("#username").css('display', 'inline-block');
-        if ($('#login-trigger').hasClass('active')) {
-          $('#login-content').slideToggle();
-          $('#login-trigger').toggleClass('active');
-        }
-        $("#login-trigger").css('display', 'none');
-        $("#signup-trigger").css('display', 'none');
-
-        $.post( "api.php", { action: 'getlines', username: username, password: password }, function(data) {
-          data = JSON.parse(data);
-          srs.updateSRS(data);
-        }, () => console.warn("fail to send an HTTP POST request")
-        );
-
-      }
-    }).fail(function() {
-      $("#loginerror").text("Problem contacting server");
-    });
-  }
-  var form = document.getElementById('loginform');
-  if (form.attachEvent) {
-    form.attachEvent("submit", login);
-  } else {
-    form.addEventListener("submit", login);
-  }
 
   /*
     // COMMENTS SECTION
@@ -1828,7 +1731,7 @@ addToolTipToOpening("Bird Opening, General");
 addToolTipToOpening("Van Geet Opening, General");
 // addToolTipToOpening("Grob's Attack (Traps)");
 
-preloadBookImages();
+//preloadBookImages();
 
 $( document ).tooltip();
 
