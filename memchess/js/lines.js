@@ -1,15 +1,3 @@
-var _____WB$wombat$assign$function_____ = function(name) {return (self._wb_wombat && self._wb_wombat.local_init && self._wb_wombat.local_init(name)) || self[name]; };
-if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; return this; } }
-{
-  let window = _____WB$wombat$assign$function_____("window");
-  let self = _____WB$wombat$assign$function_____("self");
-  let document = _____WB$wombat$assign$function_____("document");
-  let location = _____WB$wombat$assign$function_____("location");
-  let top = _____WB$wombat$assign$function_____("top");
-  let parent = _____WB$wombat$assign$function_____("parent");
-  let frames = _____WB$wombat$assign$function_____("frames");
-  let opener = _____WB$wombat$assign$function_____("opener");
-
 var whiteLines = {
 	"e4c5Nf3Nc6d4cxd4Nxd4Nf6Nc3e5":["e4c5Nf3Nc6d4cxd4Nxd4Nf6Nc3e5Ndb5d6Bg5a6Na3b5Nd5Be7Bxf6Bxf6c3Bg5Nc2Ne7Ncb4O-Oa4bxa4",
 	"e4c5Nf3Nc6d4cxd4Nxd4Nf6Nc3e5Ndb5d6Bg5a6Na3b5Nd5Be7Bxf6Bxf6c3Bg5Nc2O-Oa4bxa4Rxa4a5",
@@ -27958,23 +27946,3 @@ var blackLines = {
 };
 
 
-}
-/*
-     FILE ARCHIVED ON 23:22:56 Jan 30, 2019 AND RETRIEVED FROM THE
-     INTERNET ARCHIVE ON 06:42:35 Mar 10, 2024.
-     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
-
-     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
-     SECTION 108(a)(3)).
-*/
-/*
-playback timings (ms):
-  exclusion.robots: 0.096
-  exclusion.robots.policy: 0.086
-  cdx.remote: 0.088
-  esindex: 0.011
-  LoadShardBlock: 187.433 (6)
-  PetaboxLoader3.datanode: 232.229 (8)
-  load_resource: 237.041 (2)
-  PetaboxLoader3.resolve: 90.286 (2)
-*/
