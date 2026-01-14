@@ -11,7 +11,7 @@
 
 	<link rel="icon" type="image/png" href="img/favicon.png">
 	<link rel="stylesheet" type="text/css" href="css/memchess.css">
-	<link href="fonts/ABeeZee.css" rel="stylesheet" type="text/css">
+	<!-- <link href="fonts/ABeeZee.css" rel="stylesheet" type="text/css"> -->
 </head>
 <body>
 	<div style="display: none" id="hideAll">&nbsp;</div>
@@ -24,43 +24,6 @@
 			Sorry, you'll need to enable Javascript to use this site
 		</noscript>
 		<div id="header">
-                  <div style="display:none">
-			<nav>
-				<ul>
-					<span id="username"></span>
-					<li id="login">
-						<span id="login-trigger">
-							Log in
-						</span>
-						<div id="login-content" class="userbox">
-							<form id="loginform">
-								<input id="loginusername" type="text" name="Username" placeholder="Username" maxlength="20" required>   
-								<input id="loginpassword" type="password" name="Password" placeholder="Password" maxlength="40" required>
-								<div class="errorwarning" id="loginerror">&nbsp;</div>
-								<button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" id="btnloginsubmit" role="button"><span class="ui-button-text">Log in</span></button>
-								<!--<label><input type="checkbox" checked="checked"> Keep me signed in</label>-->
-							</form>
-						</div>                     
-					</li>
-					<span id="logout">Logout</span>
-					<li id="signup">
-						<span id="signup-trigger">
-							Sign Up
-						</span>
-						<div id="signup-content" class="userbox">
-							<form id="signupform">
-								<input id="signupusername" type="text" placeholder="Username" maxlength="20" required>   
-								<input id="signuppassword" type="password" placeholder="Password" maxlength="40" required>
-								<input id="signuppassword2" type="password" placeholder="Verify Password" maxlength="40" required>
-								<input id="signupemail" type="email" placeholder="Email (optional, for password resets)" maxlength="80">
-								<div class="errorwarning" id="signuperror">&nbsp;</div>
-								<button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" id="btnsignupsubmit" role="button"><span class="ui-button-text">Sign Up</span></button>
-							</form>
-						</div>  
-					</li>
-				</ul>
-			</nav>
-                  </div>
 			<div id="headingHeader">
 				<h1>MemChess</h1>
 			</div>
@@ -179,7 +142,7 @@
 	<script src="js/chessboard-0.3.0.min.js"></script>
 	<script src="js/chessy.js"></script>
 	<script src="js/opening_names.js"></script>
-	<script src="js/books.js"></script>
+	<!-- <script src="js/books.js"></script> -->
 	<script src="js/lines.js"></script>
 	<script src="js/jquery.layout-latest.js"></script>
 	<script src="js/jquery.ui.touch-punch.min.js"></script>
