@@ -48,6 +48,7 @@ if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; re
   var mistakesCount = 0;
   var comments;
 
+
   function retrieveData(srs) {
     let whiteLines = [], blackLines = [];
     for (let line of srs.whiteSRSLines) {
@@ -751,41 +752,7 @@ $('#signup-trigger').click(function() {
 $('#logout').click(function() {
   logout();
 });
-function logout() {
-  $.post( "api.php", { action: 'logout' }, function( data ) {
-    if (data == 'success') {
-      loggedin = false;
-      $("#logout").css('display', 'none');
-      $("#username").css('display', 'none');
-      $("#login-trigger").css('display', 'inline-block');
-      $("#signup-trigger").css('display', 'inline-block');
 
-      srs.destroy();
-      srs = new SRS();
-
-      // Update the history
-      $.each(opening_book, function(index) {
-        opening_book[index][3] = 0;
-        opening_book[index][4] = 0;
-        opening_book[index][6] = 0;
-        opening_book[index][7] = 0;
-      });
-      srs.updateDueLines();
-
-      $(".openingLineName").each(function(){
-        var name = $(this).text();
-        addProgressBar(opening_book_moves[name]);
-        addToolTipToOpening(name);						
-      });
-
-      $(document).tooltip();
-    } else {
-      alert("error logging out");
-    }
-  }).fail(function() {
-    alert("error contacting server"); 
-  });
-}
 $(document).keyup(function(e) {
   if (e.keyCode == 27) {
     if ($('#signup-trigger').hasClass('active')) {
@@ -1506,7 +1473,7 @@ function updateOpeningText() {
       // chessy.history()
       currentLine.match(halfMoveRegex)
 	.join('_') +
-      '">lichess analysis</a>'
+      '" target="_blank">lichess analysis</a>'
     )
 }
 
@@ -1584,49 +1551,6 @@ function getNextMove(history, line) {
   }
 
   return splitMoves[0];
-}
-
-function showBookAd() {
-  var adId = Math.floor(Math.random() * bwbads.length);
-  var adcode = '<a href="https://web.archive.org/web/20190130125125/http://www.jdoqocy.com/click-8175570-10487484-1399918848000?url=http%3A%2F%2Fwww.betterworldbooks.com%2Fdetail.aspx%3FItemId%3D';
-  adcode += bwbads[adId][0];
-  adcode += '%26utm_source%3DAffiliate%26utm_campaign%3DText%26utm_medium%3Dbooklink%26utm_term%3D1%26utm_content%3Dproduct" target="_blank"><img src="';
-  adcode += bwbads[adId][1];
-  adcode += '" style="max-width:100%;max-height:100%;"/></a><img src="https://web.archive.org/web/20190130125125/http://www.tqlkg.com/image-8175570-10487484-1399918848000" width="1" height="1" border="0"/>';
-  $("#finishdlgadbox").html(adcode);
-
-  /*var currentOpeningMoves = opening_book_moves[currentOpening];
-        var bookID = -1;
-        if (chessy.orientation() == 'white') {
-                bookID = opening_book[currentOpeningMoves][10][0];
-        } else if (chessy.orientation() == 'black') {
-                bookID = opening_book[currentOpeningMoves][11][0];
-        }*/
-
-  // Show the targeted book 30% of the time, random books 70%
-  /*if (bookID != 1) {
-                if (Math.random() < 0.7) {
-                        bookID = 1;
-                }
-        }
-
-        if (bookID == 1) {
-                var subBookID = Math.floor((Math.random() * 7) + 1); 
-                bookID = String(bookID) + "-" + String(subBookID);
-        }
-
-        var adimg = books[String(bookID) + '_img'];
-        var adframe = books[String(bookID) + '_frame'];
-        $("#finishdlgadbox").html(adimg);
-        $("#finishdlgad").prop('title', adframe);
-
-        $('#finishdlgad').tooltip({
-                content: function() {
-                        return $(this).attr('title');
-                },
-                position: { my: "left+15 center", at: "right center" },
-                tooltipClass: "tooltipHint"
-        });*/
 }
 
 function millisecondsToString(ms) {
