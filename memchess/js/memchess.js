@@ -1114,7 +1114,7 @@ function countMoves(s) {
 function showHint() {
   if( $("img").is(':animated')) return;
 
-  if (chessy.history().length >= 2) perfectLine = false;
+  // if (chessy.history().length >= 2) perfectLine = false;
   timesHintAsked += 1;
 
   if (timesHintAsked == 1) {
